@@ -1,3 +1,8 @@
+
+/Debug
+/Release
+/Engine/Assets
+
 # Prerequisites
 *.d
 
