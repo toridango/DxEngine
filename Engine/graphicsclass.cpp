@@ -59,14 +59,31 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 
 	// Create the model object.
+	// WARNING: you're going to change the floor, or fix the error this gives when turned into
+	// an assimp model with the same texture
 	m_Model = new ModelClass;
 	if (!m_Model)
 	{
 		return false;
 	}
+	char* path_floorModel = "../Engine/Assets/cube.txt";
+	WCHAR* path_floorTex = L"../Engine/Assets/grassfloor.dds";
+
+	if (!FileExists(path_floorModel))
+	{
+		MessageBox(hwnd, L"Floor model doesn't seem to exist", L"Error", MB_OK);
+		return false;
+	}
+		
+	if(!FileExists(path_floorTex))
+	{
+		MessageBox(hwnd, L"Floor texture doesn't seem to exist", L"Error", MB_OK);
+		return false;
+	}
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/grassfloor.dds");
+	//result = m_Model->Initialize(m_D3D->GetDevice(), "../Engine/Assets/cube.txt", L"../Engine/Assets/grassfloor.dds");
+	result = m_Model->Initialize(m_D3D->GetDevice(), path_floorModel, path_floorTex);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the cube model object.", L"Error", MB_OK);
@@ -74,6 +91,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Create the model object.
+	// WARNING: Before adapting this to only assimp models, you need to 
+	// adapt the cubemap options from modelclass into assimpmodelclass
 	m_ModelSky = new ModelClass;
 	if (!m_ModelSky)
 	{
@@ -81,7 +100,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object.
-	result = m_ModelSky->Initialize(m_D3D->GetDevice(), "../Engine/data/sphere.txt", L"../Engine/Assets/Skybox/skybox_texture.dds", true);
+	result = m_ModelSky->Initialize(m_D3D->GetDevice(), "../Engine/Assets/sphere.txt", L"../Engine/Assets/Skybox/skybox_texture.dds", true);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the sky model object.", L"Error", MB_OK);
@@ -119,12 +138,12 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	{
 		return false;
 	}
-	result = m_ModelRock->Initialize(m_D3D->GetDevice(), "../Engine/Assets/rock/stone.obj", 
-														L"../Engine/Assets/rock/tex/stone_albedo.png", 
-														L"../Engine/Assets/rock/tex/stone_normal.png",
-														L"../Engine/Assets/rock/tex/stone_diffuse.png",
-														L"../Engine/Assets/rock/tex/stone_ao.png", 
-														L"../Engine/Assets/rock/tex/stone_specular.png");
+	result = m_ModelRock->Initialize(m_D3D->GetDevice(), "../Engine/Assets/rock/stone.obj",
+		L"../Engine/Assets/rock/tex/stone_albedo.png",
+		L"../Engine/Assets/rock/tex/stone_normal.png",
+		L"../Engine/Assets/rock/tex/stone_diffuse.png",
+		L"../Engine/Assets/rock/tex/stone_ao.png",
+		L"../Engine/Assets/rock/tex/stone_specular.png");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the rock model object.", L"Error", MB_OK);
@@ -307,6 +326,22 @@ void GraphicsClass::Shutdown()
 }
 
 
+bool GraphicsClass::FileExists(char* filename)
+{
+	struct stat buffer;
+	return (stat(filename, &buffer) == 0);
+}
+bool GraphicsClass::FileExists(WCHAR* filename)
+{
+	size_t s = wcslen(filename);
+	char* newstr = new char[s+1];
+	memset(newstr, 0, s + 1);
+	wcstombs(newstr, filename, s);
+	return FileExists(newstr);
+}
+
+
+
 bool GraphicsClass::Frame()
 {
 	bool result;
@@ -338,21 +373,43 @@ bool GraphicsClass::Frame()
 	return true;
 }
 
+/////////////////////////
+//     INPUT CODE      //
 
-void GraphicsClass::Strafe(float sign)
+void GraphicsClass::StrafeLeft()
 {
-	m_camPos = m_Camera->Strafe(sign);
+	Strafe(-1.0 * MOV_SPEED);
+}
+void GraphicsClass::StrafeRight()
+{
+	Strafe(MOV_SPEED);
+}
+void GraphicsClass::MoveForward()
+{
+	Advance(MOV_SPEED);
+}
+void GraphicsClass::MoveBack()
+{
+	Advance(-1.0 * MOV_SPEED);
 }
 
-void GraphicsClass::Advance(float sign)
+void GraphicsClass::Strafe(float amount)
 {
-	 m_camPos = m_Camera->Advance(sign);
+	m_camPos = m_Camera->Strafe(amount);
+}
+
+void GraphicsClass::Advance(float amount)
+{
+	m_camPos = m_Camera->Advance(amount);
 }
 
 void GraphicsClass::Rotate(D3DXVECTOR3 rot)
 {
 	m_Camera->Rotate(rot);
 }
+
+//                     //
+/////////////////////////
 
 
 bool GraphicsClass::Render(float rotation, float deltavalue)
@@ -407,7 +464,7 @@ bool GraphicsClass::Render(float rotation, float deltavalue)
 
 	// Rotate the world matrix by the rotation value so that the model will spin.
 	// D3DXMatrixRotationY(&worldMatrix, rotation);
-	
+
 	// Scaling
 	transform._11 = 20.0f;
 	transform._22 = 0.01f;
@@ -435,7 +492,7 @@ bool GraphicsClass::Render(float rotation, float deltavalue)
 	m_D3D->GetWorldMatrix(worldMatrix);
 
 	D3DXMatrixIdentity(&transform);
-	
+
 	D3DXMatrixRotationZ(&rotz, 45 * (D3DX_PI / 180.0f));
 	D3DXMatrixRotationY(&roty, 90 * (D3DX_PI / 180.0f));
 

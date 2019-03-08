@@ -130,7 +130,7 @@ void InputClass::Shutdown()
 	return;
 }
 
-
+// Reads Keyboard and Mouse when called. Updates mouse position data
 bool InputClass::Frame()
 {
 	bool result;

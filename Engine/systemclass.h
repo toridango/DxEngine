@@ -38,6 +38,7 @@ public:
 	bool Initialize();
 	void Shutdown();
 	void Run();
+	bool HandleInput();
 
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
 

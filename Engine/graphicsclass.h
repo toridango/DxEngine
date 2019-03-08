@@ -26,6 +26,7 @@ const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
+const float MOV_SPEED = 0.166f;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,6 +42,10 @@ public:
 	bool Initialize(int, int, HWND);
 	void Shutdown();
 	bool Frame();
+	void StrafeLeft();
+	void StrafeRight();
+	void MoveForward();
+	void MoveBack();
 	void Strafe(float);
 	void Advance(float);
 	void Rotate(D3DXVECTOR3);
@@ -49,6 +54,9 @@ private:
 	bool Render(float, float);
 	bool RenderToTexture();
 	bool RenderScene();
+
+	bool FileExists(char* filename);
+	bool FileExists(WCHAR* filename);
 
 private:
 

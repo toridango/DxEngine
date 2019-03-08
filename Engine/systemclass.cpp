@@ -4,6 +4,12 @@
 #include "systemclass.h"
 
 
+// TODO: 
+// Move input to message handling and make 1 function per command
+// Make Scene
+// Move Sound to Scene
+
+
 SystemClass::SystemClass()
 {
 	m_Input = 0;
@@ -154,7 +160,7 @@ void SystemClass::Run()
 			}
 		}
 
-		if (m_Input->IsWPressed())
+		/*if (m_Input->IsWPressed())
 		{
 			m_Graphics->Advance(0.166);
 		}
@@ -169,19 +175,15 @@ void SystemClass::Run()
 		if (m_Input->IsDPressed())
 		{
 			m_Graphics->Strafe(0.166);
-		}
+		}*/
 
-		D3DXVECTOR3 mouseMov = m_Input->GetMouseMovement();
-		if (mouseMov.x || mouseMov.y)
-		{
-			m_Graphics->Rotate(mouseMov);
-		}
+		
 
 		//Check if the user pressed escape and wants to quit
-		if (m_Input->IsEscapePressed())
+		/*if (m_Input->IsEscapePressed())
 		{
 			done = true;
-		}
+		}*/
 
 	}
 
@@ -191,25 +193,24 @@ void SystemClass::Run()
 
 bool SystemClass::Frame()
 {
-	bool result;
-
-
-	// Check if the user pressed escape and wants to exit the application.
-	/*if(m_Input->IsKeyDown(VK_ESCAPE))
+	// Do the input frame processing
+	// aka read and update information
+	if (!m_Input->Frame())
 	{
 		return false;
-	}*/
+	}
 
-	// Do the input frame processing
-	result = m_Input->Frame();
-	if (!result)
+	// Check if the user pressed escape and wants to exit the application.
+	//if(m_Input->IsKeyDown(VK_ESCAPE))
+
+	// Actually handle keyboard and mouse input
+	if (!HandleInput())
 	{
 		return false;
 	}
 
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame();
-	if (!result)
+	if (!m_Graphics->Frame())
 	{
 		return false;
 	}
@@ -217,16 +218,47 @@ bool SystemClass::Frame()
 	return true;
 }
 
-
-LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+bool SystemClass::HandleInput()
 {
-	switch (umsg)
+	if (m_Input->IsEscapePressed())
+	{
+		return false;
+	}
+	if (m_Input->IsWPressed())
+	{
+		m_Graphics->MoveForward();
+	}
+	if (m_Input->IsAPressed())
+	{
+		m_Graphics->StrafeLeft();
+	}
+	if (m_Input->IsSPressed())
+	{
+		m_Graphics->MoveBack();
+	}
+	if (m_Input->IsDPressed())
+	{
+		m_Graphics->StrafeRight();
+	}
+
+	D3DXVECTOR3 mouseMov = m_Input->GetMouseMovement();
+	if (mouseMov.x || mouseMov.y)
+	{
+		m_Graphics->Rotate(mouseMov);
+	}
+	return true;
+}
+
+
+LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT uimsg, WPARAM wparam, LPARAM lparam)
+{
+	switch (uimsg)
 	{
 		// Check if a key has been pressed on the keyboard.
-		/*case WM_KEYDOWN:
+		case WM_KEYDOWN:
 		{
 			// If a key is pressed send it to the input object so it can record that state.
-			m_Input->KeyDown((unsigned int)wparam);
+			//m_Input->KeyDown((unsigned int)wparam);			
 			return 0;
 		}
 
@@ -234,20 +266,18 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 		case WM_KEYUP:
 		{
 			// If a key is released then send it to the input object so it can unset the state for that key.
-			m_Input->KeyUp((unsigned int)wparam);
+			//m_Input->KeyUp((unsigned int)wparam);
 			return 0;
 		}
 
 		case WM_INPUT:
 		{
 			break;
-		}*/
+		}
 
 		// Any other messages send to the default message handler as our application won't make use of them.
 	default:
-	{
-		return DefWindowProc(hwnd, umsg, wparam, lparam);
-	}
+		return DefWindowProc(hwnd, uimsg, wparam, lparam);
 	}
 }
 
@@ -360,17 +390,12 @@ void SystemClass::ShutdownWindows()
 }
 
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK WndProc(HWND hwnd, UINT uimessage, WPARAM wparam, LPARAM lparam)
 {
-	switch (umessage)
+	switch (uimessage)
 	{
-		// Check if the window is being destroyed.
+	// Check if the window is being destroyed.
 	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-		return 0;
-	}
-
 	// Check if the window is being closed.
 	case WM_CLOSE:
 	{
@@ -381,7 +406,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 	// All other messages pass to the message handler in the system class.
 	default:
 	{
-		return ApplicationHandle->MessageHandler(hwnd, umessage, wparam, lparam);
+		return ApplicationHandle->MessageHandler(hwnd, uimessage, wparam, lparam);
 	}
 	}
 }

@@ -63,6 +63,12 @@
     <ClCompile Include="texturearrayclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RockSwordScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cameraclass.h">
@@ -110,6 +116,12 @@
     <ClInclude Include="texturearrayclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RockSwordScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="light.vs">
@@ -130,5 +142,6 @@
     <None Include="bumpmap.vs">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
