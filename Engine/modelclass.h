@@ -9,10 +9,13 @@
 // INCLUDES //
 //////////////
 #include <d3d11.h>
-#include <d3dx10math.h>
+//#include <d3dx10math.h>
 #include <fstream>
-#include "textureclass.h"
+#include <DirectXMath.h>
 
+
+#include "textureclass.h"
+using namespace DirectX;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: ModelClass
@@ -22,9 +25,9 @@ class ModelClass
 private:
 	struct VertexType
 	{
-		D3DXVECTOR3 position;
-	    D3DXVECTOR2 texture;
-		D3DXVECTOR3 normal;
+		XMFLOAT3 position;
+		XMFLOAT2 texture;
+		XMFLOAT3 normal;
 	};
 
 	struct ModelType

@@ -241,7 +241,7 @@ bool SystemClass::HandleInput()
 		m_Graphics->StrafeRight();
 	}
 
-	D3DXVECTOR3 mouseMov = m_Input->GetMouseMovement();
+	XMFLOAT3 mouseMov = m_Input->GetMouseMovement();
 	if (mouseMov.x || mouseMov.y)
 	{
 		m_Graphics->Rotate(mouseMov);

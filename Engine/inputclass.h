@@ -45,7 +45,7 @@ public:
 	bool IsAPressed() const;
 	bool IsSPressed() const;
 	bool IsDPressed() const;
-	D3DXVECTOR3 GetMouseMovement() const;
+	XMFLOAT3 GetMouseMovement() const;
 	void GetMouseLocation(int&, int&);
 
 private:

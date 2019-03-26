@@ -17,6 +17,8 @@
 #include "AssimpModelClass.h"
 #include "AssimpBumpedModelClass.h"
 #include "bumpmapshaderclass.h"
+#include "LightShader.h"
+#include "BumpShader.h"
 
 
 /////////////
@@ -48,30 +50,31 @@ public:
 	void MoveBack();
 	void Strafe(float);
 	void Advance(float);
-	void Rotate(D3DXVECTOR3);
+	void Rotate(XMFLOAT3);
 
 private:
 	bool Render(float, float);
 	bool RenderToTexture();
 	bool RenderScene();
 
-	bool FileExists(char* filename);
-	bool FileExists(WCHAR* filename);
+	//bool FileExists(char* filename);
+	//bool FileExists(WCHAR* filename);
 
 private:
 
-	D3DXVECTOR3 m_camPos;
+	// D3DXVECTOR3 m_camPos;
+	XMFLOAT3 m_camPos;
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
 	ModelClass* m_Model;
 	ModelClass* m_ModelSky;
 	AssimpModelClass* m_ModelSword;
 	AssimpBumpedModelClass* m_ModelRock;
-	LightShaderClass* m_LightShader;
-	LightShaderClass* m_SkyShader;
+	LightShader* m_LightShader;
+	LightShader* m_SkyShader;
 	LightClass* m_Light;
 	RenderTextureClass* m_RenderTexture;
-	BumpMapShaderClass* m_BumpMapShader;
+	BumpShader* m_BumpMapShader;
 };
 
 #endif

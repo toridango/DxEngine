@@ -21,53 +21,48 @@ LightClass::~LightClass()
 
 void LightClass::SetDiffuseColour(float red, float green, float blue, float alpha)
 {
-	m_diffuseColour = D3DXVECTOR4(red, green, blue, alpha);
-	return;
+	m_diffuseColour = XMFLOAT4(red, green, blue, alpha);
 }
 
 void LightClass::SetAmbientColour(float red, float green, float blue, float alpha)
 {
-	m_ambientColour = D3DXVECTOR4(red, green, blue, alpha);
-	return;
+	m_ambientColour = XMFLOAT4(red, green, blue, alpha);
 }
 
 void LightClass::SetSpecularColour(float red, float green, float blue, float alpha)
 {
-	m_specularColour = D3DXVECTOR4(red, green, blue, alpha);
-	return;
+	m_specularColour = XMFLOAT4(red, green, blue, alpha);
 }
 
 void LightClass::SetSpecularPower(float power)
 {
 	m_specularPower = power;
-	return;
 }
 
 
 void LightClass::SetDirection(float x, float y, float z)
 {
-	m_direction = D3DXVECTOR3(x, y, z);
-	return;
+	m_direction = XMFLOAT3(x, y, z);
 }
 
 
-D3DXVECTOR4 LightClass::GetDiffuseColour()
+XMFLOAT4 LightClass::GetDiffuseColour()
 {
 	return m_diffuseColour;
 }
 
-D3DXVECTOR4 LightClass::GetAmbientColour()
+XMFLOAT4 LightClass::GetAmbientColour()
 {
 	return m_ambientColour;
 }
 
 
-D3DXVECTOR3 LightClass::GetDirection()
+XMFLOAT3 LightClass::GetDirection()
 {
 	return m_direction;
 }
 
-D3DXVECTOR4 LightClass::GetSpecularColour()
+XMFLOAT4 LightClass::GetSpecularColour()
 {
 	return m_specularColour;
 }

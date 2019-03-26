@@ -3,14 +3,17 @@
 #include <vector>
 #include <memory>
 #include <d3d11.h>
-#include <d3dx10math.h>
+//#include <d3dx10math.h>
 #include <fstream>
 #include <iostream>
+#include <DirectXMath.h>
 
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <assimp/material.h>
+
+using namespace DirectX;
 
 #include "textureclass.h"
 
@@ -20,9 +23,9 @@ class AssimpModelClass
 private:
 	struct VertexType
 	{
-		D3DXVECTOR3 position;
-		D3DXVECTOR2 texture;
-		D3DXVECTOR3 normal;
+		XMFLOAT3 position;
+		XMFLOAT2 texture;
+		XMFLOAT3 normal;
 	};
 
 	struct ModelType

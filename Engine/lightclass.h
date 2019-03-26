@@ -8,8 +8,10 @@
 //////////////
 // INCLUDES //
 //////////////
-#include <d3dx10math.h>
+//#include <d3dx10math.h>
+#include <DirectXMath.h>
 
+using namespace DirectX;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: LightClass
@@ -27,18 +29,18 @@ public:
 	void SetSpecularPower(float);
 	void SetDirection(float, float, float);
 
-	D3DXVECTOR4 GetDiffuseColour();
-	D3DXVECTOR4 GetAmbientColour();
-	D3DXVECTOR4 GetSpecularColour();
+	XMFLOAT4 GetDiffuseColour();
+	XMFLOAT4 GetAmbientColour();
+	XMFLOAT4 GetSpecularColour();
 	float GetSpecularPower();
-	D3DXVECTOR3 GetDirection();
+	XMFLOAT3 GetDirection();
 
 private:
-	D3DXVECTOR4 m_diffuseColour;
-	D3DXVECTOR4 m_ambientColour;
-	D3DXVECTOR4 m_specularColour;
+	XMFLOAT4 m_diffuseColour;
+	XMFLOAT4 m_ambientColour;
+	XMFLOAT4 m_specularColour;
 	float m_specularPower;
-	D3DXVECTOR3 m_direction;
+	XMFLOAT3 m_direction;
 };
 
 #endif

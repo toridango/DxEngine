@@ -243,7 +243,7 @@ bool InputClass::IsSPressed() const { return (m_keyboardState[DIK_S] & 0x80); }
 
 bool InputClass::IsDPressed() const { return (m_keyboardState[DIK_D] & 0x80); }
 
-D3DXVECTOR3 InputClass::GetMouseMovement() const { return D3DXVECTOR3(m_mouseState.lX, m_mouseState.lY, m_mouseState.lZ); }
+XMFLOAT3 InputClass::GetMouseMovement() const { return XMFLOAT3(m_mouseState.lX, m_mouseState.lY, m_mouseState.lZ); }
 
 
 

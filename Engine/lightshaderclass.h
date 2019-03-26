@@ -9,10 +9,12 @@
 // INCLUDES //
 //////////////
 #include <d3d11.h>
-#include <d3dx10math.h>
+//#include <d3dx10math.h>
 #include <d3dx11async.h>
 #include <fstream>
-using namespace std;
+#include <DirectXMath.h>
+//using namespace std;
+using namespace DirectX;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -23,30 +25,30 @@ class LightShaderClass
 private:
 	struct MatrixBufferType
 	{
-		D3DXMATRIX world;
-		D3DXMATRIX view;
-		D3DXMATRIX projection;
+		XMMATRIX world;
+		XMMATRIX view;
+		XMMATRIX projection;
 	};
 
 	struct CameraBufferType
 	{
-		D3DXVECTOR3 cameraPosition;
+		XMFLOAT3 cameraPosition;
 		float cpadding;
 	};
 
 	struct VariableBufferType
 	{
 		float delta;
-		D3DXVECTOR3 padding;
+		XMFLOAT3 padding;
 	};
 
 	struct LightBufferType
 	{
-		D3DXVECTOR4 ambientColour;
-		D3DXVECTOR4 diffuseColour;
-		D3DXVECTOR3 lightDirection;
+		XMFLOAT4 ambientColour;
+		XMFLOAT4 diffuseColour;
+		XMFLOAT3 lightDirection;
 		float specularPower;
-		D3DXVECTOR4 specularColour;
+		XMFLOAT4 specularColour;
 	};
 
 public:
@@ -54,21 +56,21 @@ public:
 	LightShaderClass(const LightShaderClass&);
 	~LightShaderClass();
 
-	bool Initialize(ID3D11Device*, HWND);
-	bool Initialize(ID3D11Device*, HWND, WCHAR* vs, WCHAR* ps);
+	bool Initialize(ID3D11Device* device, HWND hwnd);
+	bool Initialize(ID3D11Device* device, HWND hwnd, WCHAR* vs_filename, WCHAR* ps_filename);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
-		D3DXMATRIX projectionMatrix, D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColour, D3DXVECTOR4 diffuseColour,
-		D3DXVECTOR3 cameraPosition, D3DXVECTOR4 specularColour, float specularPower, float deltavalue, ID3D11ShaderResourceView*);
+	bool Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+		XMMATRIX projectionMatrix, XMFLOAT3 lightDirection, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour,
+		XMFLOAT3 cameraPosition, XMFLOAT4 specularColour, float specularPower, float deltavalue, ID3D11ShaderResourceView* texture);
 
 private:
 	bool InitializeShader(ID3D11Device*, HWND, WCHAR*, WCHAR*);
 	void ShutdownShader();
 	void OutputShaderErrorMessage(ID3D10Blob*, HWND, WCHAR*);
 
-	bool SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix,
-		D3DXMATRIX projectionMatrix, D3DXVECTOR3 lightDirection, D3DXVECTOR4 ambientColour,
-		D3DXVECTOR4 diffuseColour, D3DXVECTOR3 cameraPosition, D3DXVECTOR4 specularColour,
+	bool SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+		XMMATRIX projectionMatrix, XMFLOAT3 lightDirection, XMFLOAT4 ambientColour,
+		XMFLOAT4 diffuseColour, XMFLOAT3 cameraPosition, XMFLOAT4 specularColour,
 		float specularPower, float deltavalue, ID3D11ShaderResourceView*);
 	void RenderShader(ID3D11DeviceContext*, int);
 
