@@ -6,4 +6,6 @@
 
 bool FileExists(char* filename);
 
+bool FileExists(const char* filename);
+
 bool FileExists(WCHAR* filename);

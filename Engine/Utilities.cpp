@@ -9,6 +9,11 @@ bool FileExists(char* filename)
 	return (stat(filename, &buffer) == 0);
 }
 
+bool FileExists(const char* filename)
+{
+	struct stat buffer;
+	return (stat(filename, &buffer) == 0);
+}
 
 bool FileExists(WCHAR* filename)
 {
