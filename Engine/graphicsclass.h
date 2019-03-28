@@ -8,7 +8,7 @@
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
-#include "d3dclass.h"
+/*#include "d3dclass.h"
 #include "cameraclass.h"
 #include "modelclass.h"
 #include "lightshaderclass.h"
@@ -18,7 +18,8 @@
 #include "AssimpBumpedModelClass.h"
 #include "bumpmapshaderclass.h"
 #include "LightShader.h"
-#include "BumpShader.h"
+#include "BumpShader.h"*/
+#include "SwordRockScene.h"
 
 
 /////////////
@@ -63,10 +64,11 @@ private:
 private:
 
 	// D3DXVECTOR3 m_camPos;
-	XMFLOAT3 m_camPos;
 	D3DClass* m_D3D;
+	SwordRockScene* m_srScene;
 	CameraClass* m_Camera;
-	ModelClass* m_Model;
+	XMFLOAT3 m_camPos;
+	/*ModelClass* m_Model;
 	ModelClass* m_ModelSky;
 	AssimpModelClass* m_ModelSword;
 	AssimpBumpedModelClass* m_ModelRock;
@@ -74,7 +76,7 @@ private:
 	LightShader* m_SkyShader;
 	LightClass* m_Light;
 	RenderTextureClass* m_RenderTexture;
-	BumpShader* m_BumpMapShader;
+	BumpShader* m_BumpMapShader;*/
 };
 
 #endif

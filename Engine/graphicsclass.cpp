@@ -7,12 +7,13 @@
 GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
+	m_srScene = 0;
 	m_Camera = 0;
-	m_Model = 0;
+	/*m_Model = 0;
 	m_LightShader = 0;
 	m_SkyShader = 0;
 	m_Light = 0;
-	m_BumpMapShader = 0;
+	m_BumpMapShader = 0;*/
 }
 
 
@@ -47,6 +48,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Camera = new CameraClass;
 	if (!m_Camera) { return false; }
 	m_Camera->Initialize(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
+
+	m_srScene = new SwordRockScene(hwnd, m_D3D);
+	m_srScene->Initialize(m_Camera);
+
+
+
+	/*
 
 	// Set the initial position of the camera.
 	m_camPos = XMFLOAT3(0.0f, 0.0f, -10.0f);
@@ -109,17 +117,17 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Old Rock
-	/*m_ModelRock = new AssimpModelClass;
-	if (!m_ModelRock)
-	{
-		return false;
-	}
-	result = m_ModelRock->Initialize(m_D3D->GetDevice(), "../Engine/Assets/rock/stone.obj", L"../Engine/Assets/rock/tex/stone_albedo.png");
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-		return false;
-	}*/
+	//m_ModelRock = new AssimpModelClass;
+	//if (!m_ModelRock)
+	//{
+	//	return false;
+	//}
+	//result = m_ModelRock->Initialize(m_D3D->GetDevice(), "../Engine/Assets/rock/stone.obj", L"../Engine/Assets/rock/tex/stone_albedo.png");
+	//if (!result)
+	//{
+	//	MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+	//	return false;
+	//}
 
 	// New Rock
 	m_ModelRock = new AssimpBumpedModelClass;
@@ -205,7 +213,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	// Initialize the render to texture object.
 	result = m_RenderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight);
-	if (!result) { return false; }
+	if (!result) { return false; }*/
 
 	return true;
 }
@@ -214,7 +222,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 void GraphicsClass::Shutdown()
 {
 	// Release the light object.
-	if (m_Light)
+	/*if (m_Light)
 	{
 		delete m_Light;
 		m_Light = 0;
@@ -268,20 +276,6 @@ void GraphicsClass::Shutdown()
 		m_ModelRock = 0;
 	}
 
-	// Release the camera object.
-	if (m_Camera)
-	{
-		delete m_Camera;
-		m_Camera = 0;
-	}
-
-	// Release the D3D object.
-	if (m_D3D)
-	{
-		m_D3D->Shutdown();
-		delete m_D3D;
-		m_D3D = 0;
-	}
 
 	// Release the render to texture object.
 	if (m_RenderTexture)
@@ -297,9 +291,31 @@ void GraphicsClass::Shutdown()
 		//m_BumpMapShader->Shutdown();
 		delete m_BumpMapShader;
 		m_BumpMapShader = 0;
+	}*/
+
+	// Release the D3D object.
+	if (m_D3D)
+	{
+		m_D3D->Shutdown();
+		delete m_D3D;
+		m_D3D = 0;
 	}
 
-	return;
+	// Release the camera object.
+	//if (m_Camera)
+	//{
+	//	delete m_Camera;
+	//	m_Camera = 0;
+	//}
+
+	// Release the Sword Rock Scene.
+	if (m_srScene)
+	{
+		//m_srScene->Shutdown();
+		delete m_srScene;
+		m_srScene = 0;
+	}
+
 }
 
 
@@ -388,202 +404,209 @@ void GraphicsClass::Rotate(XMFLOAT3 rot)
 
 bool GraphicsClass::Render(float rotation, float deltavalue)
 {
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
 
+	result = m_srScene->Render(deltavalue);
+	if (!result)
+	{
+		return false;
+	}
+
 	// Render the entire scene to the texture first.
-	/*result = RenderToTexture();
-	if (!result)
-	{
-		return false;
-	}*/
+	//result = RenderToTexture();
+	//if (!result)
+	//{
+	//	return false;
+	//}
 
-	// Clear the buffers to begin the scene.
-	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 0.0f);
+	//// Clear the buffers to begin the scene.
+	//m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 0.0f);
 
-	// Render the scene as normal to the back buffer.
-	/*result = RenderScene();
-	if (!result)
-	{
-		return false;
-	}*/
+	//// Render the scene as normal to the back buffer.
+	//result = RenderScene();
+	//if (!result)
+	//{
+	//	return false;
+	//}
 
-	/*D3DXVECTOR3 light = m_Light->GetDirection();
-	light.x = cos(30 * deltavalue);
-	light.z = sin(30 * deltavalue);*/
-	m_Light->SetDirection(cos(30), sin(30), 0.0f);
+	//D3DXVECTOR3 light = m_Light->GetDirection();
+	//light.x = cos(30 * deltavalue);
+	//light.z = sin(30 * deltavalue);
 
-	/*D3DXVECTOR3 cam = { -cos(30 * deltavalue) + 0.0f, -sin(30 * deltavalue) + 0.0f,  -10.0f };
-	m_Camera->SetPosition(cam[0], cam[1], cam[2]);*/
+	//m_Light->SetDirection(cos(30), sin(30), 0.0f);
+
+	//D3DXVECTOR3 cam = { -cos(30 * deltavalue) + 0.0f, -sin(30 * deltavalue) + 0.0f,  -10.0f };
+	//m_Camera->SetPosition(cam[0], cam[1], cam[2]);
 
 
-	XMMATRIX transform = XMMatrixIdentity();
-	//D3DXMatrixIdentity(&transform);
-	XMMATRIX rotx = XMMatrixIdentity();
-	//D3DXMatrixIdentity(&transform);
-	XMMATRIX roty = XMMatrixIdentity();
-	//D3DXMatrixIdentity(&transform);
-	XMMATRIX rotz = XMMatrixIdentity();
-	//D3DXMatrixIdentity(&transform);
+	//XMMATRIX transform = XMMatrixIdentity();
+	////D3DXMatrixIdentity(&transform);
+	//XMMATRIX rotx = XMMatrixIdentity();
+	////D3DXMatrixIdentity(&transform);
+	//XMMATRIX roty = XMMatrixIdentity();
+	////D3DXMatrixIdentity(&transform);
+	//XMMATRIX rotz = XMMatrixIdentity();
+	////D3DXMatrixIdentity(&transform);
 
 
 
 	// Generate the view matrix based on the camera's position.
-	m_Camera->Render();
+	//m_Camera->Render();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
-	viewMatrix = m_Camera->GetViewMatrix();
-	//worldMatrix = m_D3D->GetWorldMatrix();
-	worldMatrix = XMMatrixIdentity();
-	//projectionMatrix = m_D3D->GetProjectionMatrix();
-	projectionMatrix = m_Camera->GetProjectionMatrix();
+	//viewMatrix = m_Camera->GetViewMatrix();
+	////worldMatrix = m_D3D->GetWorldMatrix();
+	//worldMatrix = XMMatrixIdentity();
+	////projectionMatrix = m_D3D->GetProjectionMatrix();
+	//projectionMatrix = m_Camera->GetProjectionMatrix();
 
 	// Rotate the world matrix by the rotation value so that the model will spin.
 	// D3DXMatrixRotationY(&worldMatrix, rotation);
 
-	XMFLOAT4X4 ftransform;
+	//XMFLOAT4X4 ftransform;
 
-	XMStoreFloat4x4(&ftransform, XMMatrixIdentity());
-	// Scaling
-	ftransform._11 = 20.0f;
-	ftransform._22 = 0.01f;
-	ftransform._33 = 20.0f;
-	// Translation
-	ftransform._41 = 0.0f;
-	ftransform._42 = -2.0f;
-	ftransform._43 = 0.0f;
-	transform = XMLoadFloat4x4(&ftransform);
+	//XMStoreFloat4x4(&ftransform, XMMatrixIdentity());
+	//// Scaling
+	//ftransform._11 = 20.0f;
+	//ftransform._22 = 0.01f;
+	//ftransform._33 = 20.0f;
+	//// Translation
+	//ftransform._41 = 0.0f;
+	//ftransform._42 = -2.0f;
+	//ftransform._43 = 0.0f;
+	//transform = XMLoadFloat4x4(&ftransform);
 
-	//D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &transform);
-	worldMatrix = worldMatrix * transform;
+	////D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &transform);
+	//worldMatrix = worldMatrix * transform;
 
-	m_Model->Render(m_D3D->GetDeviceContext());
+	//m_Model->Render(m_D3D->GetDeviceContext());
 
 	// Render the model using the light shader.
-	result = m_LightShader->Render(m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
-		m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_Model->GetTexture());
+	//result = m_LightShader->Render(m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+		//m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
+		//m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_Model->GetTexture());
 
-	if (!result) { return false; }
+	//if (!result) { return false; }
 
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
-	//worldMatrix = m_D3D->GetWorldMatrix();
-	worldMatrix = XMMatrixIdentity();
+	////worldMatrix = m_D3D->GetWorldMatrix();
+	//worldMatrix = XMMatrixIdentity();
 
-	//D3DXMatrixIdentity(&transform);
-	transform = XMMatrixIdentity();
+	////D3DXMatrixIdentity(&transform);
+	//transform = XMMatrixIdentity();
 
-	//D3DXMatrixRotationZ(&rotz, 45 * (D3DX_PI / 180.0f));
-	//D3DXMatrixRotationY(&roty, 90 * (D3DX_PI / 180.0f));
-	rotz = XMMatrixRotationZ(45 * (XM_PI / 180.0f));
-	roty = XMMatrixRotationY(90 * (XM_PI / 180.0f));
+	////D3DXMatrixRotationZ(&rotz, 45 * (D3DX_PI / 180.0f));
+	////D3DXMatrixRotationY(&roty, 90 * (D3DX_PI / 180.0f));
+	//rotz = XMMatrixRotationZ(45 * (XM_PI / 180.0f));
+	//roty = XMMatrixRotationY(90 * (XM_PI / 180.0f));
 
-	//D3DXMatrixMultiply(&transform, &roty, &rotz);
-	transform = roty * rotz;
-
-
-	XMStoreFloat4x4(&ftransform, transform);
-	// Translation
-	ftransform._41 = 0.5f;
-	ftransform._42 = 1.4f;
-	ftransform._43 = -0.2f;
-	transform = XMLoadFloat4x4(&ftransform);
+	////D3DXMatrixMultiply(&transform, &roty, &rotz);
+	//transform = roty * rotz;
 
 
-	//D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &transform);
-	worldMatrix = worldMatrix * transform;
-
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	m_ModelSword->Render(m_D3D->GetDeviceContext());
-
-
-	// Render the model using the light shader.
-	result = m_LightShader->Render(m_ModelSword->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
-		m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, /*m_RenderTexture->GetShaderResourceView()*/m_ModelSword->GetTexture());
-
-	if (!result) { return false; }
+	//XMStoreFloat4x4(&ftransform, transform);
+	//// Translation
+	//ftransform._41 = 0.5f;
+	//ftransform._42 = 1.4f;
+	//ftransform._43 = -0.2f;
+	//transform = XMLoadFloat4x4(&ftransform);
 
 
+	////D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &transform);
+	//worldMatrix = worldMatrix * transform;
 
-	// Get the world, view, and projection matrices from the camera and d3d objects.
-	//worldMatrix = m_D3D->GetWorldMatrix();
-	worldMatrix = XMMatrixIdentity();
-
-	//D3DXMatrixIdentity(&transform);
-	XMStoreFloat4x4(&ftransform, XMMatrixIdentity());
-
-	// Scaling
-	ftransform._11 = 3.0f;
-	ftransform._22 = 3.0f;
-	ftransform._33 = 3.0f;
-	// Translation
-	ftransform._41 = 0.0f;
-	ftransform._42 = -0.6f;
-	ftransform._43 = 0.0f;
-	transform = XMLoadFloat4x4(&ftransform);
-
-	//D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &transform);
-	worldMatrix = worldMatrix * transform;
-
-	XMFLOAT4 v = m_Light->GetSpecularColour();
-	v.x = v.y = v.z = v.w = 0.0f;
-
-	m_ModelRock->Render(m_D3D->GetDeviceContext());
-	m_Light->SetDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
-
-	// Render the model using the light shader.
-	/*result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
-		m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_ModelRock->GetTexture());*/
-		//result = m_BumpMapShader->Render(m_D3D->GetDeviceContext(), m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		//	m_ModelRock->GetTextureArray(), m_Light->GetDirection());
-	result = m_BumpMapShader->Render(m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_ModelRock->GetTextureArray(), m_Light->GetDirection());
-
-	if (!result) { return false; }
+	//// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	//m_ModelSword->Render(m_D3D->GetDeviceContext());
 
 
-	//worldMatrix = m_D3D->GetWorldMatrix();
-	worldMatrix = XMMatrixIdentity();
+	//// Render the model using the light shader.
+	//result = m_LightShader->Render(m_ModelSword->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+	//	m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
+	//	m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, /*m_RenderTexture->GetShaderResourceView()*/m_ModelSword->GetTexture());
 
-	XMStoreFloat4x4(&ftransform, XMMatrixIdentity());
-
-	// Translation
-	ftransform._41 = m_camPos.x;
-	ftransform._42 = m_camPos.y;
-	ftransform._43 = m_camPos.z;
-	transform = XMLoadFloat4x4(&ftransform);
-
-	//D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &transform);
-	worldMatrix = worldMatrix * transform;
-
-
-	m_D3D->setSkyMode(true);
-
-	m_ModelSky->Render(m_D3D->GetDeviceContext());
-
-	// Render the model using the light shader.
-	result = m_SkyShader->Render(m_ModelSky->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
-		m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_ModelSky->GetTexture());
-
-	if (!result) { return false; }
-
-
-	m_D3D->setSkyMode(false);
+	//if (!result) { return false; }
 
 
 
-	// Present the rendered scene to the screen.
-	m_D3D->EndScene();
+	//// Get the world, view, and projection matrices from the camera and d3d objects.
+	////worldMatrix = m_D3D->GetWorldMatrix();
+	//worldMatrix = XMMatrixIdentity();
+
+	////D3DXMatrixIdentity(&transform);
+	//XMStoreFloat4x4(&ftransform, XMMatrixIdentity());
+
+	//// Scaling
+	//ftransform._11 = 3.0f;
+	//ftransform._22 = 3.0f;
+	//ftransform._33 = 3.0f;
+	//// Translation
+	//ftransform._41 = 0.0f;
+	//ftransform._42 = -0.6f;
+	//ftransform._43 = 0.0f;
+	//transform = XMLoadFloat4x4(&ftransform);
+
+	////D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &transform);
+	//worldMatrix = worldMatrix * transform;
+
+	//XMFLOAT4 v = m_Light->GetSpecularColour();
+	//v.x = v.y = v.z = v.w = 0.0f;
+
+	//m_ModelRock->Render(m_D3D->GetDeviceContext());
+	//m_Light->SetDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
+
+	//// Render the model using the light shader.
+	////result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+	////	m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
+	////	m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_ModelRock->GetTexture());
+	//	//result = m_BumpMapShader->Render(m_D3D->GetDeviceContext(), m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+	//	//	m_ModelRock->GetTextureArray(), m_Light->GetDirection());
+	//result = m_BumpMapShader->Render(m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+	//	m_ModelRock->GetTextureArray(), m_Light->GetDirection());
+
+	//if (!result) { return false; }
+
+
+	////worldMatrix = m_D3D->GetWorldMatrix();
+	//worldMatrix = XMMatrixIdentity();
+
+	//XMStoreFloat4x4(&ftransform, XMMatrixIdentity());
+
+	//// Translation
+	//ftransform._41 = m_camPos.x;
+	//ftransform._42 = m_camPos.y;
+	//ftransform._43 = m_camPos.z;
+	//transform = XMLoadFloat4x4(&ftransform);
+
+	////D3DXMatrixMultiply(&worldMatrix, &worldMatrix, &transform);
+	//worldMatrix = worldMatrix * transform;
+
+
+	//m_D3D->setSkyMode(true);
+
+	//m_ModelSky->Render(m_D3D->GetDeviceContext());
+
+	//// Render the model using the light shader.
+	//result = m_SkyShader->Render(m_ModelSky->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+	//	m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
+	//	m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_ModelSky->GetTexture());
+
+	//if (!result) { return false; }
+
+
+	//m_D3D->setSkyMode(false);
+
+
+
+	//// Present the rendered scene to the screen.
+	//m_D3D->EndScene();
 
 	return true;
 }
 
 
-bool GraphicsClass::RenderToTexture()
+/*bool GraphicsClass::RenderToTexture()
 {
 	bool result;
 
@@ -603,10 +626,10 @@ bool GraphicsClass::RenderToTexture()
 	m_D3D->SetBackBufferRenderTarget();
 
 	return true;
-}
+}*/
 
 
-bool GraphicsClass::RenderScene()
+/*bool GraphicsClass::RenderScene()
 {
 	//D3DXMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -625,11 +648,11 @@ bool GraphicsClass::RenderScene()
 	projectionMatrix = m_Camera->GetProjectionMatrix();
 
 	// Update the rotation variable each frame.
-	/*rotation += (float)D3DX_PI * 0.005f;
-	if (rotation > 360.0f)
-	{
-		rotation -= 360.0f;
-	}*/
+	//rotation += (float)D3DX_PI * 0.005f;
+	//if (rotation > 360.0f)
+	//{
+	//	rotation -= 360.0f;
+	//}
 
 	//D3DXMatrixRotationY(&worldMatrix, rotation);
 	worldMatrix = XMMatrixRotationY(rotation);
@@ -645,4 +668,4 @@ bool GraphicsClass::RenderScene()
 	if (!result) { return false; }
 
 	return true;
-}
+}*/

@@ -181,13 +181,14 @@ void CameraClass::Rotate(XMFLOAT3 rot)
 	m_rotationPitch += rot.y;
 	m_rotationYaw += rot.x;*/
 
+
 	// Save mov as a normalise version of rot
 	XMFLOAT3 mov;
 	XMStoreFloat3(&mov, XMVector3Normalize(XMLoadFloat3(&rot)));
 
 	// Apply normalised rotation
-	m_rotation.x += mov.y;
-	m_rotation.y += mov.x;
+	m_rotation.x += ROTATION_SPEED * mov.y;
+	m_rotation.y += ROTATION_SPEED * mov.x;
 }
 
 

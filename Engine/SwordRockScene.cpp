@@ -238,12 +238,12 @@ bool SwordRockScene::Initialize(CameraClass* camera)
 	m_Camera = camera;
 
 	// Set the initial position of the camera.
-	m_camPos = XMFLOAT3(0.0f, 0.0f, -10.0f);
-	m_Camera->SetPosition(m_camPos.x, m_camPos.y, m_camPos.z);
+	XMFLOAT3 camPos = XMFLOAT3(0.0f, 0.0f, -10.0f);
+	m_Camera->SetPosition(camPos.x, camPos.y, camPos.z);
 
 
-	if (!InitializeModels()) return false;
-	if (!InitializeShaders()) return false;
+	if (!InitializeModels()) { return false; }
+	if (!InitializeShaders()) { return false; }
 
 
 	// Create the light object.
@@ -310,7 +310,7 @@ bool SwordRockScene::InitializeModels()
 	go_sky = new GameObject();
 	go_sky->SetModel(m_Model);
 
-	go_sky->SetTranslation(m_camPos);
+	go_sky->SetTranslation(m_Camera->GetPosition());
 
 
 
@@ -327,8 +327,8 @@ bool SwordRockScene::InitializeModels()
 	go_sword = new GameObject();
 	go_sword->SetModel(m_ModelSword);
 
-	go_sword->RotateDegreesAroundY(45);
-	go_sword->RotateDegreesAroundZ(90);
+	go_sword->RotateDegreesAroundY(90.0f);
+	go_sword->RotateDegreesAroundZ(45.0f);
 	go_sword->SetTranslation(0.5f, 1.4f, -0.2f);
 
 
@@ -358,7 +358,7 @@ bool SwordRockScene::InitializeModels()
 	go_rock->SetTranslation(0.0f, -0.6f, 0.0f);
 
 
-
+	return true;
 }
 
 
@@ -418,8 +418,14 @@ bool SwordRockScene::Render(float deltavalue)
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
 
+	float R, G, B, A;
+	R = 0.6f;
+	G = 0.1f;
+	B = 0.5f;
+	A = 1.0f;
+
 	// Clear the buffers to begin the scene.
-	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 0.0f);
+	m_D3D->BeginScene(R, G, B, A);
 
 
 	// Generate the view matrix based on the camera's position.
@@ -427,6 +433,10 @@ bool SwordRockScene::Render(float deltavalue)
 
 	//m_Model->Render(m_D3D->GetDeviceContext());
 	go_floor->Render(m_D3D->GetDeviceContext());
+
+	worldMatrix = go_floor->GetWorldMatrix();
+	viewMatrix = m_Camera->GetViewMatrix();
+	projectionMatrix = m_Camera->GetProjectionMatrix();
 
 	// Render the model using the light shader.
 	result = m_LightShader->Render(m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
@@ -455,6 +465,7 @@ bool SwordRockScene::Render(float deltavalue)
 	//m_ModelSword->Render(m_D3D->GetDeviceContext());
 	go_sword->Render(m_D3D->GetDeviceContext()); 
 
+	worldMatrix = go_sword->GetWorldMatrix();
 
 	// Render the model using the light shader.
 	result = m_LightShader->Render(m_ModelSword->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
@@ -465,7 +476,14 @@ bool SwordRockScene::Render(float deltavalue)
 
 
 
-	
+	XMFLOAT4 v = m_Light->GetSpecularColour();
+	v.x = v.y = v.z = v.w = 0.0f;
+
+	//m_ModelRock->Render(m_D3D->GetDeviceContext());
+	go_rock->Render(m_D3D->GetDeviceContext());
+	m_Light->SetDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
+
+	worldMatrix = go_rock->GetWorldMatrix();
 
 	// Render the model using the light shader.
 	/*result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
@@ -482,7 +500,11 @@ bool SwordRockScene::Render(float deltavalue)
 
 	m_D3D->setSkyMode(true);
 
-	m_ModelSky->Render(m_D3D->GetDeviceContext());
+	//m_ModelSky->Render(m_D3D->GetDeviceContext());
+	go_sky->Render(m_D3D->GetDeviceContext());
+
+	go_sky->SetTranslation(m_Camera->GetPosition());
+	worldMatrix = go_sky->GetWorldMatrix();
 
 	// Render the model using the light shader.
 	result = m_SkyShader->Render(m_ModelSky->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,

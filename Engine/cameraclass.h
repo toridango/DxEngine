@@ -11,6 +11,8 @@
 // #include <d3dx10math.h>
 #include <DirectXMath.h>
 
+const float ROTATION_SPEED = 1.65f;
+
 using namespace DirectX;
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -58,7 +58,7 @@ private:
 	BumpShader* m_BumpMapShader;
 
 	// VARIABLES
-	XMFLOAT3 m_camPos;
+	//XMFLOAT3 m_camPos;
 
 	// FILE PATHS
 	char* path_floorModel = "../Engine/Assets/cube.txt";

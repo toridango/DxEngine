@@ -65,8 +65,8 @@ void GameObject::SetModel(AssimpBumpedModelClass* model)
 
 void GameObject::SetTranslation(XMVECTOR t)
 {
-	// Make sure 4th parameter (w) is 0 before adding
-	t = XMVectorSetW(t, 0.0f);
+	// Make sure 4th parameter (w) is 1 before setting
+	t = XMVectorSetW(t, 1.0f);
 
 	m_worldMatrix.r[3] = t;
 }
@@ -78,7 +78,7 @@ void GameObject::SetTranslation(XMFLOAT3 t)
 
 void GameObject::SetTranslation(float x, float y, float z)
 {
-	SetTranslation(XMVectorSet(x, y, z, 0.0f));
+	SetTranslation(XMVectorSet(x, y, z, 1.0f));
 }
 
 void GameObject::Translate(XMVECTOR t)
