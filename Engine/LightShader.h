@@ -36,9 +36,10 @@ public:
 	bool InitializeShader(ShaderFiles sf);
 	bool InitializeShader(WCHAR* vsFilename, WCHAR* psFilename);
 
-	bool Render(int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-		XMMATRIX projectionMatrix, XMFLOAT3 lightDirection, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour,
-		XMFLOAT3 cameraPosition, XMFLOAT4 specularColour, float specularPower, float deltavalue, ID3D11ShaderResourceView* texture);
+	///bool Render(int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+	///	XMMATRIX projectionMatrix, XMFLOAT3 lightDirection, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour,
+	///	XMFLOAT3 cameraPosition, XMFLOAT4 specularColour, float specularPower, float deltavalue, ID3D11ShaderResourceView* texture);
+	bool Render(GameObject* go, CameraClass* camera, LightClass* light, float deltavalue);
 
 private:
 

@@ -30,9 +30,6 @@
     <ClCompile Include="lightclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lightshaderclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,16 +42,10 @@
     <ClCompile Include="textureclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rendertextureclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AssimpModelClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="soundclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="bumpmapshaderclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AssimpBumpedModelClass.cpp">
@@ -101,9 +92,6 @@
     <ClInclude Include="lightclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lightshaderclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="modelclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -113,16 +101,10 @@
     <ClInclude Include="textureclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rendertextureclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AssimpModelClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="soundclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bumpmapshaderclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AssimpBumpedModelClass.h">

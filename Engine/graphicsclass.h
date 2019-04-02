@@ -8,17 +8,6 @@
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
-/*#include "d3dclass.h"
-#include "cameraclass.h"
-#include "modelclass.h"
-#include "lightshaderclass.h"
-#include "lightclass.h"
-#include "rendertextureclass.h"
-#include "AssimpModelClass.h"
-#include "AssimpBumpedModelClass.h"
-#include "bumpmapshaderclass.h"
-#include "LightShader.h"
-#include "BumpShader.h"*/
 #include "SwordRockScene.h"
 
 
@@ -55,28 +44,14 @@ public:
 
 private:
 	bool Render(float, float);
-	bool RenderToTexture();
-	bool RenderScene();
 
-	//bool FileExists(char* filename);
-	//bool FileExists(WCHAR* filename);
 
 private:
 
-	// D3DXVECTOR3 m_camPos;
 	D3DClass* m_D3D;
 	SwordRockScene* m_srScene;
 	CameraClass* m_Camera;
 	XMFLOAT3 m_camPos;
-	/*ModelClass* m_Model;
-	ModelClass* m_ModelSky;
-	AssimpModelClass* m_ModelSword;
-	AssimpBumpedModelClass* m_ModelRock;
-	LightShader* m_LightShader;
-	LightShader* m_SkyShader;
-	LightClass* m_Light;
-	RenderTextureClass* m_RenderTexture;
-	BumpShader* m_BumpMapShader;*/
 };
 
 #endif

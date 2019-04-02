@@ -21,7 +21,7 @@ AssimpModelClass::~AssimpModelClass()
 }
 
 
-bool AssimpModelClass::Initialize(ID3D11Device* device, const char* modelFilename, WCHAR* textureFilename)
+bool AssimpModelClass::Initialize(ID3D11Device* device, const char* modelFilename, WCHAR* textureFilename, bool iscubemap)
 {
 	bool result;
 
@@ -34,7 +34,7 @@ bool AssimpModelClass::Initialize(ID3D11Device* device, const char* modelFilenam
 	}
 
 	// Load the texture for this model.
-	result = LoadTexture(device, textureFilename);
+	result = LoadTexture(device, textureFilename, iscubemap);
 	if (!result)
 	{
 		return false;
@@ -213,7 +213,7 @@ bool AssimpModelClass::LoadModel(const char* modelFilename)
 {
 	const aiScene* scene = aiImportFile(modelFilename, aiProcessPreset_TargetRealtime_MaxQuality 
 														| aiProcess_Triangulate 
-														/*| aiProcess_MakeLeftHanded */
+														//| aiProcess_MakeLeftHanded 
 														| aiProcess_FlipUVs
 														| aiProcess_ConvertToLeftHanded);
 	if (!scene)
@@ -272,9 +272,9 @@ bool AssimpModelClass::LoadModel(const char* modelFilename)
 		//idxVector.reserve(mesh->mNumFaces * 3u);
 		for (std::uint32_t faceIdx = 0u; faceIdx < mesh->mNumFaces; faceIdx++)
 		{
-			/*idxVector.push_back(mesh->mFaces[faceIdx].mIndices[0u]);
-			idxVector.push_back(mesh->mFaces[faceIdx].mIndices[1u]);
-			idxVector.push_back(mesh->mFaces[faceIdx].mIndices[2u]);*/
+			//idxVector.push_back(mesh->mFaces[faceIdx].mIndices[0u]);
+			//idxVector.push_back(mesh->mFaces[faceIdx].mIndices[1u]);
+			//idxVector.push_back(mesh->mFaces[faceIdx].mIndices[2u]);
 			for (unsigned int j = 0; j < mesh->mFaces[faceIdx].mNumIndices; j++) {
 				idxVector.push_back(mesh->mFaces[faceIdx].mIndices[j]);
 			}
@@ -285,6 +285,8 @@ bool AssimpModelClass::LoadModel(const char* modelFilename)
 
 	aiReleaseImport(scene);
 }
+
+
 
 void AssimpModelClass::ReleaseModel()
 {
@@ -304,7 +306,7 @@ ID3D11ShaderResourceView* AssimpModelClass::GetTexture()
 }
 
 
-bool AssimpModelClass::LoadTexture(ID3D11Device* device, WCHAR* filename)
+bool AssimpModelClass::LoadTexture(ID3D11Device* device, WCHAR* filename, bool iscubemap)
 {
 	bool result;
 
@@ -317,7 +319,7 @@ bool AssimpModelClass::LoadTexture(ID3D11Device* device, WCHAR* filename)
 	}
 
 	// Initialize the texture object.
-	result = m_Texture->Initialize(device, filename);
+	result = m_Texture->Initialize(device, filename, iscubemap);
 	if (!result)
 	{
 		return false;

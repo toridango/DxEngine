@@ -86,6 +86,13 @@ void SwordRockScene::Shutdown()
 		m_Camera = 0;
 	}
 
+	if (m_Sound)
+	{
+		m_Sound->Shutdown();
+		delete m_Sound;
+		m_Sound = 0;
+	}
+
 	// Release the D3D object.
 	/*if (m_D3D)
 	{
@@ -133,93 +140,101 @@ bool SwordRockScene::CheckAllPaths()
 {
 	std::wstring msg = L"Some files weren't found:\n";
 	std::wstring ws;
-	bool any, result = true;
+	bool all = true;
+	bool result = true;
+
+	// SOUNDS
+	ws = L"Background Loop\n";
+	result = CheckPath(path_soundLoop);
+	all &= result;
+	if (!result) msg += ws;
 
 	// CUBE
 	ws = L"Cube model\n";
 	result = CheckPath(path_floorModel);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Cube texture\n";
 	result = CheckPath(path_floorTex);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 
 	// SKY
 	ws = L"Sky model\n";
 	result = CheckPath(path_skyModel);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Sky texture\n";
 	result = CheckPath(path_skyTex);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 
 	// CLAYMORE
 	ws = L"Claymore model\n";
 	result = CheckPath(path_claymoreModel);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Claymore texture\n";
 	result = CheckPath(path_claymoreTex);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 
 	// ROCK
 	ws = L"Rock model\n";
 	result = CheckPath(path_rockModel);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Rock albedo\n";
 	result = CheckPath(path_rockAlbedo);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Rock normal map\n";
 	result = CheckPath(path_rockNormal);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Rock diffuse\n";
 	result = CheckPath(path_rockDiffuse);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Rock ambient occlusion\n";
 	result = CheckPath(path_rockAmbientOcclusion);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Rock specular\n";
 	result = CheckPath(path_rockSpecular);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 
 
 	// SHADERS
 	ws = L"Light vertex shader\n";
 	result = CheckPath(path_lightVertexShader);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Light pixel shader\n";
 	result = CheckPath(path_lightPixelShader);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Bump vertex shader\n";
 	result = CheckPath(path_bumpVertexShader);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Bump pixel shader\n";
 	result = CheckPath(path_bumpPixelShader);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Sky vertex shader\n";
 	result = CheckPath(path_skyVertexShader);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
 	ws = L"Sky pixel shader\n";
 	result = CheckPath(path_skyPixelShader);
-	any &= result;
+	all &= result;
 	if (!result) msg += ws;
-	
 
-	if (any)
+
+	// CHANGE TO every shader/model checking their own stuff
+	if (!all)
 	{
 		MessageBox(m_hwnd, msg.c_str(), L"Error", MB_OK);
 		return false;
@@ -261,6 +276,22 @@ bool SwordRockScene::Initialize(CameraClass* camera)
 	m_Light->SetDirection(cos(30), sin(30), 0.0f);
 
 
+	// Create the sound object
+	m_Sound = new SoundClass;
+	if (!m_Sound) { return false; }
+
+	// Initialise the sound object
+	// NOTE: This won't play the .wav file
+	result = m_Sound->Initialize(m_hwnd, path_soundLoop);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialise Direct Sound.", L"Error", MB_OK);
+		return false;
+	}
+	m_Sound->PlayWaveFile();
+
+
+
 	return true;
 }
 
@@ -273,9 +304,9 @@ bool SwordRockScene::InitializeModels()
 	// Create the model object.
 	// WARNING: you're going to change the floor, or fix the error this gives when turned into
 	// an assimp model with the same texture
-	m_Model = new ModelClass;
+	m_Model = new AssimpModelClass;
 	if (!m_Model) { return false; }
-	
+
 
 	// Initialize the model object.
 	result = m_Model->Initialize(m_D3D->GetDevice(), path_floorModel, path_floorTex);
@@ -296,7 +327,7 @@ bool SwordRockScene::InitializeModels()
 	// Create the model object.
 	// WARNING: Before adapting this to only assimp models, you need to 
 	// adapt the cubemap options from modelclass into assimpmodelclass
-	m_ModelSky = new ModelClass;
+	m_ModelSky = new AssimpModelClass;
 	if (!m_ModelSky) { return false; }
 
 	// Initialize the model object.
@@ -308,7 +339,7 @@ bool SwordRockScene::InitializeModels()
 	}
 
 	go_sky = new GameObject();
-	go_sky->SetModel(m_Model);
+	go_sky->SetModel(m_ModelSky);
 
 	go_sky->SetTranslation(m_Camera->GetPosition());
 
@@ -323,7 +354,7 @@ bool SwordRockScene::InitializeModels()
 		MessageBox(m_hwnd, L"Could not initialize the sword model object.", L"Error", MB_OK);
 		return false;
 	}
-	
+
 	go_sword = new GameObject();
 	go_sword->SetModel(m_ModelSword);
 
@@ -418,6 +449,7 @@ bool SwordRockScene::Render(float deltavalue)
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
 
+	// Base colour
 	float R, G, B, A;
 	R = 0.6f;
 	G = 0.1f;
@@ -439,9 +471,10 @@ bool SwordRockScene::Render(float deltavalue)
 	projectionMatrix = m_Camera->GetProjectionMatrix();
 
 	// Render the model using the light shader.
-	result = m_LightShader->Render(m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
-		m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_Model->GetTexture());
+	//result = m_LightShader->Render(m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+	//	m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
+	//	m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_Model->GetTexture());
+	result = m_LightShader->Render(go_floor, m_Camera, m_Light, deltavalue);
 
 	if (!result) { return false; }
 
@@ -463,14 +496,16 @@ bool SwordRockScene::Render(float deltavalue)
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	//m_ModelSword->Render(m_D3D->GetDeviceContext());
-	go_sword->Render(m_D3D->GetDeviceContext()); 
+	go_sword->Render(m_D3D->GetDeviceContext());
 
 	worldMatrix = go_sword->GetWorldMatrix();
 
 	// Render the model using the light shader.
-	result = m_LightShader->Render(m_ModelSword->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
-		m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, /*m_RenderTexture->GetShaderResourceView()*/m_ModelSword->GetTexture());
+	//result = m_LightShader->Render(m_ModelSword->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+	//	m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
+	//	m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, /*m_RenderTexture->GetShaderResourceView()*/m_ModelSword->GetTexture());
+	result = m_LightShader->Render(go_sword, m_Camera, m_Light, deltavalue);
+
 
 	if (!result) { return false; }
 
@@ -491,8 +526,9 @@ bool SwordRockScene::Render(float deltavalue)
 		m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_ModelRock->GetTexture());*/
 		//result = m_BumpMapShader->Render(m_D3D->GetDeviceContext(), m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
 		//	m_ModelRock->GetTextureArray(), m_Light->GetDirection());
-	result = m_BumpMapShader->Render(m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_ModelRock->GetTextureArray(), m_Light->GetDirection());
+	//result = m_BumpMapShader->Render(m_ModelRock->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+	//	m_ModelRock->GetTextureArray(), m_Light->GetDirection());
+	result = m_BumpMapShader->Render(go_rock, m_Camera, m_Light);
 
 	if (!result) { return false; }
 
@@ -507,9 +543,10 @@ bool SwordRockScene::Render(float deltavalue)
 	worldMatrix = go_sky->GetWorldMatrix();
 
 	// Render the model using the light shader.
-	result = m_SkyShader->Render(m_ModelSky->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-		m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
-		m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_ModelSky->GetTexture());
+	//result = m_SkyShader->Render(m_ModelSky->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
+	//	m_Light->GetDirection(), m_Light->GetAmbientColour(), m_Light->GetDiffuseColour(), m_Camera->GetPosition(),
+	//	m_Light->GetSpecularColour(), m_Light->GetSpecularPower(), deltavalue, m_ModelSky->GetTexture());
+	result = m_SkyShader->Render(go_sky, m_Camera, m_Light, deltavalue);
 
 	if (!result) { return false; }
 

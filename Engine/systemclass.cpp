@@ -4,17 +4,11 @@
 #include "systemclass.h"
 
 
-// TODO: 
-// Move input to message handling and make 1 function per command
-// Make Scene
-// Move Sound to Scene
-
 
 SystemClass::SystemClass()
 {
 	m_Input = 0;
 	m_Graphics = 0;
-	m_Sound = 0;
 }
 
 
@@ -71,22 +65,6 @@ bool SystemClass::Initialize()
 	}
 
 
-	// Create the sound object
-	m_Sound = new SoundClass;
-	if (!m_Sound)
-	{
-		return false;
-	}
-
-	// Initialise the sound object
-	// NOTE: This will also start playing the .wav file
-	result = m_Sound->Initialize(m_hwnd);
-	if (!result)
-	{
-		MessageBox(m_hwnd, L"Could not initialise Direct Sound.", L"Error", MB_OK);
-		return false;
-	}
-
 
 	return true;
 }
@@ -108,14 +86,6 @@ void SystemClass::Shutdown()
 		m_Input->Shutdown();
 		delete m_Input;
 		m_Input = 0;
-	}
-
-	// Release the sound object.
-	if (m_Sound)
-	{
-		m_Sound->Shutdown();
-		delete m_Sound;
-		m_Sound = 0;
 	}
 
 	// Shutdown the window.
@@ -160,30 +130,6 @@ void SystemClass::Run()
 			}
 		}
 
-		/*if (m_Input->IsWPressed())
-		{
-			m_Graphics->Advance(0.166);
-		}
-		if (m_Input->IsAPressed())
-		{
-			m_Graphics->Strafe(-0.166);
-		}
-		if (m_Input->IsSPressed())
-		{
-			m_Graphics->Advance(-0.166);
-		}
-		if (m_Input->IsDPressed())
-		{
-			m_Graphics->Strafe(0.166);
-		}*/
-
-		
-
-		//Check if the user pressed escape and wants to quit
-		/*if (m_Input->IsEscapePressed())
-		{
-			done = true;
-		}*/
 
 	}
 

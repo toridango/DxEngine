@@ -23,7 +23,7 @@ SoundClass::~SoundClass()
 }
 
 
-bool SoundClass::Initialize(HWND hwnd)
+bool SoundClass::Initialize(HWND hwnd, char* filename)
 {
 	bool result;
 	// First initialize the DirectSound API as well as the primary buffer.
@@ -38,18 +38,19 @@ bool SoundClass::Initialize(HWND hwnd)
 	}
 
 	// Load a wave audio file onto a secondary buffer.
-	result = LoadWaveFile("../Engine/Assets/sounds/magical_forest.wav", &m_secondaryBuffer1);
+	//result = LoadWaveFile("../Engine/Assets/sounds/magical_forest.wav", &m_secondaryBuffer1);
+	result = LoadWaveFile(filename, &m_secondaryBuffer1);
 	if (!result)
 	{
 		return false;
 	}
 
 	// Play the wave file now that it has been loaded.
-	result = PlayWaveFile();
+	/*result = PlayWaveFile();
 	if (!result)
 	{
 		return false;
-	}
+	}*/
 
 	return true;
 }

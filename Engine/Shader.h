@@ -6,7 +6,9 @@
 #include <fstream>
 #include <DirectXMath.h>
 
-
+#include "GameObject.h"
+#include "lightclass.h"
+#include "cameraclass.h"
 #include "Utilities.h"
 using namespace DirectX;
 

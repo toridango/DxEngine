@@ -31,8 +31,9 @@ public:
 	//	XMMATRIX projectionMatrix, XMFLOAT3 lightDirection, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour,
 	//	XMFLOAT3 cameraPosition, XMFLOAT4 specularColour, float specularPower, float deltavalue, ID3D11ShaderResourceView* texture);
 	
-	bool Render(int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-		XMMATRIX projectionMatrix, ID3D11ShaderResourceView** textureArray, XMFLOAT3 lightDirection);
+	///bool Render(int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+	///	XMMATRIX projectionMatrix, ID3D11ShaderResourceView** textureArray, XMFLOAT3 lightDirection);ç
+	bool Render(GameObject* go, CameraClass* camera, LightClass* light);
 
 private:
 

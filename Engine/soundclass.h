@@ -74,10 +74,12 @@ public:
 	~SoundClass();
 	
 	// Initialize DirectSound and load in the .wav audio file and then play it once.
-	bool Initialize(HWND);
+	bool Initialize(HWND hwnd, char* filename);
 
 	// Shutdown will release the .wav file and shutdown DirectSound.
 	void Shutdown();
+
+	bool PlayWaveFile();
 
 private:
 	bool InitializeDirectSound(HWND);
@@ -86,7 +88,6 @@ private:
 	bool LoadWaveFile(char*, IDirectSoundBuffer8**);
 	void ShutdownWaveFile(IDirectSoundBuffer8**);
 
-	bool PlayWaveFile();
 
 private:
 	IDirectSound8* m_DirectSound;

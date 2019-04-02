@@ -44,7 +44,9 @@ public:
 
 	XMMATRIX GetWorldMatrix();
 	MODELTYPE GetModelType();
-	void* GetModel();
+	int GetIndexCount();
+	ID3D11ShaderResourceView* GetTexture();
+	ID3D11ShaderResourceView** GetTextureArray();
 
 	void Render(ID3D11DeviceContext* deviceContext);
 

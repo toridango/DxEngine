@@ -2,13 +2,11 @@
 
 #include "d3dclass.h"
 #include "cameraclass.h"
-#include "modelclass.h"
-#include "lightshaderclass.h"
 #include "lightclass.h"
-#include "rendertextureclass.h"
+#include "soundclass.h"
+#include "modelclass.h"
 #include "AssimpModelClass.h"
 #include "AssimpBumpedModelClass.h"
-#include "bumpmapshaderclass.h"
 #include "LightShader.h"
 #include "BumpShader.h"
 #include "GameObject.h"
@@ -39,6 +37,7 @@ private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
 	LightClass* m_Light;
+	SoundClass* m_Sound;
 
 	// GAME OBJECTS;
 	GameObject* go_floor;
@@ -47,8 +46,8 @@ private:
 	GameObject* go_sword;
 
 	// MODELS
-	ModelClass* m_Model;
-	ModelClass* m_ModelSky;
+	AssimpModelClass* m_Model;
+	AssimpModelClass* m_ModelSky;
 	AssimpModelClass* m_ModelSword;
 	AssimpBumpedModelClass* m_ModelRock;
 
@@ -61,15 +60,17 @@ private:
 	//XMFLOAT3 m_camPos;
 
 	// FILE PATHS
-	char* path_floorModel = "../Engine/Assets/cube.txt";
+	char* path_soundLoop = "../Engine/Assets/sounds/magical_forest.wav";
+
+	char* path_floorModel = "../Engine/Assets/cube.fbx";
 	WCHAR* path_floorTex = L"../Engine/Assets/grassfloor.dds";
 	
-	char* path_skyModel = "../Engine/Assets/sphere.txt";
+	char* path_skyModel = "../Engine/Assets/sphere.fbx";
 	WCHAR* path_skyTex = L"../Engine/Assets/Skybox/skybox_texture.dds";
 	
 	const char* path_claymoreModel = "../Engine/Assets/claymore/Mini_claymore.obj";
 	WCHAR* path_claymoreTex = L"../Engine/Assets/claymore/Mini_claymore_texture.png";
-
+	
 	const char* path_rockModel = "../Engine/Assets/rock/stone.obj";
 	WCHAR* path_rockAlbedo = L"../Engine/Assets/rock/tex/stone_albedo.png";
 	WCHAR* path_rockNormal = L"../Engine/Assets/rock/tex/stone_normal.png";

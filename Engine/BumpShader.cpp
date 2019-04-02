@@ -110,20 +110,26 @@ bool BumpShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilename)
 }
 
 // The Render function sets the shader parameters first and then renders the model using the bump map shader.
-bool BumpShader::Render(int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView** textureArray, XMFLOAT3 lightDirection)
+///bool BumpShader::Render(int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+///	XMMATRIX projectionMatrix, ID3D11ShaderResourceView** textureArray, XMFLOAT3 lightDirection)
+bool BumpShader::Render(GameObject* go, CameraClass* camera, LightClass* light)
 {
 	bool result;
 
 	// Set the shader parameters that it will use for rendering.
-	result = SetShaderParameters(worldMatrix, viewMatrix, projectionMatrix, textureArray, lightDirection);
-	if (!result)
+	if (!SetShaderParameters(
+		go->GetWorldMatrix(),
+		camera->GetViewMatrix(),
+		camera->GetProjectionMatrix(),
+		go->GetTextureArray(),
+		light->GetDirection()
+	))
 	{
 		return false;
 	}
 
 	// Now render the prepared buffers with the shader.
-	RenderShader(indexCount);
+	RenderShader(go->GetIndexCount());
 
 	return true;
 }

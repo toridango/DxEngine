@@ -237,22 +237,32 @@ bool LightShader::SetShaderParameters(XMMATRIX worldMatrix,
 
 
 
-bool LightShader::Render(int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, XMFLOAT3 lightDirection, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour,
-	XMFLOAT3 cameraPosition, XMFLOAT4 specularColour, float specularPower, float deltavalue, ID3D11ShaderResourceView* texture)
+///bool LightShader::Render(int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+///	XMMATRIX projectionMatrix, XMFLOAT3 lightDirection, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour,
+///	XMFLOAT3 cameraPosition, XMFLOAT4 specularColour, float specularPower, float deltavalue, ID3D11ShaderResourceView* texture)
+bool LightShader::Render(GameObject* go, CameraClass* camera, LightClass* light, float deltavalue)
 {
-
-
+	
 	// Set the shader parameters that it will use for rendering.
-	if (!SetShaderParameters(worldMatrix, viewMatrix, projectionMatrix, 
-		lightDirection, ambientColour, diffuseColour, cameraPosition, specularColour,
-		specularPower, deltavalue, texture))
+	if (!SetShaderParameters(
+			go->GetWorldMatrix(), 
+			camera->GetViewMatrix(), 
+			camera->GetProjectionMatrix(),
+			light->GetDirection(), 
+			light->GetAmbientColour(), 
+			light->GetDiffuseColour(), 
+			camera->GetPosition(),
+			light->GetSpecularColour(),
+			light->GetSpecularPower(), 
+			deltavalue, 
+			go->GetTexture()
+		))
 	{
 		return false;
 	}
 
 	// Now render the prepared buffers with the shader.
-	RenderShader(indexCount);
+	RenderShader(go->GetIndexCount());
 
 	return true;
 }

@@ -167,19 +167,51 @@ GameObject::MODELTYPE GameObject::GetModelType()
 	return m_modelType;
 }
 
-void* GameObject::GetModel()
+int GameObject::GetIndexCount()
 {
 	switch (m_modelType)
 	{
-	case MODEL_ASSIMP:
-		return m_model;
-
 	case MODEL_ASSIMPBUMP:
-		return m_assimpModel;
+		return m_assimpBumpModel->GetIndexCount();
 
 	case MODEL_RSTTEK:
+		return m_model->GetIndexCount();
+
+	case MODEL_ASSIMP:
 	default:
-		return m_assimpBumpModel;
+		return m_assimpModel->GetIndexCount();
+	}
+}
+
+
+ID3D11ShaderResourceView* GameObject::GetTexture()
+{
+	switch (m_modelType)
+	{
+	case MODEL_ASSIMPBUMP:
+		return NULL;
+
+	case MODEL_RSTTEK:
+		return m_model->GetTexture();
+
+	case MODEL_ASSIMP:
+	default:
+		return m_assimpModel->GetTexture();
+	}
+}
+
+
+ID3D11ShaderResourceView** GameObject::GetTextureArray()
+{
+	switch (m_modelType)
+	{
+	case MODEL_ASSIMPBUMP:
+		return m_assimpBumpModel->GetTextureArray();
+
+	case MODEL_RSTTEK:
+	case MODEL_ASSIMP:
+	default:
+		return NULL;
 	}
 }
 
@@ -188,20 +220,20 @@ void GameObject::Render(ID3D11DeviceContext* deviceContext)
 {
 	switch (m_modelType)
 	{
-	case MODEL_ASSIMP:
-	{
-		m_assimpModel->Render(deviceContext);
-		break;
-	}
 	case MODEL_ASSIMPBUMP:
 	{
 		m_assimpBumpModel->Render(deviceContext);
 		break;
 	}
 	case MODEL_RSTTEK:
-	default:
 	{
 		m_model->Render(deviceContext);
+		break;
+	}
+	case MODEL_ASSIMP:
+	default:
+	{
+		m_assimpModel->Render(deviceContext);
 		break;
 	}
 	}
