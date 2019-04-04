@@ -106,149 +106,34 @@ void SwordRockScene::Shutdown()
 }
 
 
-bool SwordRockScene::CheckPath(/*std::string item,*/ char* path)
-{
-	if (!FileExists(path))
-	{
-		//MessageBox(m_hwnd, item + L" doesn't seem to exist", L"Error", MB_OK);
-		return false;
-	}
-	return true;
-}
-
-bool SwordRockScene::CheckPath(/*std::string item,*/ const char* path)
-{
-	if (!FileExists(path))
-	{
-		//MessageBox(m_hwnd, L"Floor model doesn't seem to exist", L"Error", MB_OK);
-		return false;
-	}
-	return true;
-}
-
-bool SwordRockScene::CheckPath(/*std::string item,*/ WCHAR* path)
-{
-	if (!FileExists(path))
-	{
-		//MessageBox(m_hwnd, L"Floor model doesn't seem to exist", L"Error", MB_OK);
-		return false;
-	}
-	return true;
-}
-
-bool SwordRockScene::CheckAllPaths()
-{
-	std::wstring msg = L"Some files weren't found:\n";
-	std::wstring ws;
-	bool all = true;
-	bool result = true;
-
-	// SOUNDS
-	ws = L"Background Loop\n";
-	result = CheckPath(path_soundLoop);
-	all &= result;
-	if (!result) msg += ws;
-
-	// CUBE
-	ws = L"Cube model\n";
-	result = CheckPath(path_floorModel);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Cube texture\n";
-	result = CheckPath(path_floorTex);
-	all &= result;
-	if (!result) msg += ws;
-
-	// SKY
-	ws = L"Sky model\n";
-	result = CheckPath(path_skyModel);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Sky texture\n";
-	result = CheckPath(path_skyTex);
-	all &= result;
-	if (!result) msg += ws;
-
-	// CLAYMORE
-	ws = L"Claymore model\n";
-	result = CheckPath(path_claymoreModel);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Claymore texture\n";
-	result = CheckPath(path_claymoreTex);
-	all &= result;
-	if (!result) msg += ws;
-
-	// ROCK
-	ws = L"Rock model\n";
-	result = CheckPath(path_rockModel);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Rock albedo\n";
-	result = CheckPath(path_rockAlbedo);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Rock normal map\n";
-	result = CheckPath(path_rockNormal);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Rock diffuse\n";
-	result = CheckPath(path_rockDiffuse);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Rock ambient occlusion\n";
-	result = CheckPath(path_rockAmbientOcclusion);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Rock specular\n";
-	result = CheckPath(path_rockSpecular);
-	all &= result;
-	if (!result) msg += ws;
-
-
-	// SHADERS
-	ws = L"Light vertex shader\n";
-	result = CheckPath(path_lightVertexShader);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Light pixel shader\n";
-	result = CheckPath(path_lightPixelShader);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Bump vertex shader\n";
-	result = CheckPath(path_bumpVertexShader);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Bump pixel shader\n";
-	result = CheckPath(path_bumpPixelShader);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Sky vertex shader\n";
-	result = CheckPath(path_skyVertexShader);
-	all &= result;
-	if (!result) msg += ws;
-	ws = L"Sky pixel shader\n";
-	result = CheckPath(path_skyPixelShader);
-	all &= result;
-	if (!result) msg += ws;
-
-
-	// CHANGE TO every shader/model checking their own stuff
-	if (!all)
-	{
-		MessageBox(m_hwnd, msg.c_str(), L"Error", MB_OK);
-		return false;
-	}
-
-	return true;
-}
-
 
 bool SwordRockScene::Initialize(CameraClass* camera)
 {
 	bool result;
 
-	CheckAllPaths();
+
+	m_cpPaths.push_back(path_soundLoop);
+	m_cpPaths.push_back(path_floorModel);
+	m_cpPaths.push_back(path_skyModel);
+	m_cpPaths.push_back(path_claymoreModel);
+	m_cpPaths.push_back(path_rockModel);
+
+	m_wcpPaths.push_back(path_floorTex);
+	m_wcpPaths.push_back(path_skyTex);
+	m_wcpPaths.push_back(path_claymoreTex);
+	m_wcpPaths.push_back(path_rockAlbedo);
+	m_wcpPaths.push_back(path_rockNormal);
+	m_wcpPaths.push_back(path_rockDiffuse);
+	m_wcpPaths.push_back(path_rockAmbientOcclusion);
+	m_wcpPaths.push_back(path_rockSpecular);
+	m_wcpPaths.push_back(path_lightVertexShader);
+	m_wcpPaths.push_back(path_lightPixelShader);
+	m_wcpPaths.push_back(path_skyVertexShader);
+	m_wcpPaths.push_back(path_skyPixelShader);
+	m_wcpPaths.push_back(path_bumpVertexShader);
+	m_wcpPaths.push_back(path_bumpPixelShader);
+
+	CheckAllPaths(m_hwnd);
 
 	m_Camera = camera;
 
@@ -451,10 +336,10 @@ bool SwordRockScene::Render(float deltavalue)
 
 	// Base colour
 	float R, G, B, A;
-	R = 0.6f;
-	G = 0.1f;
-	B = 0.5f;
-	A = 1.0f;
+	R = m_sceneBaseColour.x;
+	G = m_sceneBaseColour.y;
+	B = m_sceneBaseColour.z;
+	A = m_sceneBaseColour.w;
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(R, G, B, A);

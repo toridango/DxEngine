@@ -9,6 +9,7 @@
 // MY CLASS INCLUDES //
 ///////////////////////
 #include "SwordRockScene.h"
+#include "OverWorldScene.h"
 
 
 /////////////
@@ -49,7 +50,8 @@ private:
 private:
 
 	D3DClass* m_D3D;
-	SwordRockScene* m_srScene;
+	//SwordRockScene* m_Scene;
+	Scene* m_Scene;
 	CameraClass* m_Camera;
 	XMFLOAT3 m_camPos;
 };

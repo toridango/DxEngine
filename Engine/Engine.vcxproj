@@ -97,6 +97,8 @@
     <ClCompile Include="LightShader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="modelclass.cpp" />
+    <ClCompile Include="OverWorldScene.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SwordRockScene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
@@ -118,6 +120,8 @@
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="LightShader.h" />
     <ClInclude Include="modelclass.h" />
+    <ClInclude Include="OverWorldScene.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="SwordRockScene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />

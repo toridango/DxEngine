@@ -7,7 +7,7 @@
 GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
-	m_srScene = 0;
+	m_Scene = 0;
 	m_Camera = 0;
 }
 
@@ -44,8 +44,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_Camera) { return false; }
 	m_Camera->Initialize(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
 
-	m_srScene = new SwordRockScene(hwnd, m_D3D);
-	m_srScene->Initialize(m_Camera);
+	//m_Scene = new SwordRockScene(hwnd, m_D3D);
+	m_Scene = new OverWorldScene(hwnd, m_D3D);
+	m_Scene->Initialize(m_Camera);
 
 
 
@@ -65,11 +66,11 @@ void GraphicsClass::Shutdown()
 	}
 
 	// Release the Sword Rock Scene.
-	if (m_srScene)
+	if (m_Scene)
 	{
 		//m_srScene->Shutdown();
-		delete m_srScene;
-		m_srScene = 0;
+		delete m_Scene;
+		m_Scene = 0;
 	}
 
 }
@@ -149,7 +150,7 @@ bool GraphicsClass::Render(float rotation, float deltavalue)
 	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
 
-	result = m_srScene->Render(deltavalue);
+	result = m_Scene->Render(deltavalue);
 	if (!result)
 	{
 		return false;

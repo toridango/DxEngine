@@ -1,18 +1,8 @@
 #pragma once
 
-#include "d3dclass.h"
-#include "cameraclass.h"
-#include "lightclass.h"
-#include "soundclass.h"
-#include "modelclass.h"
-#include "AssimpModelClass.h"
-#include "AssimpBumpedModelClass.h"
-#include "LightShader.h"
-#include "BumpShader.h"
-#include "GameObject.h"
-#include "Utilities.h"
+#include "Scene.h"
 
-class SwordRockScene
+class SwordRockScene : public Scene
 {
 public:
 	SwordRockScene(HWND hwnd, D3DClass* d3d);
@@ -25,11 +15,11 @@ public:
 
 	bool Render(float deltavalue);
 
-private:
-	bool CheckPath(/*std::string item,*/ char* path);
-	bool CheckPath(/*std::string item,*/ const char* path);
-	bool CheckPath(/*std::string item,*/ WCHAR* path);
-	bool CheckAllPaths();
+/*private:
+	bool CheckPath(char* path);
+	bool CheckPath(const char* path);
+	bool CheckPath(WCHAR* path);
+	bool CheckAllPaths();*/
 
 private:
 	// CLASS VARIABLES
@@ -68,10 +58,10 @@ private:
 	char* path_skyModel = "../Engine/Assets/sphere.fbx";
 	WCHAR* path_skyTex = L"../Engine/Assets/Skybox/skybox_texture.dds";
 	
-	const char* path_claymoreModel = "../Engine/Assets/claymore/Mini_claymore.obj";
+	/*const*/ char* path_claymoreModel = "../Engine/Assets/claymore/Mini_claymore.obj";
 	WCHAR* path_claymoreTex = L"../Engine/Assets/claymore/Mini_claymore_texture.png";
 	
-	const char* path_rockModel = "../Engine/Assets/rock/stone.obj";
+	/*const*/ char* path_rockModel = "../Engine/Assets/rock/stone.obj";
 	WCHAR* path_rockAlbedo = L"../Engine/Assets/rock/tex/stone_albedo.png";
 	WCHAR* path_rockNormal = L"../Engine/Assets/rock/tex/stone_normal.png";
 	WCHAR* path_rockDiffuse = L"../Engine/Assets/rock/tex/stone_diffuse.png";
