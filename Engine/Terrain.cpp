@@ -4,7 +4,8 @@
 #include "Terrain.h"
 
 
-Terrain::Terrain()
+Terrain::Terrain() :
+	m_perlinImpNoise()
 {
 	m_vertexBuffer = 0;
 	m_indexBuffer = 0;
@@ -31,6 +32,9 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	float height = 0.0;
 	bool result;
 	m_device = device;
+
+	m_perlinImpNoise.InitialisePerlin(m_perlinImpNoise.RollUInt());
+
 
 	// Save the dimensions of the terrain.
 	m_terrainWidth = terrainWidth;
@@ -146,9 +150,9 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 
 
 			double n = m_perlinImpNoise.noise(
-				inverseWidth *	(double)m_heightMap[index].x * zoom,
-								(double)m_heightMap[index].y * zoom,
-				inverseHeight *	(double)m_heightMap[index].z * zoom);
+				(inverseWidth	*	(double)m_heightMap[index].x - 0.5)	* zoom,
+									(double)m_heightMap[index].y		* zoom,
+				(inverseHeight	*	(double)m_heightMap[index].z - 0.5) * zoom);
 
 			m_heightMap[index].x = (float)i;
 			m_heightMap[index].y = (float)(n * scaling);

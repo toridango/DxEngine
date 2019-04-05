@@ -8,10 +8,22 @@
 
 // I ADDED AN EXTRA METHOD THAT GENERATES A NEW PERMUTATION VECTOR (THIS IS NOT PRESENT IN THE ORIGINAL IMPLEMENTATION)
 
-// Initialize with the reference values for the permutation vector
-ImprovedNoise::ImprovedNoise()
-{
 
+std::random_device ImprovedNoise::m_randomDevice;
+std::mt19937_64 ImprovedNoise::m_mtGenerator(ImprovedNoise::m_randomDevice());
+
+ImprovedNoise::ImprovedNoise(float min, float max)
+{
+	m_perlinInit = false;
+	m_floatDistribution = std::uniform_real_distribution<float>(min, max);
+	m_UIntDistribution = std::uniform_int_distribution<unsigned int>((unsigned int) 100*min, (unsigned int) 100*max);
+}
+
+
+// Initialize with the reference values for the permutation vector
+void ImprovedNoise::InitialisePerlin()
+{
+	m_perlinInit = true;
 	// Initialize the permutation vector with the reference values
 	p = {
 		151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,
@@ -30,9 +42,12 @@ ImprovedNoise::ImprovedNoise()
 	p.insert(p.end(), p.begin(), p.end());
 }
 
+
 // Generate a new permutation vector based on the value of seed
-ImprovedNoise::ImprovedNoise(unsigned int seed) 
+void ImprovedNoise::InitialisePerlin(unsigned int seed)
 {
+	InitialisePerlin();
+	//OutputDebugStringA(("Seed: " + std::to_string(seed) + "\n").c_str());
 	p.resize(256);
 
 	// Fill p with values from 0 to 255
@@ -47,6 +62,27 @@ ImprovedNoise::ImprovedNoise(unsigned int seed)
 	// Duplicate the permutation vector
 	p.insert(p.end(), p.begin(), p.end());
 }
+
+
+void ImprovedNoise::SetRealDistributionRange(float min, float max)
+{
+	m_floatDistribution = std::uniform_real_distribution<float>(min, max);
+}
+void ImprovedNoise::SetIntDistributionRange(unsigned int min, unsigned int max)
+{
+	m_UIntDistribution = std::uniform_int_distribution<unsigned int>(min, max);
+}
+
+float ImprovedNoise::RollFloat()
+{
+	return m_floatDistribution(m_mtGenerator);
+}
+
+unsigned int ImprovedNoise::RollUInt()
+{
+	return m_UIntDistribution(m_mtGenerator);
+}
+
 
 double ImprovedNoise::noise(double x, double y, double z) 
 {

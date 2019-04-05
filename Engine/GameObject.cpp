@@ -189,6 +189,7 @@ ID3D11ShaderResourceView* GameObject::GetTexture()
 	switch (m_modelType)
 	{
 	case MODEL_ASSIMPBUMP:
+		// This mode has a texture array not a single texture
 		return NULL;
 
 	case MODEL_RSTTEK:
@@ -211,6 +212,7 @@ ID3D11ShaderResourceView** GameObject::GetTextureArray()
 	case MODEL_RSTTEK:
 	case MODEL_ASSIMP:
 	default:
+		// These modes have a single texture, not texture arrays
 		return NULL;
 	}
 }

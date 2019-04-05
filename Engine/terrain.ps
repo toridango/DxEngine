@@ -22,6 +22,10 @@ cbuffer LightBuffer
 //////////////
 struct PixelInputType
 {
+    // Color by height experiments
+    float4 color : COLOR;
+    // ---------------------------
+
     float4 position : SV_POSITION;
 	float3 normal : NORMAL;
 };
@@ -54,6 +58,11 @@ float4 TerrainPixelShader(PixelInputType input) : SV_TARGET
 
     // Saturate the final light color.
     color = saturate(color);
+    
+
+    // Color by height experiments
+    color = input.color;
+    // ---------------------------
 
     return color;
 }

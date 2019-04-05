@@ -1,1 +1,7 @@
-﻿  Engine.vcxproj -> C:\Users\Delom\Docs\MSc CGT\S2\CMP505 Procedural\UnDeadEngine\Debug\Engine.exe
+﻿  ImprovedNoise.cpp
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\improvednoise.cpp(19): warning C4244: 'argument': conversion from 'float' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=unsigned int
+          ]
+  Engine.vcxproj -> C:\Users\Delom\Docs\MSc CGT\S2\CMP505 Procedural\UnDeadEngine\Debug\Engine.exe

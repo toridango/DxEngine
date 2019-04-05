@@ -126,6 +126,7 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	// Set the initial position of the camera.
 	XMFLOAT3 camPos = XMFLOAT3(-50.0f, 30.0f, -50.0f);
 	m_Camera->SetPosition(camPos.x, camPos.y, camPos.z);
+	m_Camera->SetRotation(20.0f, 45.0f, 0.0f);
 
 
 	if (!InitializeModels()) { return false; }
@@ -195,8 +196,6 @@ bool OverWorldScene::InitializeModels()
 
 
 
-
-
 	// ------------------ New Rock ------------------
 
 	m_ModelRock = new AssimpBumpedModelClass;
@@ -229,8 +228,6 @@ bool OverWorldScene::InitializeModels()
 	go_procTerrain = new Terrain();
 	go_procTerrain->Initialize(m_D3D->GetDevice(), TERRAINWIDTH, TERRAINHEIGHT);
 	go_procTerrain->GenerateHeightMap(6.0, 12.0);
-	//go_procTerrain->GenerateHeightMap();
-	//go_procTerrain->GenerateHeightMap();
 	go_procTerrain->SetTranslation(-(float)TERRAINWIDTH/2.0f, 0.0f, -(float)TERRAINHEIGHT/2.0f);
 
 

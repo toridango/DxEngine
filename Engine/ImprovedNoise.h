@@ -5,6 +5,8 @@
 #include <random>
 #include <algorithm>
 #include <numeric>
+//#include <d3d11.h>
+//#include <string>
 
 
 // From https://github.com/sol-prog/Perlin_Noise
@@ -21,17 +23,42 @@ class ImprovedNoise
 {
 	// The permutation vector
 	std::vector<int> p;
+
+
 public:
+	ImprovedNoise(float min = 0.0f, float max = 1.0f);
+
 	// Initialize with the reference values for the permutation vector
-	ImprovedNoise();
+	void InitialisePerlin();
 	// Generate a new permutation vector based on the value of seed
-	ImprovedNoise(unsigned int seed);
+	void InitialisePerlin(unsigned int seed);
+
+	void SetRealDistributionRange(float min, float max);
+	void SetIntDistributionRange(unsigned int min, unsigned int max);
+	float RollFloat();
+	unsigned int RollUInt();
+
 	// Get a noise value, for 2D images z can have any value
 	double noise(double x, double y, double z);
+
 private:
+
 	double fade(double t);
 	double lerp(double t, double a, double b);
 	double grad(int hash, double x, double y, double z);
+
+private:
+
+	// Been initialised flag
+	bool m_perlinInit;
+	// Random number generator (based on stochastic processes to generate sequence of uniformily distributed random numbers)
+	static std::random_device m_randomDevice;
+	// Mersenne Twister pseudo-random generator of 64-bit numbers with a state size of 19937 bits
+	static std::mt19937_64 m_mtGenerator;
+
+	std::uniform_int_distribution<unsigned int> m_UIntDistribution;
+	std::uniform_real_distribution<float> m_floatDistribution;
+
 };
 
 #endif
