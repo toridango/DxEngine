@@ -1,4 +1,6 @@
-
+/.vs
+/packages
+/Engine/Assets
 /Debug
 /Release
 

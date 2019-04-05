@@ -30,6 +30,7 @@ private:
 	// GAME OBJECTS;
 	GameObject* go_sky;
 	GameObject* go_rock;
+	Terrain* go_procTerrain;
 
 	// MODELS
 	AssimpModelClass* m_Model;
@@ -40,6 +41,7 @@ private:
 	LightShader* m_LightShader;
 	LightShader* m_SkyShader;
 	BumpShader* m_BumpMapShader;
+	TerrainShader* m_TerrainShader;
 
 
 	// FILE PATHS
@@ -48,7 +50,7 @@ private:
 	char* path_skyModel = "../Engine/Assets/sphere.fbx";
 	WCHAR* path_skyTex = L"../Engine/Assets/Skybox/skybox_texture.dds";
 
-	const char* path_rockModel = "../Engine/Assets/rock/stone.obj";
+	char* path_rockModel = "../Engine/Assets/rock/stone.obj";
 	WCHAR* path_rockAlbedo = L"../Engine/Assets/rock/tex/stone_albedo.png";
 	WCHAR* path_rockNormal = L"../Engine/Assets/rock/tex/stone_normal.png";
 	WCHAR* path_rockDiffuse = L"../Engine/Assets/rock/tex/stone_diffuse.png";
@@ -62,5 +64,7 @@ private:
 	WCHAR* path_skyPixelShader = L"../Engine/sky.ps";
 	WCHAR* path_bumpVertexShader = L"../Engine/bumpmap.vs";
 	WCHAR* path_bumpPixelShader = L"../Engine/bumpmap.ps";
+	WCHAR* path_terrainVertexShader = L"../Engine/terrain.vs";
+	WCHAR* path_terrainPixelShader = L"../Engine/terrain.ps";
 };
 

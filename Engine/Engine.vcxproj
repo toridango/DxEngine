@@ -92,6 +92,7 @@
     <ClCompile Include="d3dclass.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
+    <ClCompile Include="ImprovedNoise.cpp" />
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="lightclass.cpp" />
     <ClCompile Include="LightShader.cpp" />
@@ -104,6 +105,8 @@
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="soundclass.cpp" />
     <ClCompile Include="systemclass.cpp" />
+    <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="TerrainShader.cpp" />
     <ClCompile Include="texturearrayclass.cpp" />
     <ClCompile Include="textureclass.cpp" />
     <ClCompile Include="Utilities.cpp" />
@@ -116,6 +119,7 @@
     <ClInclude Include="d3dclass.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="graphicsclass.h" />
+    <ClInclude Include="ImprovedNoise.h" />
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="LightShader.h" />
@@ -127,6 +131,8 @@
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="soundclass.h" />
     <ClInclude Include="systemclass.h" />
+    <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TerrainShader.h" />
     <ClInclude Include="texturearrayclass.h" />
     <ClInclude Include="textureclass.h" />
     <ClInclude Include="Utilities.h" />
@@ -139,6 +145,8 @@
     <None Include="packages.config" />
     <None Include="sky.ps" />
     <None Include="sky.vs" />
+    <None Include="terrain.ps" />
+    <None Include="terrain.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -47,6 +47,14 @@ void OverWorldScene::Shutdown()
 		m_BumpMapShader = 0;
 	}
 
+	// Release the bump map shader object.
+	if (m_TerrainShader)
+	{
+		//m_BumpMapShader->Shutdown();
+		delete m_TerrainShader;
+		m_TerrainShader = 0;
+	}
+
 	// Release the model object.
 	if (m_ModelSky)
 	{
@@ -56,12 +64,12 @@ void OverWorldScene::Shutdown()
 	}
 
 	// Release the model object.
-	/*if (m_ModelRock)
+	if (m_ModelRock)
 	{
 		m_ModelRock->Shutdown();
 		delete m_ModelRock;
 		m_ModelRock = 0;
-	}*/
+	}
 
 
 	// Release the camera object.
@@ -108,13 +116,15 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	m_wcpPaths.push_back(path_skyPixelShader);
 	m_wcpPaths.push_back(path_bumpVertexShader);
 	m_wcpPaths.push_back(path_bumpPixelShader);
+	m_wcpPaths.push_back(path_terrainVertexShader);
+	m_wcpPaths.push_back(path_terrainPixelShader);
 
 	CheckAllPaths(m_hwnd);
 
 	m_Camera = camera;
 
 	// Set the initial position of the camera.
-	XMFLOAT3 camPos = XMFLOAT3(0.0f, 0.0f, -10.0f);
+	XMFLOAT3 camPos = XMFLOAT3(-50.0f, 30.0f, -50.0f);
 	m_Camera->SetPosition(camPos.x, camPos.y, camPos.z);
 
 
@@ -130,7 +140,7 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	m_Light->SetAmbientColour(1.f, 1.0f, 1.f, 1.0f);
 	m_Light->SetDiffuseColour(.6f, .0f, .3f, 1.0f);
 	m_Light->SetSpecularColour(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetDirection(0.0f, 0.0f, 1.0f);
+	m_Light->SetDirection(1.0f, -0.3f, 1.0f);
 	m_Light->SetSpecularPower(32.0f);
 
 	// Was in render
@@ -160,6 +170,9 @@ bool OverWorldScene::InitializeModels()
 {
 	bool result;
 
+
+	// ------------------ Sky ------------------
+
 	// Create the model object.
 	// WARNING: Before adapting this to only assimp models, you need to 
 	// adapt the cubemap options from modelclass into assimpmodelclass
@@ -178,6 +191,47 @@ bool OverWorldScene::InitializeModels()
 	go_sky->SetModel(m_ModelSky);
 
 	go_sky->SetTranslation(m_Camera->GetPosition());
+
+
+
+
+
+
+	// ------------------ New Rock ------------------
+
+	m_ModelRock = new AssimpBumpedModelClass;
+	if (!m_ModelRock) { return false; }
+
+	result = m_ModelRock->Initialize(m_D3D->GetDevice(), path_rockModel,
+		path_rockAlbedo,
+		path_rockNormal,
+		path_rockDiffuse,
+		path_rockAmbientOcclusion,
+		path_rockSpecular);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the rock model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	go_rock = new GameObject();
+	go_rock->SetModel(m_ModelRock);
+
+	go_rock->ScaleAtOrigin(3.0f, 3.0f, 3.0f);
+	go_rock->SetTranslation(0.0f, 1.6f, 0.0f);
+
+
+
+
+	// ------------------ Terrain ------------------
+
+
+	go_procTerrain = new Terrain();
+	go_procTerrain->Initialize(m_D3D->GetDevice(), TERRAINWIDTH, TERRAINHEIGHT);
+	go_procTerrain->GenerateHeightMap(6.0, 12.0);
+	//go_procTerrain->GenerateHeightMap();
+	//go_procTerrain->GenerateHeightMap();
+	go_procTerrain->SetTranslation(-(float)TERRAINWIDTH/2.0f, 0.0f, -(float)TERRAINHEIGHT/2.0f);
 
 
 
@@ -229,6 +283,19 @@ bool OverWorldScene::InitializeShaders()
 	}
 
 
+	// Create the bump map shader object.
+	m_TerrainShader = new TerrainShader(m_hwnd, m_D3D->GetDevice(), m_D3D->GetDeviceContext());
+	if (!m_TerrainShader) { return false; }
+
+	// Initialize the bump map shader object.
+	result = m_TerrainShader->InitializeShader(path_terrainVertexShader, path_terrainPixelShader);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the terrain shader object.", L"Error", MB_OK);
+		return false;
+	}
+
+
 	return true;
 }
 
@@ -236,7 +303,6 @@ bool OverWorldScene::InitializeShaders()
 bool OverWorldScene::Render(float deltavalue)
 {
 
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
 
 	// Base colour
@@ -252,26 +318,21 @@ bool OverWorldScene::Render(float deltavalue)
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
 
-	viewMatrix = m_Camera->GetViewMatrix();
-	projectionMatrix = m_Camera->GetProjectionMatrix();
 
+	// ------------------ New Rock ------------------
 
-
-
-	/*XMFLOAT4 v = m_Light->GetSpecularColour();
-	v.x = v.y = v.z = v.w = 0.0f;
 
 	//m_ModelRock->Render(m_D3D->GetDeviceContext());
 	go_rock->Render(m_D3D->GetDeviceContext());
-	m_Light->SetDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
-
-	worldMatrix = go_rock->GetWorldMatrix();
-
+	
 	// Render the model using the light shader.
 	result = m_BumpMapShader->Render(go_rock, m_Camera, m_Light);
 
-	if (!result) { return false; }*/
+	if (!result) { return false; }
 
+
+
+	// ------------------ Sky ------------------
 
 
 	m_D3D->setSkyMode(true);
@@ -280,10 +341,21 @@ bool OverWorldScene::Render(float deltavalue)
 	go_sky->Render(m_D3D->GetDeviceContext());
 
 	go_sky->SetTranslation(m_Camera->GetPosition());
-	worldMatrix = go_sky->GetWorldMatrix();
 
 	// Render the model using the light shader.
 	result = m_SkyShader->Render(go_sky, m_Camera, m_Light, deltavalue);
+
+	if (!result) { return false; }
+
+	m_D3D->setSkyMode(false);
+
+
+
+	// ------------------ Terrain ------------------
+
+	go_procTerrain->Render(m_D3D->GetDeviceContext());
+
+	result = m_TerrainShader->Render(go_procTerrain, m_Camera, m_Light);
 
 	if (!result) { return false; }
 
