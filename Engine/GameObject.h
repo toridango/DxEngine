@@ -13,7 +13,8 @@ public:
 	{
 		MODEL_RSTTEK,
 		MODEL_ASSIMP,
-		MODEL_ASSIMPBUMP
+		MODEL_ASSIMPBUMP,
+		MODEL_TERRAIN
 	};
 
 public:
@@ -44,11 +45,11 @@ public:
 
 	XMMATRIX GetWorldMatrix();
 	MODELTYPE GetModelType();
-	int GetIndexCount();
+	virtual int GetIndexCount();
 	ID3D11ShaderResourceView* GetTexture();
 	ID3D11ShaderResourceView** GetTextureArray();
 
-	void Render(ID3D11DeviceContext* deviceContext);
+	virtual void Render(ID3D11DeviceContext* deviceContext);
 
 private:
 

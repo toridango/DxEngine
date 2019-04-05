@@ -8,13 +8,18 @@
 #include "cameraclass.h"
 #include "lightclass.h"
 #include "soundclass.h"
+#include "GameObject.h"
+#include "Utilities.h"
+
 #include "modelclass.h"
 #include "AssimpModelClass.h"
 #include "AssimpBumpedModelClass.h"
+#include "Terrain.h"
+
 #include "LightShader.h"
 #include "BumpShader.h"
-#include "GameObject.h"
-#include "Utilities.h"
+#include "TerrainShader.h"
+
 
 // Abstract Scene
 class Scene

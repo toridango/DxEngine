@@ -86,7 +86,7 @@ bool BumpShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilename)
 	{
 		return false;
 	}
-	   
+
 
 
 	// The light constant buffer is set up here.
