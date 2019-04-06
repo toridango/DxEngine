@@ -227,12 +227,9 @@ bool InputClass::IsEscapePressed() const
 	// Do a bitwise and on the keyboard state to check if the escape key is currently being pressed.
 	// 0x80 is used as a mask to get the bit that tells if the key is being pressed
 	// e.g for ESC: 10000001 & 10000000 when its pressed
-	if (m_keyboardState[DIK_ESCAPE] & 0x80)
-	{
-		return true;
-	}
+	return (m_keyboardState[DIK_ESCAPE] & 0x80); //{ return true; }
 
-	return false;
+	//return false;
 }
 
 bool InputClass::IsWPressed() const { return (m_keyboardState[DIK_W] & 0x80); }
@@ -242,6 +239,8 @@ bool InputClass::IsAPressed() const { return (m_keyboardState[DIK_A] & 0x80); }
 bool InputClass::IsSPressed() const { return (m_keyboardState[DIK_S] & 0x80); }
 
 bool InputClass::IsDPressed() const { return (m_keyboardState[DIK_D] & 0x80); }
+
+bool InputClass::IsLShiftPressed() const { return (m_keyboardState[DIK_LSHIFT] & 0x80); }
 
 XMFLOAT3 InputClass::GetMouseMovement() const { return XMFLOAT3(m_mouseState.lX, m_mouseState.lY, m_mouseState.lZ); }
 

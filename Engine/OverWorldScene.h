@@ -1,5 +1,8 @@
 #pragma once
 
+#include <d3d11.h>
+#include <string>
+
 
 #include "Scene.h"
 
@@ -26,6 +29,7 @@ private:
 	CameraClass* m_Camera;
 	LightClass* m_Light;
 	SoundClass* m_Sound;
+	double m_k; // iteration variable that was being used to watch the terrain change
 
 	// GAME OBJECTS;
 	GameObject* go_sky;

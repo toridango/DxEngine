@@ -45,6 +45,7 @@ public:
 	bool IsAPressed() const;
 	bool IsSPressed() const;
 	bool IsDPressed() const;
+	bool IsLShiftPressed() const;
 	XMFLOAT3 GetMouseMovement() const;
 	void GetMouseLocation(int&, int&);
 

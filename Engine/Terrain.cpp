@@ -21,6 +21,7 @@ Terrain::Terrain(const Terrain& other)
 
 Terrain::~Terrain()
 {
+	ModelShutdown();
 }
 
 
@@ -33,7 +34,8 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	bool result;
 	m_device = device;
 
-	m_perlinImpNoise.InitialisePerlin(m_perlinImpNoise.RollUInt());
+	// Commented randomisation for testing purposes
+	m_perlinImpNoise.InitialisePerlin(/*m_perlinImpNoise.RollUInt()*/);
 
 
 	// Save the dimensions of the terrain.
@@ -145,14 +147,16 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 		for (int i = 0; i < m_terrainWidth; i++)
 		{
 			index = (m_terrainHeight * j) + i;
-			double inverseHeight = (1.0 / (double)m_terrainHeight);
-			double inverseWidth = (1.0 / (double)m_terrainWidth);
+			double z = (double)m_heightMap[index].z * zoom * (1.0 / (double)m_terrainHeight);
+			double y = (double)m_heightMap[index].y * zoom;
+			double x = (double)m_heightMap[index].x * zoom * (1.0 / (double)m_terrainWidth);
 
-
-			double n = m_perlinImpNoise.noise(
-				(inverseWidth	*	(double)m_heightMap[index].x - 0.5)	* zoom,
-									(double)m_heightMap[index].y		* zoom,
-				(inverseHeight	*	(double)m_heightMap[index].z - 0.5) * zoom);
+			double k[] = { 1.0, 2.0, 4.0 };
+			double n = 0.0;
+			for (double d : k)
+			{
+				n += (1.0 / d) * m_perlinImpNoise.noise(d*x, d*y, d*z);
+			}
 
 			m_heightMap[index].x = (float)i;
 			m_heightMap[index].y = (float)(n * scaling);
@@ -171,7 +175,7 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 	// Initialize the vertex and index buffer that hold the geometry for the terrain.
 	result = InitializeBuffers(m_device);
 	if (!result) { return false; }
-
+	
 	//	m_terrainGeneratedToggle = true;
 	//}
 	//else
@@ -496,12 +500,20 @@ void Terrain::ShutdownHeightMap()
 		m_heightMap = 0;
 	}
 
+	if (m_pastMap)
+	{
+		delete[] m_pastMap;
+		m_pastMap = 0;
+	}
+
 	return;
 }
 
 
 bool Terrain::InitializeBuffers(ID3D11Device* device)
 {
+	ShutdownBuffers();
+
 	VertexType* vertices;
 	unsigned long* indices;
 	int index, i, j;

@@ -170,6 +170,9 @@ bool SystemClass::HandleInput()
 	{
 		return false;
 	}
+
+	m_Graphics->SetSprint(m_Input->IsLShiftPressed());
+
 	if (m_Input->IsWPressed())
 	{
 		m_Graphics->MoveForward();

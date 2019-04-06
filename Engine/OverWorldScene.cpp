@@ -6,6 +6,7 @@ OverWorldScene::OverWorldScene(HWND hwnd, D3DClass* d3d) :
 	m_hwnd(hwnd),
 	m_D3D(d3d)
 {
+	m_k = 0;
 }
 
 
@@ -227,8 +228,11 @@ bool OverWorldScene::InitializeModels()
 
 	go_procTerrain = new Terrain();
 	go_procTerrain->Initialize(m_D3D->GetDevice(), TERRAINWIDTH, TERRAINHEIGHT);
-	go_procTerrain->GenerateHeightMap(6.0, 12.0);
-	go_procTerrain->SetTranslation(-(float)TERRAINWIDTH/2.0f, 0.0f, -(float)TERRAINHEIGHT/2.0f);
+	double scaling = 6.0;
+	double zoom = 12.0;
+	go_procTerrain->GenerateHeightMap(scaling, zoom);
+	OutputDebugStringA(("Scaling: " + std::to_string(scaling) + "\t\tZoom: " + std::to_string(zoom) + "\n").c_str());
+	go_procTerrain->SetTranslation(-(float)TERRAINWIDTH/2.0f, -0.5f, -(float)TERRAINHEIGHT/2.0f);
 
 
 
@@ -349,13 +353,21 @@ bool OverWorldScene::Render(float deltavalue)
 
 
 	// ------------------ Terrain ------------------
+	
+	// Stupid but fun animation to see the parameters increasing
+	/*go_procTerrain->ModelShutdown();
+	go_procTerrain->Initialize(m_D3D->GetDevice(), TERRAINWIDTH, TERRAINHEIGHT);
+	go_procTerrain->GenerateHeightMap(m_k, m_k*2);
+	go_procTerrain->Smooth();
+	OutputDebugStringA(("Scaling: " + std::to_string(m_k) + "\t\tZoom: " + std::to_string(m_k*2) + "\n").c_str());
+	m_k += 0.05;*/
+	
 
 	go_procTerrain->Render(m_D3D->GetDeviceContext());
 
 	result = m_TerrainShader->Render(go_procTerrain, m_Camera, m_Light);
 
 	if (!result) { return false; }
-
 
 
 	// Present the rendered scene to the screen.

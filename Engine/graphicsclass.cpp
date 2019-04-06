@@ -25,7 +25,8 @@ GraphicsClass::~GraphicsClass()
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
-
+	m_sprint = false;
+	m_movSpeed = MOV_SPEED_NORMAL;
 
 	// Create the Direct3D object.
 	m_D3D = new D3DClass;
@@ -111,19 +112,19 @@ bool GraphicsClass::Frame()
 
 void GraphicsClass::StrafeLeft()
 {
-	Strafe(-1.0 * MOV_SPEED);
+	Strafe(-1.0 * m_movSpeed);
 }
 void GraphicsClass::StrafeRight()
 {
-	Strafe(MOV_SPEED);
+	Strafe(m_movSpeed);
 }
 void GraphicsClass::MoveForward()
 {
-	Advance(MOV_SPEED);
+	Advance(m_movSpeed);
 }
 void GraphicsClass::MoveBack()
 {
-	Advance(-1.0 * MOV_SPEED);
+	Advance(-1.0 * m_movSpeed);
 }
 
 void GraphicsClass::Strafe(float amount)
@@ -139,6 +140,13 @@ void GraphicsClass::Advance(float amount)
 void GraphicsClass::Rotate(XMFLOAT3 rot)
 {
 	m_Camera->Rotate(rot);
+}
+
+void GraphicsClass::SetSprint(bool sprint)
+{
+	m_sprint = sprint;
+	if (sprint) m_movSpeed = MOV_SPEED_SPRINT;
+	else m_movSpeed = MOV_SPEED_NORMAL;
 }
 
 //                     //
