@@ -53,7 +53,7 @@ private:
 	char* path_soundLoop = "../Engine/Assets/sounds/magical_forest.wav";
 
 	char* path_floorModel = "../Engine/Assets/cube.fbx";
-	WCHAR* path_floorTex = L"../Engine/Assets/grassfloor.dds";
+	WCHAR* path_floorTex = L"../Engine/Assets/grass.dds";
 	
 	char* path_skyModel = "../Engine/Assets/sphere.fbx";
 	WCHAR* path_skyTex = L"../Engine/Assets/Skybox/skybox_texture.dds";

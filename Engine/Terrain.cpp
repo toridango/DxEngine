@@ -11,6 +11,11 @@ Terrain::Terrain() :
 	m_indexBuffer = 0;
 	m_heightMap = 0;
 	m_terrainGeneratedToggle = false;
+
+	for (TextureClass* t : m_Textures)
+	{
+		t = 0;
+	}
 }
 
 
@@ -27,12 +32,16 @@ Terrain::~Terrain()
 
 
 
-bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight)
+bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight,
+	WCHAR* lowestTexFile, WCHAR* lowTexFile, WCHAR* highTexFile, WCHAR* highestTexFile)
 {
 	int index;
 	float height = 0.0;
 	bool result;
+	//m_maxHeight = 120.0;
+	//m_minHeight = 0.0;
 	m_device = device;
+	m_Textures.reserve(4);
 
 	// Commented randomisation for testing purposes
 	m_perlinImpNoise.InitialisePerlin(/*m_perlinImpNoise.RollUInt()*/);
@@ -49,6 +58,9 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	m_pastMap = new HeightMapType[m_terrainWidth * m_terrainHeight];
 	if (!m_pastMap) { return false; }
 
+	float invWidth = 1.0f / m_terrainWidth;
+	float invHeight = 1.0f / m_terrainHeight;
+
 	// Initialise the data in the height map (flat).
 	for (int j = 0; j < m_terrainHeight; j++)
 	{
@@ -60,13 +72,15 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 			m_heightMap[index].y = (float)height;
 			m_heightMap[index].z = (float)j;
 
+			m_heightMap[index].tu = (float)i * invWidth; //(float)(i % 1024) / 1024.0f;
+			m_heightMap[index].tv = (float)j * invHeight; //(float)(j % 1024) / 1024.0f;
+
 			m_pastMap[index].x = m_heightMap[index].x;
 			m_pastMap[index].y = m_heightMap[index].y;
 			m_pastMap[index].z = m_heightMap[index].z;
 
 		}
 	}
-
 
 	// Normalize the height of the height map.
 	NormalizeHeightMap();
@@ -75,6 +89,19 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	// Calculate the normals for the terrain data.
 	result = CalculateNormals();
 	if (!result) { return false; }
+
+
+	result = LoadTexture(device, lowestTexFile, LOWEST);
+	if (!result) { return false; }
+	result = LoadTexture(device, lowTexFile, LOW);
+	if (!result) { return false; }
+	result = LoadTexture(device, highTexFile, HIGH);
+	if (!result) { return false; }
+	result = LoadTexture(device, highestTexFile, HIGHEST);
+	if (!result) { return false; }
+
+
+
 
 	// Initialize the vertex and index buffer that hold the geometry for the terrain.
 	result = InitializeBuffers(device);
@@ -94,6 +121,38 @@ void Terrain::ModelShutdown()
 
 	// Release the height map data.
 	ShutdownHeightMap();
+
+	ReleaseTextures();
+}
+
+
+
+ID3D11ShaderResourceView* Terrain::GetTexture(Terrain::TEXID id)
+{
+	return m_Textures[id]->GetTexture();
+}
+
+
+bool Terrain::LoadTexture(ID3D11Device* device, WCHAR* filename, Terrain::TEXID id)
+{
+	bool result;
+
+
+	// Create the texture object.
+	//std::vector<TextureClass*>::allocator_type texAlloc = m_Textures.get_allocator();
+	//TextureClass* tex = new TextureClass;
+	m_Textures.emplace_back(new TextureClass);
+	//m_Textures[id] = new TextureClass;
+	if (!m_Textures[id])
+	{
+		return false;
+	}
+
+	// Initialize the texture object.
+	result = m_Textures[id]->Initialize(device, filename);
+	if (!result) { return false; }
+
+	return true;
 }
 
 
@@ -138,6 +197,8 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 	int index;
 	float height = 0.0;
 
+	double maxHeight = -DBL_MAX;
+	double minHeight = DBL_MAX;
 
 	//loop through the terrain and set the heights how we want. This is where we generate the terrain
 	//in this case I will run a sin-wave through the terrain in one axis.
@@ -158,13 +219,23 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 				n += (1.0 / d) * m_perlinImpNoise.noise(d*x, d*y, d*z);
 			}
 
+			double e = (n * scaling);
+
+			if (e > maxHeight) maxHeight = e;
+			if (e < minHeight) minHeight = e;
+
 			m_heightMap[index].x = (float)i;
-			m_heightMap[index].y = (float)(n * scaling);
+			m_heightMap[index].y = (float)e;
 			m_heightMap[index].z = (float)j;
+
 
 		}
 	}
 
+	m_maxHeight = maxHeight;
+	m_minHeight = minHeight;
+
+	CalculateBlendings();
 
 	result = CalculateNormals();
 	if (!result)
@@ -175,7 +246,7 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 	// Initialize the vertex and index buffer that hold the geometry for the terrain.
 	result = InitializeBuffers(m_device);
 	if (!result) { return false; }
-	
+
 	//	m_terrainGeneratedToggle = true;
 	//}
 	//else
@@ -240,6 +311,87 @@ bool Terrain::Smooth()
 	return true;
 
 }
+
+XMFLOAT4 Terrain::TextureBlendingByHeight(HeightMapType h)
+{
+	return TextureBlendingByHeight(h.y);
+}
+
+
+XMFLOAT4 Terrain::TextureBlendingByHeight(float h)
+{
+	XMFLOAT4 blending;
+	float e = (h - m_minHeight) / (m_maxHeight - m_minHeight);
+
+	// Thresholds: for 4 textures, 6 thresholds are needed for the 7 zones:
+	// only colour1, colour1 & colour2 blend,
+	// only colour2, colour2 & colour3 blend,
+	// only colour3, colour3 & colour4 blend,
+	// only colour4
+	// From Highest to lowest:
+	//			c1 | c1&2 | c2 | c2&3 | c3 | c3&4 | c4 
+	float th[] = { 0.9f, 0.7f, 0.6f, 0.4f, 0.3f, 0.1f };
+	
+
+	if (e >= th[0])
+	{
+		blending = XMFLOAT4{ 1.0f, 0.0f, 0.0f, 0.0f };
+	}
+	else if (e < th[0] && e >= th[1])
+	{
+		float a = (e - th[1]) / (th[0] - th[1]);
+		blending = XMFLOAT4{ a, 1.0f - a, 0.0f, 0.0f };
+	}
+	else if (e < th[1] && e >= th[2])
+	{
+		blending = XMFLOAT4{ 0.0f, 1.0f, 0.0f, 0.0f };
+	}
+	else if (e < th[2] && e >= th[3])
+	{
+		float a = (e - th[3]) / (th[2] - th[3]);
+		blending = XMFLOAT4{ 0.0f, a, 1.0f - a, 0.0f };
+	}
+	else if (e < th[3] && e >= th[4])
+	{
+		blending = XMFLOAT4{ 0.0f, 0.0f, 1.0f, 0.0f };
+	}
+	else if (e < th[4] && e >= th[5])
+	{
+		float a = (e - th[5]) / (th[4] - th[5]);
+		blending = XMFLOAT4{ 0.0f, 0.0f, a, 1.0f - a };
+	}
+	else if (e < th[5])
+	{
+		blending = XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f };
+	}
+
+	if (e > 0.9f)
+	{
+		OutputDebugStringA(("minH: " + std::to_string(m_minHeight) + "\tmaxH: " + std::to_string(m_maxHeight)).c_str());
+		OutputDebugStringA(("\tthis height: " + std::to_string(h) + "\t\t").c_str()); 
+		OutputDebugStringA(("blending: " + std::to_string(blending.x) + ", "
+							+ std::to_string(blending.y) + ", " + std::to_string(blending.z) + ", "
+							+ std::to_string(blending.w) + ", " + "\n").c_str());
+	}
+
+
+	return blending;
+}
+
+void Terrain::CalculateBlendings()
+{
+	
+	int index;
+	for (int j = 0; j < m_terrainHeight; j++)
+	{
+		for (int i = 0; i < m_terrainWidth; i++)
+		{
+			index = (m_terrainHeight * j) + i;
+			m_heightMap[index].blending = TextureBlendingByHeight(m_heightMap[index]);
+		}
+	}
+}
+
 
 void Terrain::NormalizeHeightMap()
 {
@@ -394,101 +546,63 @@ bool Terrain::CalculateNormals()
 	return true;
 }
 
-/*bool TerrainClass::LoadColourMap(char* filename)
+void Terrain::CalculateTextureCoordinates()
 {
-	int error, imageSize, i, j, k, index, colorMapWidth, colorMapHeight;
-	FILE* filePtr;
-	unsigned int count;
-	BITMAPFILEHEADER bitmapFileHeader;
-	BITMAPINFOHEADER bitmapInfoHeader;
-	unsigned char* bitmapImage;
+	int incrementCount, i, j, tuCount, tvCount;
+	float incrementValue, tuCoordinate, tvCoordinate;
 
 
-	// Open the color map file in binary.
-	error = fopen_s(&filePtr, filename, "rb");
-	if (error != 0)
+	// Calculate how much to increment the texture coordinates by.
+	incrementValue = (float)TEXTURE_REPEAT / (float)m_terrainWidth;
+
+	// Calculate how many times to repeat the texture.
+	incrementCount = m_terrainWidth / TEXTURE_REPEAT;
+
+	// Initialize the tu and tv coordinate values.
+	tuCoordinate = 0.0f;
+	tvCoordinate = 1.0f;
+
+	// Initialize the tu and tv coordinate indexes.
+	tuCount = 0;
+	tvCount = 0;
+
+	// Loop through the entire height map and calculate the tu and tv texture coordinates for each vertex.
+	for (j = 0; j < m_terrainHeight; j++)
 	{
-		return false;
-	}
-
-	// Read in the file header.
-	count = fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
-	if (count != 1)
-	{
-		return false;
-	}
-
-	// Read in the bitmap info header.
-	count = fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, filePtr);
-	if (count != 1)
-	{
-		return false;
-	}
-
-	// For simplicity I ensure that the color map size is the same as the height map size.If you would like to use any size color map and have it stretch, shrink, or interpolate you can remove this check and modify the code below.
-
-	// Make sure the color map dimensions are the same as the terrain dimensions for easy 1 to 1 mapping.
-	colorMapWidth = bitmapInfoHeader.biWidth;
-	colorMapHeight = bitmapInfoHeader.biHeight;
-
-	if ((colorMapWidth != m_terrainWidth) || (colorMapHeight != m_terrainHeight))
-	{
-		return false;
-	}
-
-	// Calculate the size of the bitmap image data.
-	imageSize = colorMapWidth * colorMapHeight * 3;
-
-	// Allocate memory for the bitmap image data.
-	bitmapImage = new unsigned char[imageSize];
-	if (!bitmapImage)
-	{
-		return false;
-	}
-
-	// Move to the beginning of the bitmap data.
-	fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
-
-	// Read in the bitmap image data.
-	count = fread(bitmapImage, 1, imageSize, filePtr);
-	if (count != imageSize)
-	{
-		return false;
-	}
-
-	// Close the file.
-	error = fclose(filePtr);
-	if (error != 0)
-	{
-		return false;
-	}
-
-	// The color map data is read into the r, g, and b components of the height map array.
-
-	// Initialize the position in the image data buffer.
-	k = 0;
-
-	// Read the image data into the color map portion of the height map structure.
-	for (j = 0; j<colorMapHeight; j++)
-	{
-		for (i = 0; i<colorMapWidth; i++)
+		for (i = 0; i < m_terrainWidth; i++)
 		{
-			index = (colorMapHeight * j) + i;
+			// Store the texture coordinate in the height map.
+			m_heightMap[(m_terrainHeight * j) + i].tu = tuCoordinate;
+			m_heightMap[(m_terrainHeight * j) + i].tv = tvCoordinate;
 
-			m_heightMap[index].b = (float)bitmapImage[k] / 255.0f;
-			m_heightMap[index].g = (float)bitmapImage[k + 1] / 255.0f;
-			m_heightMap[index].r = (float)bitmapImage[k + 2] / 255.0f;
+			// Increment the tu texture coordinate by the increment value and increment the index by one.
+			tuCoordinate += incrementValue;
+			tuCount++;
 
-			k += 3;
+			// Check if at the far right end of the texture and if so then start at the beginning again.
+			if (tuCount == incrementCount)
+			{
+				tuCoordinate = 0.0f;
+				tuCount = 0;
+			}
+		}
+
+		// Increment the tv texture coordinate by the increment value and increment the index by one.
+		tvCoordinate -= incrementValue;
+		tvCount++;
+
+		// Check if at the top of the texture and if so then start at the bottom again.
+		if (tvCount == incrementCount)
+		{
+			tvCoordinate = 1.0f;
+			tvCount = 0;
 		}
 	}
 
-	// Release the bitmap image data.
-	delete[] bitmapImage;
-	bitmapImage = 0;
+	return;
+}
 
-	return true;
-}*/
+
 
 
 
@@ -507,6 +621,20 @@ void Terrain::ShutdownHeightMap()
 	}
 
 	return;
+}
+
+void Terrain::ReleaseTextures()
+{
+	for (TextureClass* tex : m_Textures)
+	{
+		// Release the texture object.
+		if (tex)
+		{
+			tex->Shutdown();
+			delete tex;
+			tex = nullptr;
+		}
+	}
 }
 
 
@@ -531,17 +659,11 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 
 	// Create the vertex array.
 	vertices = new VertexType[m_vertexCount];
-	if (!vertices)
-	{
-		return false;
-	}
+	if (!vertices) { return false; }
 
 	// Create the index array.
 	indices = new unsigned long[m_indexCount];
-	if (!indices)
-	{
-		return false;
-	}
+	if (!indices) { return false; }
 
 	// Initialize the index to the vertex buffer.
 	index = 0;
@@ -559,36 +681,61 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			// Upper left.
 			vertices[index].position = XMFLOAT3(m_heightMap[index3].x, m_heightMap[index3].y, m_heightMap[index3].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index3].nx, m_heightMap[index3].ny, m_heightMap[index3].nz);
+			vertices[index].uv = XMFLOAT2(m_heightMap[index3].tu, m_heightMap[index3].tv);
+			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index3]);
+			vertices[index].blending = m_heightMap[index3].blending;
 			indices[index] = index;
 			index++;
 
 			// Upper right.
 			vertices[index].position = XMFLOAT3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index4].nx, m_heightMap[index4].ny, m_heightMap[index4].nz);
+			vertices[index].uv = XMFLOAT2(m_heightMap[index4].tu, m_heightMap[index4].tv);
+			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index4]);
+			vertices[index].blending = m_heightMap[index4].blending;
 			indices[index] = index;
 			index++;
 
 			// Bottom left.
 			vertices[index].position = XMFLOAT3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index1].nx, m_heightMap[index1].ny, m_heightMap[index1].nz);
+			vertices[index].uv = XMFLOAT2(m_heightMap[index1].tu, m_heightMap[index1].tv);
+			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index1]);
+			vertices[index].blending = m_heightMap[index1].blending;
 			indices[index] = index;
 			index++;
 
 			// Bottom left.
 			vertices[index].position = XMFLOAT3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index1].nx, m_heightMap[index1].ny, m_heightMap[index1].nz);
+			vertices[index].uv = XMFLOAT2(m_heightMap[index1].tu, m_heightMap[index1].tv);
+			vertices[index].blending = m_heightMap[index1].blending;
+			//vertices[index].position = vertices[index - 1].position;
+			//vertices[index].normal = vertices[index - 1].normal;
+			//vertices[index].uv = vertices[index - 1].uv;
+			//vertices[index].blending = vertices[index - 1].blending;
 			indices[index] = index;
 			index++;
 
 			// Upper right.
 			vertices[index].position = XMFLOAT3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index4].nx, m_heightMap[index4].ny, m_heightMap[index4].nz);
+			vertices[index].uv = XMFLOAT2(m_heightMap[index4].tu, m_heightMap[index4].tv);
+			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index4]);
+			vertices[index].blending = m_heightMap[index4].blending;
+			//vertices[index].position = vertices[index - 3].position;
+			//vertices[index].normal = vertices[index - 3].normal;
+			//vertices[index].uv = vertices[index - 3].uv;
+			//vertices[index].blending = vertices[index - 3].blending;
 			indices[index] = index;
 			index++;
 
 			// Bottom right.
 			vertices[index].position = XMFLOAT3(m_heightMap[index2].x, m_heightMap[index2].y, m_heightMap[index2].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index2].nx, m_heightMap[index2].ny, m_heightMap[index2].nz);
+			vertices[index].uv = XMFLOAT2(m_heightMap[index2].tu, m_heightMap[index2].tv);
+			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index2]);
+			vertices[index].blending = m_heightMap[index2].blending;
 			indices[index] = index;
 			index++;
 		}

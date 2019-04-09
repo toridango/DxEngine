@@ -227,11 +227,13 @@ bool OverWorldScene::InitializeModels()
 
 
 	go_procTerrain = new Terrain();
-	go_procTerrain->Initialize(m_D3D->GetDevice(), TERRAINWIDTH, TERRAINHEIGHT);
-	double scaling = 6.0;
+	go_procTerrain->Initialize(m_D3D->GetDevice(), TERRAINWIDTH, TERRAINHEIGHT,
+		L"../Engine/Assets/sand.dds", L"../Engine/Assets/grass.dds",
+		L"../Engine/Assets/tundra.dds", L"../Engine/Assets/snow.dds");
+	double scaling = 12.0;
 	double zoom = 12.0;
 	go_procTerrain->GenerateHeightMap(scaling, zoom);
-	OutputDebugStringA(("Scaling: " + std::to_string(scaling) + "\t\tZoom: " + std::to_string(zoom) + "\n").c_str());
+	//OutputDebugStringA(("Scaling: " + std::to_string(scaling) + "\t\tZoom: " + std::to_string(zoom) + "\n").c_str());
 	go_procTerrain->SetTranslation(-(float)TERRAINWIDTH/2.0f, -0.5f, -(float)TERRAINHEIGHT/2.0f);
 
 

@@ -17,17 +17,24 @@ cbuffer LightBuffer
 };
 
 
+Texture2D shHighestTexture : register(t0);
+Texture2D shHighTexture : register(t1);
+Texture2D shLowTexture : register(t2);
+Texture2D shLowestTexture : register(t3);
+
 //////////////
 // TYPEDEFS //
 //////////////
 struct PixelInputType
 {
     // Color by height experiments
-    float4 color : COLOR;
+    //float4 color : COLOR;
     // ---------------------------
 
     float4 position : SV_POSITION;
 	float3 normal : NORMAL;
+    float2 tex : TEXCOORD0;
+    float4 blending : SOULS;
 };
 
 
@@ -39,7 +46,15 @@ float4 TerrainPixelShader(PixelInputType input) : SV_TARGET
 	float3 lightDir;
 	float lightIntensity;
 	float4 color;
+	float4 textureColour1;
+    float4 textureColour2;
+    float4 textureColour3;
+    float4 textureColour4;
 
+    textureColour1 = shHighestTexture.Sample(SampleType, input.tex);
+    textureColour2 = shHighTexture.Sample(SampleType, input.tex);
+    textureColour3 = shLowTexture.Sample(SampleType, input.tex);
+    textureColour4 = shLowestTexture.Sample(SampleType, input.tex);
 
 	// Set the default output color to the ambient light value for all pixels.
     color = ambientColor;
@@ -58,10 +73,38 @@ float4 TerrainPixelShader(PixelInputType input) : SV_TARGET
 
     // Saturate the final light color.
     color = saturate(color);
+
+    //textureColour1 = float4(1.0,0.0,0.0,1.0);
+    //textureColour2 = float4(0.0,1.0,0.0,1.0);
+    //textureColour3 = float4(0.0,0.0,1.0,1.0);
+    //textureColour4 = float4(1.0,0.0,1.0,1.0);
+
+    /*textureColour1.w = input.blending.x;
+    textureColour2.w = input.blending.y;
+    textureColour3.w = input.blending.z;
+    textureColour4.w = input.blending.w;*/
+
+    /*float4 c1 = textureColour1 * input.blending.x;
+    float4 c2 = textureColour2 * input.blending.y;
+    float4 c3 = textureColour3 * input.blending.z;
+    float4 c4 = textureColour4 * input.blending.w;*/
+
     
+    // Apparently blending is in ARGB format, not RGBA // 1 is w, 2 is x, etc
+    float4 c12 = lerp(textureColour2, textureColour1, input.blending.x);
+    float4 c34 = lerp(textureColour4, textureColour3, input.blending.z);
+    float blend = input.blending.x + input.blending.y;
+    float4 c = lerp(c34, c12, blend);
+
+    /*color = saturate(
+            textureColour1 * input.blending.x +
+            textureColour2 * input.blending.y +
+            textureColour3 * input.blending.z +
+            textureColour4 * input.blending.w);*/
+    color = c;//float4(input.blending.w, 0.0, 1.0, 1.0);
 
     // Color by height experiments
-    color = input.color;
+    //color = input.color;
     // ---------------------------
 
     return color;

@@ -39,7 +39,7 @@ bool TerrainShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilename)
 	ID3D10Blob* errorMessage;
 	ID3D10Blob* vertexShaderBuffer;
 	ID3D10Blob* pixelShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
+	D3D11_INPUT_ELEMENT_DESC polygonLayout[4];
 	unsigned int numElements;
 	D3D11_SAMPLER_DESC samplerDesc;
 	D3D11_BUFFER_DESC matrixBufferDesc;
@@ -120,6 +120,22 @@ bool TerrainShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilename)
 	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[1].InstanceDataStepRate = 0;
 
+	polygonLayout[2].SemanticName = "TEXCOORD";
+	polygonLayout[2].SemanticIndex = 0;
+	polygonLayout[2].Format = DXGI_FORMAT_R32G32_FLOAT;
+	polygonLayout[2].InputSlot = 0;
+	polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[2].InstanceDataStepRate = 0;
+
+	polygonLayout[3].SemanticName = "SOULS";
+	polygonLayout[3].SemanticIndex = 0;
+	polygonLayout[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	polygonLayout[3].InputSlot = 0;
+	polygonLayout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[3].InstanceDataStepRate = 0;
+
 	// Get a count of the elements in the layout.
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
@@ -197,21 +213,25 @@ bool TerrainShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilename)
 
 
 
-bool TerrainShader::Render(GameObject* go, CameraClass* camera, LightClass* light)
+bool TerrainShader::Render(Terrain* go, CameraClass* camera, LightClass* light)
 {
 	bool result;
 
 
 	// Set the shader parameters that it will use for rendering.if (!SetShaderParameters(
-	
-	result = SetShaderParameters(m_context, 
-		go->GetWorldMatrix(), 
+
+	result = SetShaderParameters(m_context,
+		go->GetWorldMatrix(),
 		camera->GetViewMatrix(),
 		camera->GetProjectionMatrix(),
 		light->GetAmbientColour(),
 		light->GetDiffuseColour(),
-		light->GetDirection());
-	if(!result)
+		light->GetDirection(),
+		go->GetTexture(Terrain::LOWEST),
+		go->GetTexture(Terrain::LOW),
+		go->GetTexture(Terrain::HIGH),
+		go->GetTexture(Terrain::HIGHEST));
+	if (!result)
 	{
 		return false;
 	}
@@ -264,10 +284,12 @@ bool TerrainShader::Render(GameObject* go, CameraClass* camera, LightClass* ligh
 
 
 bool TerrainShader::SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour, XMFLOAT3 lightDirection) 
+	XMMATRIX projectionMatrix, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour, XMFLOAT3 lightDirection,
+	ID3D11ShaderResourceView* lowestTex, ID3D11ShaderResourceView* lowTex,
+	ID3D11ShaderResourceView* highTex, ID3D11ShaderResourceView* highestTex)
 {
 	HRESULT result;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	unsigned int bufferNumber;
 	MatrixBufferType* dataPtr;
 	LightBufferType* dataPtr2;
@@ -284,7 +306,7 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatr
 
 	// Lock the constant buffer so it can be written to.
 	result = m_context->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if(FAILED(result))
+	if (FAILED(result))
 	{
 		return false;
 	}
@@ -308,7 +330,7 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatr
 
 	// Lock the light constant buffer so it can be written to.
 	result = m_context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if(FAILED(result))
+	if (FAILED(result))
 	{
 		return false;
 	}
@@ -331,6 +353,11 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatr
 	// Finally set the light constant buffer in the pixel shader with the updated values.
 	m_context->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
 
+	m_context->PSSetShaderResources(0, 1, &highestTex);
+	m_context->PSSetShaderResources(1, 1, &highTex);
+	m_context->PSSetShaderResources(2, 1, &lowTex);
+	m_context->PSSetShaderResources(3, 1, &lowestTex);
+
 	return true;
 }
 
@@ -340,9 +367,9 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatr
 	// Set the vertex input layout.
 	deviceContext->IASetInputLayout(m_layout);
 
-    // Set the vertex and pixel shaders that will be used to render this triangle.
-    deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-    deviceContext->PSSetShader(m_pixelShader, NULL, 0);
+	// Set the vertex and pixel shaders that will be used to render this triangle.
+	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
+	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
 
 	// Set the sampler state in the pixel shader.
 	deviceContext->PSSetSamplers(0, 1, &m_sampleState);

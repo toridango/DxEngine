@@ -3,12 +3,13 @@
 #define _TERRAINSHADERCLASS_H_
 
 
-#include <d3d11.h>
-#include <DirectXMath.h>
-#include <d3dx11async.h>
-#include <fstream>
+//#include <d3d11.h>
+//#include <DirectXMath.h>
+//#include <d3dx11async.h>
+//#include <fstream>
 
 #include "Shader.h"
+#include "Terrain.h"
 
 using namespace DirectX;
 
@@ -35,7 +36,7 @@ public:
 
 	void Shutdown();
 	///bool Render(ID3D11DeviceContext*, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT4 ambientColor, XMFLOAT4 diffuseColor, XMFLOAT3 lightDirection);
-	bool Render(GameObject* go, CameraClass* camera, LightClass* light);
+	bool Render(Terrain* go, CameraClass* camera, LightClass* light);
 
 private:
 	//bool InitializeShader(ID3D11Device*, HWND, WCHAR*, WCHAR*);
@@ -43,7 +44,9 @@ private:
 	//void OutputShaderErrorMessage(ID3D10Blob*, HWND, WCHAR*);
 
 	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatrix, XMMATRIX viewMatrix, 
-		XMMATRIX projectionMatrix, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour, XMFLOAT3 lightDirection);
+		XMMATRIX projectionMatrix, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour, XMFLOAT3 lightDirection,
+		ID3D11ShaderResourceView* lowestTex, ID3D11ShaderResourceView* lowTex,
+		ID3D11ShaderResourceView* highTex, ID3D11ShaderResourceView* highestTex);
 	//void RenderShader(ID3D11DeviceContext*, int indexCount);
 
 private:

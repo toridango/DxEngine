@@ -21,16 +21,20 @@ struct VertexInputType
 {
     float4 position : POSITION;
 	float3 normal : NORMAL;
+    float2 tex : TEXCOORD0;
+    float4 blending : SOULS;
 };
 
 struct PixelInputType
 {
     // Color by height experiments
-    float4 color : COLOR;
+    //float4 color : COLOR;
     // ---------------------------
 
     float4 position : SV_POSITION;
 	float3 normal : NORMAL;
+    float2 tex : TEXCOORD0;
+    float4 blending : SOULS;
 };
 
 
@@ -58,13 +62,15 @@ PixelInputType TerrainVertexShader(VertexInputType input)
 
 
     // Color by height experiments
-    output.color = saturate(float4(
+    /*output.color = saturate(float4(
                             (input.position.y/20)           + 0.05, 
                             (input.position.y/20)           + 0.2, 
                             (input.position.y/100)          + 0.1, 
                             1.0));
-    output.color *= (input.position.y/6) + 0.55;
+    output.color *= (input.position.y/6) + 0.55;*/
     // ---------------------------
+    output.blending = input.blending;
+    output.tex = input.tex;
 
     return output;
 }

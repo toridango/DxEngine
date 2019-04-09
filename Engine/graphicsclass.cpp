@@ -112,7 +112,7 @@ bool GraphicsClass::Frame()
 
 void GraphicsClass::StrafeLeft()
 {
-	Strafe(-1.0 * m_movSpeed);
+	Strafe(-1.0f * m_movSpeed);
 }
 void GraphicsClass::StrafeRight()
 {
@@ -124,7 +124,7 @@ void GraphicsClass::MoveForward()
 }
 void GraphicsClass::MoveBack()
 {
-	Advance(-1.0 * m_movSpeed);
+	Advance(-1.0f * m_movSpeed);
 }
 
 void GraphicsClass::Strafe(float amount)
