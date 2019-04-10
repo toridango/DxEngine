@@ -242,7 +242,7 @@ bool OverWorldScene::InitializeModels()
 	go_xw->Scale(1.0f, 1.0f, 1.0f);
 	//go_xw->RotateDegreesAroundX(90.0f);
 	go_xw->SetOffsetRotation(90.0f, 180.0f, 0.0f);
-	go_xw->SetTranslation(0.0f, 18.6f, 0.0f);
+	//go_xw->SetTranslation(0.0f, 18.6f, 0.0f);
 
 	/*XMFLOAT3 cpF3 = m_Camera->GetPosition();
 	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
@@ -384,7 +384,7 @@ bool OverWorldScene::Render(float deltavalue)
 	OutputDebugString(ws.c_str());*/
 
 
-	XMVECTOR r = XMVector3Cross(m_Camera->GetLookAtVector(), m_Camera->GetUpVector());
+	//XMVECTOR r = XMVector3Cross(m_Camera->GetLookAtVector(), m_Camera->GetUpVector());
 	//go_xw->SetRotationDegAroundAxis(r, 10.0f);
 	go_xw->SetRotationXYZ(camRot);
 
@@ -428,6 +428,7 @@ bool OverWorldScene::Render(float deltavalue)
 	OutputDebugStringA(("Scaling: " + std::to_string(m_k) + "\t\tZoom: " + std::to_string(m_k*2) + "\n").c_str());
 	m_k += 0.05;*/
 	
+	m_D3D->TurnOnAlphaBlending();
 
 	go_procTerrain->Render(m_D3D->GetDeviceContext());
 
@@ -435,6 +436,7 @@ bool OverWorldScene::Render(float deltavalue)
 
 	if (!result) { return false; }
 
+	m_D3D->TurnOffAlphaBlending();
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();

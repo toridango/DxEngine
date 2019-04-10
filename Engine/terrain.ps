@@ -82,7 +82,7 @@ float4 TerrainPixelShader(PixelInputType input) : SV_TARGET
     float blend = input.blending.x + input.blending.y;
     float4 c = lerp(c34, c12, blend);
 
-    color = c;
+    color = float4(c.r, c.g, c.b, 0.3);
 
     // Color by height experiments
     //color = input.color;

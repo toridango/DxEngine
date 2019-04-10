@@ -166,6 +166,12 @@ bool SystemClass::Frame()
 
 bool SystemClass::HandleInput()
 {
+	// TODO ------------------------------------------------------------------------
+	// In order to have a proper 3rd person camera the input should be fed into 
+	// a set of moveControlledCharacter inside graphicsclass then inside scene
+	// To move the camera just make it the controlled character
+	// To have a 3rd person camera, move the object and make the camera follow it
+
 	if (m_Input->IsEscapePressed())
 	{
 		return false;

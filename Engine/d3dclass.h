@@ -72,13 +72,14 @@ private:
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11RasterizerState* m_rasterState;
 	ID3D11RasterizerState* m_rasterStateSky;
+	ID3D11BlendState* m_blendStates[2];
 	/*XMMATRIX m_projectionMatrix;
 	XMMATRIX m_worldMatrix;
 	XMMATRIX m_orthoMatrix;*/
 
 	ID3D11DepthStencilState* m_depthDisabledStencilState;
-	ID3D11BlendState* m_alphaEnableBlendingState;
-	ID3D11BlendState* m_alphaDisableBlendingState;
+	//ID3D11BlendState* m_alphaEnableBlendingState;
+	//ID3D11BlendState* m_alphaDisableBlendingState;
 };
 
 #endif

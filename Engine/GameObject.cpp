@@ -146,8 +146,8 @@ void GameObject::SetRotationXYZ(XMFLOAT3 r)
 	float roll = r.z * (XM_PI / 180.0);
 
 	XMVECTOR trans = m_worldMatrix.r[3];
-	m_worldMatrix = m_baseRotation *
-					XMMatrixScalingFromVector(XMLoadFloat3(&m_scaling)) *
+	m_worldMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&m_scaling)) *
+					m_baseRotation *
 					XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
 	m_worldMatrix.r[3] = trans;
@@ -157,7 +157,7 @@ void GameObject::SetRotationXYZ(XMFLOAT3 r)
 void GameObject::SetRotationDegAroundAxis(XMVECTOR axis, float angle)
 {
 	XMVECTOR trans = m_worldMatrix.r[3];
-	m_worldMatrix = /*m_baseRotation */
+	m_worldMatrix = m_baseRotation *
 					XMMatrixScalingFromVector(XMLoadFloat3(&m_scaling)) *
 					XMMatrixRotationAxis(axis, angle);
 	m_worldMatrix.r[3] = trans;
