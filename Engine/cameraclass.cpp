@@ -77,6 +77,25 @@ XMFLOAT3 CameraClass::GetRotation()
 	return m_rotation;
 }
 
+XMVECTOR CameraClass::GetLookAtVector()
+{
+	// Copy view matrix
+	XMMATRIX viewMatrix(m_viewMatrix);
+	// Invert it
+	viewMatrix = XMMatrixInverse(&XMMatrixDeterminant(viewMatrix), viewMatrix);
+	// Forward vector (use 0, 0, -1 if you have a right-handed coordinate system)
+	XMVECTOR lookAtInViewSpace = { 0.0, 0.0, 1.0 };
+	// Transform into world space. Also: transform into normal 
+	//XMVECTOR lookAtInWorldSpace = lookAtInViewSpace * viewMatrix; 
+	return XMVector3TransformNormal(lookAtInViewSpace, viewMatrix);
+}
+
+XMVECTOR CameraClass::GetUpVector()
+{ 
+	return m_viewMatrix.r[1];
+}
+
+
 
 XMFLOAT3 CameraClass::Strafe(float sign) // + for right, - for left
 {

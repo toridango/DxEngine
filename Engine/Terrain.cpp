@@ -38,8 +38,6 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	int index;
 	float height = 0.0;
 	bool result;
-	//m_maxHeight = 120.0;
-	//m_minHeight = 0.0;
 	m_device = device;
 	m_Textures.reserve(4);
 
@@ -365,16 +363,7 @@ XMFLOAT4 Terrain::TextureBlendingByHeight(float h)
 		blending = XMFLOAT4{ 0.0f, 0.0f, 0.0f, 1.0f };
 	}
 
-	if (e > 0.9f)
-	{
-		OutputDebugStringA(("minH: " + std::to_string(m_minHeight) + "\tmaxH: " + std::to_string(m_maxHeight)).c_str());
-		OutputDebugStringA(("\tthis height: " + std::to_string(h) + "\t\t").c_str()); 
-		OutputDebugStringA(("blending: " + std::to_string(blending.x) + ", "
-							+ std::to_string(blending.y) + ", " + std::to_string(blending.z) + ", "
-							+ std::to_string(blending.w) + ", " + "\n").c_str());
-	}
-
-
+	
 	return blending;
 }
 
@@ -682,7 +671,6 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			vertices[index].position = XMFLOAT3(m_heightMap[index3].x, m_heightMap[index3].y, m_heightMap[index3].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index3].nx, m_heightMap[index3].ny, m_heightMap[index3].nz);
 			vertices[index].uv = XMFLOAT2(m_heightMap[index3].tu, m_heightMap[index3].tv);
-			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index3]);
 			vertices[index].blending = m_heightMap[index3].blending;
 			indices[index] = index;
 			index++;
@@ -691,7 +679,6 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			vertices[index].position = XMFLOAT3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index4].nx, m_heightMap[index4].ny, m_heightMap[index4].nz);
 			vertices[index].uv = XMFLOAT2(m_heightMap[index4].tu, m_heightMap[index4].tv);
-			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index4]);
 			vertices[index].blending = m_heightMap[index4].blending;
 			indices[index] = index;
 			index++;
@@ -700,7 +687,6 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			vertices[index].position = XMFLOAT3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index1].nx, m_heightMap[index1].ny, m_heightMap[index1].nz);
 			vertices[index].uv = XMFLOAT2(m_heightMap[index1].tu, m_heightMap[index1].tv);
-			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index1]);
 			vertices[index].blending = m_heightMap[index1].blending;
 			indices[index] = index;
 			index++;
@@ -710,10 +696,6 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			vertices[index].normal = XMFLOAT3(m_heightMap[index1].nx, m_heightMap[index1].ny, m_heightMap[index1].nz);
 			vertices[index].uv = XMFLOAT2(m_heightMap[index1].tu, m_heightMap[index1].tv);
 			vertices[index].blending = m_heightMap[index1].blending;
-			//vertices[index].position = vertices[index - 1].position;
-			//vertices[index].normal = vertices[index - 1].normal;
-			//vertices[index].uv = vertices[index - 1].uv;
-			//vertices[index].blending = vertices[index - 1].blending;
 			indices[index] = index;
 			index++;
 
@@ -721,12 +703,7 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			vertices[index].position = XMFLOAT3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index4].nx, m_heightMap[index4].ny, m_heightMap[index4].nz);
 			vertices[index].uv = XMFLOAT2(m_heightMap[index4].tu, m_heightMap[index4].tv);
-			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index4]);
 			vertices[index].blending = m_heightMap[index4].blending;
-			//vertices[index].position = vertices[index - 3].position;
-			//vertices[index].normal = vertices[index - 3].normal;
-			//vertices[index].uv = vertices[index - 3].uv;
-			//vertices[index].blending = vertices[index - 3].blending;
 			indices[index] = index;
 			index++;
 
@@ -734,7 +711,6 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			vertices[index].position = XMFLOAT3(m_heightMap[index2].x, m_heightMap[index2].y, m_heightMap[index2].z);
 			vertices[index].normal = XMFLOAT3(m_heightMap[index2].nx, m_heightMap[index2].ny, m_heightMap[index2].nz);
 			vertices[index].uv = XMFLOAT2(m_heightMap[index2].tu, m_heightMap[index2].tv);
-			//vertices[index].blending = TextureBlendingByHeight(m_heightMap[index2]);
 			vertices[index].blending = m_heightMap[index2].blending;
 			indices[index] = index;
 			index++;

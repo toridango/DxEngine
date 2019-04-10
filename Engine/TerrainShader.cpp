@@ -246,43 +246,6 @@ bool TerrainShader::Render(Terrain* go, CameraClass* camera, LightClass* light)
 
 
 
-
-/*void TerrainShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
-{
-	char* compileErrors;
-	unsigned long bufferSize, i;
-	std::ofstream fout;
-
-
-	// Get a pointer to the error message text buffer.
-	compileErrors = (char*)(errorMessage->GetBufferPointer());
-
-	// Get the length of the message.
-	bufferSize = errorMessage->GetBufferSize();
-
-	// Open a file to write the error message to.
-	fout.open("shader-error.txt");
-
-	// Write out the error message.
-	for(i=0; i<bufferSize; i++)
-	{
-		fout << compileErrors[i];
-	}
-
-	// Close the file.
-	fout.close();
-
-	// Release the error message.
-	errorMessage->Release();
-	errorMessage = 0;
-
-	// Pop a message up on the screen to notify the user to check the text file for compile errors.
-	MessageBox(hwnd, L"Error compiling shader.  Check shader-error.txt for message.", shaderFilename, MB_OK);
-
-	return;
-}*/
-
-
 bool TerrainShader::SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
 	XMMATRIX projectionMatrix, XMFLOAT4 ambientColour, XMFLOAT4 diffuseColour, XMFLOAT3 lightDirection,
 	ID3D11ShaderResourceView* lowestTex, ID3D11ShaderResourceView* lowTex,
@@ -296,10 +259,6 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatr
 
 
 	// Transpose the matrices to prepare them for the shader.
-	//D3DXMatrixTranspose(&worldMatrix, &worldMatrix);
-	//D3DXMatrixTranspose(&viewMatrix, &viewMatrix);
-	//D3DXMatrixTranspose(&projectionMatrix, &projectionMatrix);
-
 	worldMatrix = XMMatrixTranspose(worldMatrix);
 	viewMatrix = XMMatrixTranspose(viewMatrix);
 	projectionMatrix = XMMatrixTranspose(projectionMatrix);
@@ -360,22 +319,3 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatr
 
 	return true;
 }
-
-
-/*void TerrainShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
-{
-	// Set the vertex input layout.
-	deviceContext->IASetInputLayout(m_layout);
-
-	// Set the vertex and pixel shaders that will be used to render this triangle.
-	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
-
-	// Set the sampler state in the pixel shader.
-	deviceContext->PSSetSamplers(0, 1, &m_sampleState);
-
-	// Render the triangle.
-	deviceContext->DrawIndexed(indexCount, 0, 0);
-
-	return;
-}*/

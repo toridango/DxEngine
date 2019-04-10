@@ -37,6 +37,9 @@ public:
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetRotation();
 
+	XMVECTOR GetLookAtVector();
+	XMVECTOR GetUpVector();
+
 	//D3DXVECTOR3 Strafe(float);
 	//D3DXVECTOR3 Advance(float);
 	XMFLOAT3 Strafe(float);

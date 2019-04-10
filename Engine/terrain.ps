@@ -74,20 +74,6 @@ float4 TerrainPixelShader(PixelInputType input) : SV_TARGET
     // Saturate the final light color.
     color = saturate(color);
 
-    //textureColour1 = float4(1.0,0.0,0.0,1.0);
-    //textureColour2 = float4(0.0,1.0,0.0,1.0);
-    //textureColour3 = float4(0.0,0.0,1.0,1.0);
-    //textureColour4 = float4(1.0,0.0,1.0,1.0);
-
-    /*textureColour1.w = input.blending.x;
-    textureColour2.w = input.blending.y;
-    textureColour3.w = input.blending.z;
-    textureColour4.w = input.blending.w;*/
-
-    /*float4 c1 = textureColour1 * input.blending.x;
-    float4 c2 = textureColour2 * input.blending.y;
-    float4 c3 = textureColour3 * input.blending.z;
-    float4 c4 = textureColour4 * input.blending.w;*/
 
     
     // Apparently blending is in ARGB format, not RGBA // 1 is w, 2 is x, etc
@@ -96,12 +82,7 @@ float4 TerrainPixelShader(PixelInputType input) : SV_TARGET
     float blend = input.blending.x + input.blending.y;
     float4 c = lerp(c34, c12, blend);
 
-    /*color = saturate(
-            textureColour1 * input.blending.x +
-            textureColour2 * input.blending.y +
-            textureColour3 * input.blending.z +
-            textureColour4 * input.blending.w);*/
-    color = c;//float4(input.blending.w, 0.0, 1.0, 1.0);
+    color = c;
 
     // Color by height experiments
     //color = input.color;

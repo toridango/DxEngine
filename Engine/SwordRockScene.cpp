@@ -204,7 +204,7 @@ bool SwordRockScene::InitializeModels()
 	go_floor = new GameObject();
 	go_floor->SetModel(m_Model);
 
-	go_floor->ScaleAtOrigin(20.0f, 0.01f, 20.0f);
+	go_floor->Scale(20.0f, 0.01f, 20.0f);
 	go_floor->SetTranslation(0.0f, -2.0f, 0.0f);
 
 
@@ -244,7 +244,7 @@ bool SwordRockScene::InitializeModels()
 	go_sword->SetModel(m_ModelSword);
 
 	go_sword->RotateDegreesAroundY(90.0f);
-	go_sword->RotateDegreesAroundZ(45.0f);
+	go_sword->RotateDegreesAroundX(-45.0f);
 	go_sword->SetTranslation(0.5f, 1.4f, -0.2f);
 
 
@@ -270,7 +270,7 @@ bool SwordRockScene::InitializeModels()
 	go_rock = new GameObject();
 	go_rock->SetModel(m_ModelRock);
 
-	go_rock->ScaleAtOrigin(3.0f, 3.0f, 3.0f);
+	go_rock->Scale(3.0f, 3.0f, 3.0f);
 	go_rock->SetTranslation(0.0f, -0.6f, 0.0f);
 
 

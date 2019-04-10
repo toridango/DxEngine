@@ -104,6 +104,7 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	m_cpPaths.push_back(path_soundLoop);
 	m_cpPaths.push_back(path_skyModel);
 	m_cpPaths.push_back((char*) path_rockModel);
+	m_cpPaths.push_back(path_xwModel);
 
 	m_wcpPaths.push_back(path_skyTex);
 	m_wcpPaths.push_back(path_rockAlbedo);
@@ -119,6 +120,7 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	m_wcpPaths.push_back(path_bumpPixelShader);
 	m_wcpPaths.push_back(path_terrainVertexShader);
 	m_wcpPaths.push_back(path_terrainPixelShader);
+	m_wcpPaths.push_back(path_xwTex);
 
 	CheckAllPaths(m_hwnd);
 
@@ -127,7 +129,8 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	// Set the initial position of the camera.
 	XMFLOAT3 camPos = XMFLOAT3(-50.0f, 30.0f, -50.0f);
 	m_Camera->SetPosition(camPos.x, camPos.y, camPos.z);
-	m_Camera->SetRotation(20.0f, 45.0f, 0.0f);
+	//m_Camera->SetRotation(20.0f, 45.0f, 0.0f);
+	m_Camera->SetRotation(0.0f, 0.0f, 0.0f);
 
 
 	if (!InitializeModels()) { return false; }
@@ -217,8 +220,37 @@ bool OverWorldScene::InitializeModels()
 	go_rock = new GameObject();
 	go_rock->SetModel(m_ModelRock);
 
-	go_rock->ScaleAtOrigin(3.0f, 3.0f, 3.0f);
+	go_rock->Scale(3.0f, 3.0f, 3.0f);
 	go_rock->SetTranslation(0.0f, 1.6f, 0.0f);
+
+
+	// ------------------ XW ------------------
+
+	m_ModelXW = new AssimpModelClass;
+	if (!m_ModelXW) { return false; }
+
+	result = m_ModelXW->Initialize(m_D3D->GetDevice(), path_xwModel, path_xwTex);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the rock model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	go_xw = new GameObject();
+	go_xw->SetModel(m_ModelXW);
+
+	go_xw->Scale(1.0f, 1.0f, 1.0f);
+	//go_xw->RotateDegreesAroundX(90.0f);
+	go_xw->SetOffsetRotation(90.0f, 180.0f, 0.0f);
+	go_xw->SetTranslation(0.0f, 18.6f, 0.0f);
+
+	/*XMFLOAT3 cpF3 = m_Camera->GetPosition();
+	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
+	XMVECTOR XWPos = XMVectorAdd(camPos, m_Camera->GetUpVector());
+	XMVECTOR haha = m_Camera->GetLookAtVector();
+	XWPos = XMVectorAdd(XWPos, haha);*/
+
+	//go_xw->SetTranslation(XWPos);
 
 
 
@@ -330,6 +362,38 @@ bool OverWorldScene::Render(float deltavalue)
 	
 	// Render the model using the light shader.
 	result = m_BumpMapShader->Render(go_rock, m_Camera, m_Light);
+
+	if (!result) { return false; }
+
+
+
+	// ------------------ XW ------------------
+
+
+	XMFLOAT3 cpF3 = m_Camera->GetPosition();
+	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
+	XMVECTOR XWPos = XMVectorAdd(camPos, -5.0f*m_Camera->GetUpVector());
+	XMFLOAT3 camRot = m_Camera->GetRotation();
+	XWPos = XMVectorAdd(XWPos, 9.0f * m_Camera->GetLookAtVector());
+
+	// OUTPUTTING STUFF TO THE DEBUGGER // FOR FUTURE REFERENCE
+	/*XMStoreFloat3(&cpF3, haha);
+	std::wstringstream s;
+	s << cpF3.x << ", " << cpF3.y << ", " << cpF3.z << std::endl;
+	std::wstring ws = s.str();
+	OutputDebugString(ws.c_str());*/
+
+
+	XMVECTOR r = XMVector3Cross(m_Camera->GetLookAtVector(), m_Camera->GetUpVector());
+	//go_xw->SetRotationDegAroundAxis(r, 10.0f);
+	go_xw->SetRotationXYZ(camRot);
+
+	go_xw->SetTranslation(XWPos);
+
+	go_xw->Render(m_D3D->GetDeviceContext());
+
+	// Render the model using the light shader.
+	result = m_LightShader->Render(go_xw, m_Camera, m_Light, deltavalue);
 
 	if (!result) { return false; }
 

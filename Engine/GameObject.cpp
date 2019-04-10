@@ -8,6 +8,9 @@ GameObject::GameObject()
 	m_assimpModel = 0;
 	m_assimpBumpModel = 0;
 
+	m_scaling = { 1.0f, 1.0f, 1.0f };
+	m_baseRotation = XMMatrixIdentity();
+
 	m_worldMatrix = XMMatrixIdentity();
 }
 
@@ -62,6 +65,27 @@ void GameObject::SetModel(AssimpBumpedModelClass* model)
 }
 
 
+void GameObject::SetOffsetRotation(XMMATRIX rot)
+{
+	m_baseRotation = rot;
+	RotateDegreesMatrix(rot);
+}
+
+void GameObject::SetOffsetRotation(XMFLOAT3 rot)
+{
+	SetOffsetRotation(rot.x, rot.y, rot.z);
+}
+
+void GameObject::SetOffsetRotation(float x, float y, float z)
+{
+	float pitch = x * (XM_PI / 180.0);
+	float yaw = y * (XM_PI / 180.0);
+	float roll = z * (XM_PI / 180.0);
+	SetOffsetRotation(XMMatrixRotationRollPitchYaw(pitch, yaw, roll));
+}
+
+
+
 
 void GameObject::SetTranslation(XMVECTOR t)
 {
@@ -87,7 +111,6 @@ void GameObject::Translate(XMVECTOR t)
 	t = XMVectorSetW(t, 0.0f);
 
 	m_worldMatrix.r[3] += t;
-	//m_worldMatrix *= XMMatrixTranslationFromVector(t);
 }
 
 void GameObject::Translate(XMFLOAT3 t)
@@ -114,6 +137,40 @@ void GameObject::Translate(float x, float y, float z)
 	Translate(XMVectorSet(x, y, z, 0.0f));
 }
 
+
+void GameObject::SetRotationXYZ(XMFLOAT3 r)
+{
+
+	float pitch = r.x * (XM_PI / 180.0);
+	float yaw = r.y * (XM_PI / 180.0);
+	float roll = r.z * (XM_PI / 180.0);
+
+	XMVECTOR trans = m_worldMatrix.r[3];
+	m_worldMatrix = m_baseRotation *
+					XMMatrixScalingFromVector(XMLoadFloat3(&m_scaling)) *
+					XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+
+	m_worldMatrix.r[3] = trans;
+}
+
+
+void GameObject::SetRotationDegAroundAxis(XMVECTOR axis, float angle)
+{
+	XMVECTOR trans = m_worldMatrix.r[3];
+	m_worldMatrix = /*m_baseRotation */
+					XMMatrixScalingFromVector(XMLoadFloat3(&m_scaling)) *
+					XMMatrixRotationAxis(axis, angle);
+	m_worldMatrix.r[3] = trans;
+}
+
+
+void GameObject::RotateDegAroundAxis(XMVECTOR axis, float angle)
+{
+	m_worldMatrix *= XMMatrixRotationAxis(axis, angle);
+}
+
+
+
 void GameObject::RotateDegreesMatrix(XMMATRIX rot)
 {
 	m_worldMatrix *= rot;
@@ -134,12 +191,13 @@ void GameObject::RotateDegreesAroundZ(float degrees)
 	RotateDegreesMatrix(XMMatrixRotationZ(degrees * (XM_PI / 180.0f)));
 }
 
-void GameObject::ScaleAtOrigin(XMVECTOR s)
+void GameObject::Scale(XMVECTOR s)
 {
 	m_worldMatrix *= XMMatrixScalingFromVector(s);
+	XMStoreFloat3(&m_scaling, (XMLoadFloat3(&m_scaling) * s));
 }
 
-void GameObject::ScaleAtOrigin(XMFLOAT3 s)
+void GameObject::Scale(XMFLOAT3 s)
 {
 	/*XMMATRIX transform = XMMATRIX(
 		 s.x,  0.0f, 0.0f, 0.0f,
@@ -148,17 +206,33 @@ void GameObject::ScaleAtOrigin(XMFLOAT3 s)
 		0.0f, 0.0f, 0.0f, 1.0f);*/
 
 	m_worldMatrix *= XMMatrixScalingFromVector(XMLoadFloat3(&s));
+	XMStoreFloat3(&m_scaling, { m_scaling.x * s.x, m_scaling.y * s.y, m_scaling.z * s.z });
 }
 
-void GameObject::ScaleAtOrigin(float sx, float sy, float sz)
+void GameObject::Scale(float sx, float sy, float sz)
 {
 	//ScaleAtOrigin(XMFLOAT3(sx, sy, sz));
 	m_worldMatrix *= XMMatrixScaling(sx, sy, sz);
+	XMStoreFloat3(&m_scaling, { m_scaling.x * sx, m_scaling.y * sy, m_scaling.z * sz });
 }
 
 
 XMMATRIX GameObject::GetWorldMatrix()
 {
+	/*m_worldMatrix = XMMatrixIdentity();
+
+	m_worldMatrix *= XMMatrixScalingFromVector(XMLoadFloat3(&m_scaling));
+
+	float pitch = m_rotationXYZ.x * (XM_PI / 180.0);
+	float yaw = m_rotationXYZ.y * (XM_PI / 180.0);
+	float roll = m_rotationXYZ.z * (XM_PI / 180.0);
+	RotateDegreesMatrix(XMMatrixRotationRollPitchYaw(pitch, yaw, roll));
+
+
+	XMVECTOR t = XMLoadFloat3(&m_translation);
+	t = XMVectorSetW(t, 1.0f);
+	m_worldMatrix *= XMMatrixTranslationFromVector(t);*/
+
 	return m_worldMatrix;
 }
 

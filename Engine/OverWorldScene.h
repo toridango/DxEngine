@@ -2,6 +2,9 @@
 
 #include <d3d11.h>
 #include <string>
+#include <string>
+#include <sstream>
+#include <iostream>
 
 
 #include "Scene.h"
@@ -34,10 +37,11 @@ private:
 	// GAME OBJECTS;
 	GameObject* go_sky;
 	GameObject* go_rock;
+	GameObject* go_xw;
 	Terrain* go_procTerrain;
 
 	// MODELS
-	AssimpModelClass* m_Model;
+	AssimpModelClass* m_ModelXW;
 	AssimpModelClass* m_ModelSky;
 	AssimpBumpedModelClass* m_ModelRock;
 
@@ -53,6 +57,9 @@ private:
 
 	char* path_skyModel = "../Engine/Assets/sphere.fbx";
 	WCHAR* path_skyTex = L"../Engine/Assets/Skybox/skybox_texture.dds";
+	
+	char* path_xwModel = "../Engine/Assets/XW/xStarFighterCentered.fbx";
+	WCHAR* path_xwTex = L"../Engine/Assets/xW/Texture.png";
 
 	char* path_rockModel = "../Engine/Assets/rock/stone.obj";
 	WCHAR* path_rockAlbedo = L"../Engine/Assets/rock/tex/stone_albedo.png";
