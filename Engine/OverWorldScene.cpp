@@ -48,12 +48,18 @@ void OverWorldScene::Shutdown()
 		m_BumpMapShader = 0;
 	}
 
-	// Release the bump map shader object.
+
 	if (m_TerrainShader)
 	{
-		//m_BumpMapShader->Shutdown();
 		delete m_TerrainShader;
 		m_TerrainShader = 0;
+	}
+
+
+	if (m_WaterShader)
+	{
+		delete m_WaterShader;
+		m_WaterShader = 0;
 	}
 
 	// Release the model object.
@@ -121,6 +127,8 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	m_wcpPaths.push_back(path_terrainVertexShader);
 	m_wcpPaths.push_back(path_terrainPixelShader);
 	m_wcpPaths.push_back(path_xwTex);
+	m_wcpPaths.push_back(path_waterVertexShader);
+	m_wcpPaths.push_back(path_waterPixelShader);
 
 	CheckAllPaths(m_hwnd);
 
@@ -129,8 +137,8 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	// Set the initial position of the camera.
 	XMFLOAT3 camPos = XMFLOAT3(-50.0f, 30.0f, -50.0f);
 	m_Camera->SetPosition(camPos.x, camPos.y, camPos.z);
-	//m_Camera->SetRotation(20.0f, 45.0f, 0.0f);
-	m_Camera->SetRotation(0.0f, 0.0f, 0.0f);
+	m_Camera->SetRotation(20.0f, 45.0f, 0.0f);
+	//m_Camera->SetRotation(0.0f, 0.0f, 0.0f);
 
 
 	if (!InitializeModels()) { return false; }
@@ -270,6 +278,20 @@ bool OverWorldScene::InitializeModels()
 
 
 
+
+	// ------------------ Water ------------------
+	float terrainMaxH = (float)go_procTerrain->GetMaxHeight();
+	float terrainMinH = (float)go_procTerrain->GetMinHeight();
+
+	go_waterSurface = new Terrain();
+	go_waterSurface->Initialize(m_D3D->GetDevice(), TERRAINWIDTH, TERRAINHEIGHT, 0.0f);
+	//OutputDebugStringA(("Scaling: " + std::to_string(scaling) + "\t\tZoom: " + std::to_string(zoom) + "\n").c_str());
+	float elevation = 0.19*(terrainMaxH - terrainMinH) + terrainMinH;
+	go_waterSurface->SetTranslation(-(float)TERRAINWIDTH / 2.0f, elevation, -(float)TERRAINHEIGHT / 2.0f);
+
+
+
+
 	return true;
 }
 
@@ -318,15 +340,25 @@ bool OverWorldScene::InitializeShaders()
 	}
 
 
-	// Create the bump map shader object.
 	m_TerrainShader = new TerrainShader(m_hwnd, m_D3D->GetDevice(), m_D3D->GetDeviceContext());
 	if (!m_TerrainShader) { return false; }
 
-	// Initialize the bump map shader object.
 	result = m_TerrainShader->InitializeShader(path_terrainVertexShader, path_terrainPixelShader);
 	if (!result)
 	{
 		MessageBox(m_hwnd, L"Could not initialize the terrain shader object.", L"Error", MB_OK);
+		return false;
+	}
+
+
+
+	m_WaterShader = new WaterShader(m_hwnd, m_D3D->GetDevice(), m_D3D->GetDeviceContext());
+	if (!m_WaterShader) { return false; }
+
+	result = m_WaterShader->InitializeShader(path_waterVertexShader, path_waterPixelShader);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the water shader object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -428,11 +460,22 @@ bool OverWorldScene::Render(float deltavalue)
 	OutputDebugStringA(("Scaling: " + std::to_string(m_k) + "\t\tZoom: " + std::to_string(m_k*2) + "\n").c_str());
 	m_k += 0.05;*/
 	
-	m_D3D->TurnOnAlphaBlending();
 
 	go_procTerrain->Render(m_D3D->GetDeviceContext());
 
 	result = m_TerrainShader->Render(go_procTerrain, m_Camera, m_Light);
+
+	if (!result) { return false; }
+
+
+
+	// ------------------ Water ------------------
+	
+	m_D3D->TurnOnAlphaBlending();
+
+	go_waterSurface->Render(m_D3D->GetDeviceContext());
+
+	result = m_WaterShader->Render(go_waterSurface, m_Camera, m_Light, deltavalue);
 
 	if (!result) { return false; }
 

@@ -39,6 +39,7 @@ private:
 	GameObject* go_rock;
 	GameObject* go_xw;
 	Terrain* go_procTerrain;
+	Terrain* go_waterSurface;
 
 	// MODELS
 	AssimpModelClass* m_ModelXW;
@@ -50,7 +51,7 @@ private:
 	LightShader* m_SkyShader;
 	BumpShader* m_BumpMapShader;
 	TerrainShader* m_TerrainShader;
-
+	WaterShader* m_WaterShader;
 
 	// FILE PATHS
 	char* path_soundLoop = "../Engine/Assets/sounds/magical_forest.wav";
@@ -69,13 +70,15 @@ private:
 	WCHAR* path_rockSpecular = L"../Engine/Assets/rock/tex/stone_specular.png";
 
 
-	WCHAR* path_lightVertexShader = L"../Engine/light.vs";
-	WCHAR* path_lightPixelShader = L"../Engine/light.ps";
-	WCHAR* path_skyVertexShader = L"../Engine/sky.vs";
-	WCHAR* path_skyPixelShader = L"../Engine/sky.ps";
-	WCHAR* path_bumpVertexShader = L"../Engine/bumpmap.vs";
-	WCHAR* path_bumpPixelShader = L"../Engine/bumpmap.ps";
-	WCHAR* path_terrainVertexShader = L"../Engine/terrain.vs";
-	WCHAR* path_terrainPixelShader = L"../Engine/terrain.ps";
+	WCHAR* path_lightVertexShader = L"../Engine/light_vs.hlsl";
+	WCHAR* path_lightPixelShader = L"../Engine/light_ps.hlsl";
+	WCHAR* path_skyVertexShader = L"../Engine/sky_vs.hlsl";
+	WCHAR* path_skyPixelShader = L"../Engine/sky_ps.hlsl";
+	WCHAR* path_bumpVertexShader = L"../Engine/bumpmap_vs.hlsl";
+	WCHAR* path_bumpPixelShader = L"../Engine/bumpmap_ps.hlsl";
+	WCHAR* path_terrainVertexShader = L"../Engine/terrain_vs.hlsl";
+	WCHAR* path_terrainPixelShader = L"../Engine/terrain_ps.hlsl";
+	WCHAR* path_waterVertexShader = L"../Engine/water_vs.hlsl";
+	WCHAR* path_waterPixelShader = L"../Engine/water_ps.hlsl";
 };
 

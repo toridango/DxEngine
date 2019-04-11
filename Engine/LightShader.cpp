@@ -79,7 +79,7 @@ bool LightShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilename)
 	m_psFunctionName = "LightPixelShader";
 	m_vsFunctionName = "LightVertexShader";
 
-	// Need to pass the number of tlements, or it will wrongly calculate it inside the parent class
+	// Need to pass the number of elements, or it will wrongly calculate it inside the parent class
 	if (!this->Shader::InitializeShader(vsFilename, psFilename, polygonLayout, numElements))
 	{
 		return false;
@@ -202,6 +202,8 @@ bool LightShader::SetShaderParameters(XMMATRIX worldMatrix,
 	m_context->VSSetConstantBuffers(bufferNumber, 1, &m_variableBuffer);
 
 	//END VARIABLE BUFFER
+
+
 
 	// Lock the light constant buffer so it can be written to.
 	result = m_context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);

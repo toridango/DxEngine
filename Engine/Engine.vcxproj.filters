@@ -90,6 +90,9 @@
     <ClCompile Include="TerrainShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WaterShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cameraclass.h">
@@ -164,32 +167,43 @@
     <ClInclude Include="TerrainShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WaterShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="light.vs">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="light.ps">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="sky.ps">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="sky.vs">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="bumpmap.ps">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="bumpmap.vs">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="packages.config" />
-    <None Include="terrain.ps">
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="bumpmap_ps.hlsl">
       <Filter>Shader Files</Filter>
-    </None>
-    <None Include="terrain.vs">
+    </FxCompile>
+    <FxCompile Include="bumpmap_vs.hlsl">
       <Filter>Shader Files</Filter>
-    </None>
+    </FxCompile>
+    <FxCompile Include="light_ps.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="light_vs.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="sky_ps.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="sky_vs.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="terrain_ps.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="terrain_vs.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="water_ps.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="water_vs.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

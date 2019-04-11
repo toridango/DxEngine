@@ -64,8 +64,9 @@ public:
 	Terrain(const Terrain&);
 	~Terrain();
 
-
-	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight, WCHAR* lowestTexFile, WCHAR* lowTexFile, WCHAR* highTexFile, WCHAR* highestTexFile);
+	bool Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight, float yPos);
+	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight, 
+		WCHAR* lowestTexFile, WCHAR* lowTexFile, WCHAR* highTexFile, WCHAR* highestTexFile);
 	void ModelShutdown();
 
 	ID3D11ShaderResourceView* GetTexture(Terrain::TEXID id);
@@ -74,6 +75,10 @@ public:
 	void Render(ID3D11DeviceContext*);
 	bool GenerateHeightMap(double scaling = 1.0, double zoom = 1.0);
 	int  GetIndexCount();
+	int  GetTerrainWidth();
+	int  GetTerrainHeight();
+	double  GetMinHeight();
+	double  GetMaxHeight();
 
 	bool Smooth();
 	XMFLOAT4 TextureBlendingByHeight(HeightMapType h);

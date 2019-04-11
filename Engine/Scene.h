@@ -19,6 +19,7 @@
 #include "LightShader.h"
 #include "BumpShader.h"
 #include "TerrainShader.h"
+#include "WaterShader.h"
 
 
 // Abstract Scene

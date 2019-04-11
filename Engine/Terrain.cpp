@@ -29,6 +29,63 @@ Terrain::~Terrain()
 	ModelShutdown();
 }
 
+// This initialisation should only be used for water terrains
+bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight, float yPos)
+{
+	int index;
+	float height = yPos;
+	bool result;
+	m_device = device;
+
+
+
+	// Save the dimensions of the terrain.
+	m_terrainWidth = terrainWidth;
+	m_terrainHeight = terrainHeight;
+
+	// Create the structure to hold the terrain data.
+	m_heightMap = new HeightMapType[m_terrainWidth * m_terrainHeight];
+	if (!m_heightMap) { return false; }
+
+
+	float invWidth = 1.0f / m_terrainWidth;
+	float invHeight = 1.0f / m_terrainHeight;
+
+	// Initialise the data in the height map (flat).
+	for (int j = 0; j < m_terrainHeight; j++)
+	{
+		for (int i = 0; i < m_terrainWidth; i++)
+		{
+			index = (m_terrainHeight * j) + i;
+
+			m_heightMap[index].x = (float)i;
+			m_heightMap[index].y = (float)height;
+			m_heightMap[index].z = (float)j;
+
+			m_heightMap[index].tu = (float)i * invWidth; //(float)(i % 1024) / 1024.0f;
+			m_heightMap[index].tv = (float)j * invHeight; //(float)(j % 1024) / 1024.0f;
+
+
+		}
+	}
+
+	// Normalize the height of the height map.
+	NormalizeHeightMap();
+
+	//even though we are generating a flat terrain, we still need to normalise it. 
+	// Calculate the normals for the terrain data.
+	result = CalculateNormals();
+	if (!result) { return false; }
+	   
+
+
+	// Initialize the vertex and index buffer that hold the geometry for the terrain.
+	result = InitializeBuffers(device);
+	if (!result) { return false; }
+
+	return true;
+}
+
 
 
 
@@ -169,6 +226,29 @@ int Terrain::GetIndexCount()
 {
 	return m_indexCount;
 }
+
+int Terrain::GetTerrainWidth()
+{
+	return m_terrainWidth;
+}
+
+int Terrain::GetTerrainHeight()
+{
+	return m_terrainHeight;
+}
+
+
+double Terrain::GetMinHeight()
+{
+	return m_minHeight;
+}
+
+double Terrain::GetMaxHeight()
+{
+	return m_maxHeight;
+}
+
+
 
 
 int Terrain::RandBetween(int min, int max)
@@ -328,7 +408,7 @@ XMFLOAT4 Terrain::TextureBlendingByHeight(float h)
 	// only colour4
 	// From Highest to lowest:
 	//			c1 | c1&2 | c2 | c2&3 | c3 | c3&4 | c4 
-	float th[] = { 0.9f, 0.7f, 0.6f, 0.4f, 0.3f, 0.1f };
+	float th[] = { 0.9f, 0.7f, 0.6f, 0.4f, 0.3f, 0.2f };
 	
 
 	if (e >= th[0])
