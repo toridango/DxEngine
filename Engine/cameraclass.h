@@ -47,10 +47,13 @@ public:
 	void Rotate(XMFLOAT3);
 
 	void Render();
-	//void GetViewMatrix(D3DXMATRIX&);
+	void RenderTextureView();
+
 	XMMATRIX GetViewMatrix();
 	XMMATRIX GetProjectionMatrix();
 	XMMATRIX GetOrthogonalMatrix();
+
+	XMMATRIX GetTextureViewMatrix();
 
 private:
 	// X, Y, Z
@@ -61,6 +64,7 @@ private:
 	//float m_rotationPitch, m_rotationYaw, m_rotationRoll;
 	
 	XMMATRIX m_viewMatrix;
+	XMMATRIX m_texViewMatrix;
 	XMMATRIX m_projectionMatrix;
 	XMMATRIX m_orthoMatrix;
 };

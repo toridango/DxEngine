@@ -147,7 +147,7 @@ bool BumpShader::SetShaderParameters(XMMATRIX worldMatrix, XMMATRIX viewMatrix, 
 
 
 	// texture or texture array have to be decided here, not in base class
-	if (!this->Shader::SetMatrixBuffer(worldMatrix, viewMatrix, projectionMatrix, lightDirection))
+	if (!this->Shader::SetMatrixBuffer(worldMatrix, viewMatrix, projectionMatrix))
 	{
 		return false;
 	}

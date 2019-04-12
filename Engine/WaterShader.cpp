@@ -318,40 +318,10 @@ bool WaterShader::SetShaderParameters(ID3D11DeviceContext*, XMMATRIX worldMatrix
 
 
 	// texture or texture array have to be decided here, not in base class
-	if (!this->Shader::SetMatrixBuffer(worldMatrix, viewMatrix, projectionMatrix, lightDirection))
+	if (!this->Shader::SetMatrixBuffer(worldMatrix, viewMatrix, projectionMatrix))
 	{
 		return false;
 	}
-
-
-	// Transpose the matrices to prepare them for the shader.
-	/*worldMatrix = XMMatrixTranspose(worldMatrix);
-	viewMatrix = XMMatrixTranspose(viewMatrix);
-	projectionMatrix = XMMatrixTranspose(projectionMatrix);
-
-	// Lock the constant buffer so it can be written to.
-	result = m_context->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Get a pointer to the data in the constant buffer.
-	dataPtr = (MatrixBufferType*)mappedResource.pData;
-
-	// Copy the matrices into the constant buffer.
-	dataPtr->world = worldMatrix;
-	dataPtr->view = viewMatrix;
-	dataPtr->projection = projectionMatrix;
-
-	// Unlock the constant buffer.
-	m_context->Unmap(m_matrixBuffer, 0);
-
-	// Set the position of the constant buffer in the vertex shader.
-	bufferNumber = 0;
-
-	// Now set the constant buffer in the vertex shader with the updated values.
-	m_context->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);*/
 
 
 

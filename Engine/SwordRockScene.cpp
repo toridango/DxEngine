@@ -243,8 +243,8 @@ bool SwordRockScene::InitializeModels()
 	go_sword = new GameObject();
 	go_sword->SetModel(m_ModelSword);
 
-	go_sword->RotateDegreesAroundY(90.0f);
 	go_sword->RotateDegreesAroundX(-45.0f);
+	go_sword->RotateDegreesAroundY(90.0f);
 	go_sword->SetTranslation(0.5f, 1.4f, -0.2f);
 
 

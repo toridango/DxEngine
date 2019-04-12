@@ -231,7 +231,7 @@ void Shader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR
 
 
 // The SetShaderParameters function sets the shader parameters before rendering occurs.
-bool Shader::SetMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 lightDirection)
+bool Shader::SetMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix/*, XMFLOAT3 lightDirection*/)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -241,9 +241,6 @@ bool Shader::SetMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX
 
 
 	// Transpose the matrices to prepare them for the shader.
-	//D3DXMatrixTranspose(&worldMatrix, &worldMatrix);
-	//D3DXMatrixTranspose(&viewMatrix, &viewMatrix);
-	//D3DXMatrixTranspose(&projectionMatrix, &projectionMatrix);
 	worldMatrix = XMMatrixTranspose(worldMatrix);
 	viewMatrix = XMMatrixTranspose(viewMatrix);
 	projectionMatrix = XMMatrixTranspose(projectionMatrix);
@@ -271,37 +268,6 @@ bool Shader::SetMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX
 
 	// Now set the matrix constant buffer in the vertex shader with the updated values.
 	m_context->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
-
-	// The texture array is set here, it contains two textures:
-	// The first texture is the color texture and 
-	// the second texture is the normal map.
-
-	// Set shader texture array resource in the pixel shader.
-	//deviceContext->PSSetShaderResources(0, 5, textureArray);
-
-	// The light buffer in the pixel shader is then set with the diffuse light color and light direction.
-	// Lock the light constant buffer so it can be written to.
-	/*result = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Get a pointer to the data in the constant buffer.
-	dataPtr2 = (LightBufferType*)mappedResource.pData;
-
-	// Copy the lighting variables into the constant buffer.
-	//dataPtr2->diffuseColor = diffuseColor;
-	dataPtr2->lightDirection = lightDirection;
-
-	// Unlock the constant buffer.
-	deviceContext->Unmap(m_lightBuffer, 0);
-
-	// Set the position of the light constant buffer in the pixel shader.
-	bufferNumber = 0;
-
-	// Finally set the light constant buffer in the pixel shader with the updated values.
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);*/
 
 	return true;
 }

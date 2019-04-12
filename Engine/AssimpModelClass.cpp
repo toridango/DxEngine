@@ -253,20 +253,20 @@ bool AssimpModelClass::LoadModel(const char* modelFilename)
 
 		for (int vertIdx = 0; vertIdx < mesh->mNumVertices; vertIdx++)
 		{
-			aiVector3D vert = mesh->mVertices[vertIdx];
-			aiVector3D norm = mesh->mNormals[vertIdx];
-			aiVector3D uvs = mesh->mTextureCoords[meshIdx][vertIdx];
+			aiVector3D* vert = &mesh->mVertices[vertIdx];
+			aiVector3D* norm = &mesh->mNormals[vertIdx];
+			aiVector3D* uvs = &mesh->mTextureCoords[meshIdx][vertIdx];
 
-			m_model[vertIdx].x = vert.x;
-			m_model[vertIdx].y = vert.y;
-			m_model[vertIdx].z = vert.z;
+			m_model[vertIdx].x = vert->x;
+			m_model[vertIdx].y = vert->y;
+			m_model[vertIdx].z = vert->z;
 
-			m_model[vertIdx].tu = uvs.x;
-			m_model[vertIdx].tv = uvs.y;
+			m_model[vertIdx].tu = uvs->x;
+			m_model[vertIdx].tv = uvs->y;
 
-			m_model[vertIdx].nx = norm.x;
-			m_model[vertIdx].ny = norm.y;
-			m_model[vertIdx].nz = norm.z;
+			m_model[vertIdx].nx = norm->x;
+			m_model[vertIdx].ny = norm->y;
+			m_model[vertIdx].nz = norm->z;
 		}
 
 		//idxVector.reserve(mesh->mNumFaces * 3u);

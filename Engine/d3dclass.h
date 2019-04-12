@@ -52,9 +52,12 @@ public:
 
 	void TurnOnAlphaBlending();
 	void TurnOffAlphaBlending();
+	//void SetBackBufferRenderTarget(bool mode);
 
 	ID3D11DepthStencilView* GetDepthStencilView();
+	void SetZBuffer(bool mode);
 	void SetBackBufferRenderTarget();
+	void ResetViewport();
 
 	void setSkyMode(bool how);
 
@@ -80,6 +83,8 @@ private:
 	ID3D11DepthStencilState* m_depthDisabledStencilState;
 	//ID3D11BlendState* m_alphaEnableBlendingState;
 	//ID3D11BlendState* m_alphaDisableBlendingState;
+
+	D3D11_VIEWPORT m_viewport;
 };
 
 #endif

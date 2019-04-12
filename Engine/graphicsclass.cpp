@@ -9,6 +9,8 @@ GraphicsClass::GraphicsClass()
 	m_D3D = 0;
 	m_Scene = 0;
 	m_Camera = 0;
+	m_orthoW = 0;
+	m_RenderTexture = 0;
 }
 
 
@@ -27,12 +29,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	bool result;
 	m_sprint = false;
 	m_movSpeed = MOV_SPEED_NORMAL;
+	m_screenH = screenHeight;
+	m_screenW = screenWidth;
 
-	// Create the Direct3D object.
 	m_D3D = new D3DClass;
 	if (!m_D3D) { return false; }
-
-	// Initialize the Direct3D object.
 	result = m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN);// , SCREEN_DEPTH, SCREEN_NEAR);
 	if (!result)
 	{
@@ -40,14 +41,64 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	// Create the camera object.
+
 	m_Camera = new CameraClass;
 	if (!m_Camera) { return false; }
-	m_Camera->Initialize(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
+	result = m_Camera->Initialize(screenWidth, screenHeight, SCREEN_DEPTH, SCREEN_NEAR);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the camera object.", L"Error", MB_OK);
+		return false;
+	}
+
+
+	// -----------      Scene Selection      -------------
 
 	//m_Scene = new SwordRockScene(hwnd, m_D3D);
 	m_Scene = new OverWorldScene(hwnd, m_D3D);
+
+	// ---------------------------------------------------
+
+
+	if (!m_Scene) { return false; }
 	m_Scene->Initialize(m_Camera);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the scene object.", L"Error", MB_OK);
+		return false;
+	}
+
+	m_orthoW = new OrthoWindow();
+	if (!m_orthoW) { return false; }
+	result = m_orthoW->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the orthographic window object.", L"Error", MB_OK);
+		return false;
+	}
+	m_Camera->RenderTextureView();
+	// Get view matrix and save it
+	m_orthoView = m_Camera->GetTextureViewMatrix();
+	m_orthoMatrix = XMMatrixOrthographicLH(screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
+
+	m_RenderTexture = new RenderTexture();
+	if (!m_RenderTexture) { return false; }
+	result = m_RenderTexture->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the render to texture object.", L"Error", MB_OK);
+		return false;
+	}
+
+
+	m_ppShader = new PostProcessShader(hwnd, m_D3D->GetDevice(), m_D3D->GetDeviceContext());
+	if (!m_ppShader) { return false; }
+	result = m_ppShader->InitializeShader(L"../Engine/ppShader_vs.hlsl", L"../Engine/ppShader_ps.hlsl");
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the post processing shader.", L"Error", MB_OK);
+		return false;
+	}
 
 
 
@@ -74,6 +125,29 @@ void GraphicsClass::Shutdown()
 		m_Scene = 0;
 	}
 
+	if (m_Camera)
+	{
+		delete m_Camera;
+		m_Camera = 0;
+	}
+
+	if (m_orthoW)
+	{
+		delete m_orthoW;
+		m_orthoW = 0;
+	}
+
+	if (m_RenderTexture)
+	{
+		delete m_RenderTexture;
+		m_RenderTexture = 0;
+	}
+
+	if (m_ppShader)
+	{
+		delete m_ppShader;
+		m_ppShader = 0;
+	}
 }
 
 
@@ -155,8 +229,17 @@ void GraphicsClass::SetSprint(bool sprint)
 
 bool GraphicsClass::Render(float rotation, float deltavalue)
 {
-	//XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
+
+
+
+	// Set the render target to be the render to texture.
+	m_RenderTexture->SetRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView());
+
+	// Clear the render to texture.
+	m_RenderTexture->ClearRenderTarget(m_D3D->GetDeviceContext(), m_D3D->GetDepthStencilView(),
+										0.0f, 0.0f, 0.0f, 1.0f);
+
 
 	result = m_Scene->Render(deltavalue);
 	if (!result)
@@ -164,6 +247,60 @@ bool GraphicsClass::Render(float rotation, float deltavalue)
 		return false;
 	}
 
+
+	// Reset the render target back to the original back buffer and not the render to texture anymore.
+	m_D3D->SetBackBufferRenderTarget();
+
+	// Reset the viewport back to the original.
+	//m_D3D->ResetViewport();
+
+
+
+	RenderTextureToScreen();
+
+
+	return true;
+}
+
+
+
+
+bool GraphicsClass::RenderTextureToScreen()
+{
+	bool result;
+
+
+	// Clear the buffers to begin the scene.
+	m_D3D->BeginScene(1.0f, 0.0f, 0.0f, 0.0f);
+
+	// Generate the view matrix based on the camera's position.
+	//m_Camera->Render();
+
+	// Get the world, view, and ortho matrices from the camera and d3d objects.
+	//m_Camera->GetViewMatrix(viewMatrix);
+	//m_D3D->GetWorldMatrix(worldMatrix);
+	//m_D3D->GetOrthoMatrix(orthoMatrix);
+
+	// Turn off the Z buffer to begin all 2D rendering.
+	m_D3D->SetZBuffer(false);
+
+	//m_orthoView = m_Camera->GetTextureViewMatrix();
+	// Put the full screen ortho window vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	m_orthoW->Render(m_D3D->GetDeviceContext());
+
+	// Render the full screen ortho window using the texture shader and the full screen sized blurred render to texture resource.
+	result = m_ppShader->Render(m_orthoW->GetIndexCount(), m_orthoView, m_orthoMatrix, 
+								m_RenderTexture->GetShaderResourceView(), m_screenW);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Turn the Z buffer back on now that all 2D rendering has completed.
+	m_D3D->SetZBuffer(true);
+
+	// Present the rendered scene to the screen.
+	m_D3D->EndScene();
 
 	return true;
 }

@@ -60,7 +60,7 @@ private:
 	WCHAR* path_skyTex = L"../Engine/Assets/Skybox/skybox_texture.dds";
 	
 	char* path_xwModel = "../Engine/Assets/XW/xStarFighterCentered.fbx";
-	WCHAR* path_xwTex = L"../Engine/Assets/xW/Texture.png";
+	WCHAR* path_xwTex = L"../Engine/Assets/xW/Texture2.png";
 
 	char* path_rockModel = "../Engine/Assets/rock/stone.obj";
 	WCHAR* path_rockAlbedo = L"../Engine/Assets/rock/tex/stone_albedo.png";

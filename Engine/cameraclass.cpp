@@ -264,9 +264,40 @@ void CameraClass::Render()
 	// Finally create the view matrix from the three updated vectors.
 	//D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
 	m_viewMatrix = XMMatrixLookAtLH(posv, lookAt, up);
-
-	return;
 }
+
+
+XMMATRIX CameraClass::GetTextureViewMatrix()
+{
+	return m_texViewMatrix;
+}
+
+
+
+void CameraClass::RenderTextureView()
+{
+
+	float yaw, pitch, roll;
+
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMVECTOR lookAt = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	XMVECTOR position = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);
+
+	XMMATRIX rot = XMMatrixRotationRollPitchYaw(0.0f, 0.0f, 0.0f);
+
+
+
+	lookAt = XMVector3TransformCoord(lookAt, rot);
+	up = XMVector3TransformCoord(up, rot);
+
+
+	lookAt = position + lookAt;
+
+
+	m_texViewMatrix = XMMatrixLookAtLH(position, lookAt, up);
+}
+
+
 
 
 XMMATRIX CameraClass::GetViewMatrix()

@@ -98,7 +98,10 @@
     <ClCompile Include="LightShader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="modelclass.cpp" />
+    <ClCompile Include="OrthoWindow.cpp" />
     <ClCompile Include="OverWorldScene.cpp" />
+    <ClCompile Include="PostProcessShader.cpp" />
+    <ClCompile Include="RenderTexture.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SwordRockScene.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -125,7 +128,10 @@
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="LightShader.h" />
     <ClInclude Include="modelclass.h" />
+    <ClInclude Include="OrthoWindow.h" />
     <ClInclude Include="OverWorldScene.h" />
+    <ClInclude Include="PostProcessShader.h" />
+    <ClInclude Include="RenderTexture.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SwordRockScene.h" />
     <ClInclude Include="Shader.h" />

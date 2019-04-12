@@ -10,6 +10,9 @@
 ///////////////////////
 #include "SwordRockScene.h"
 #include "OverWorldScene.h"
+#include "OrthoWindow.h"
+#include "RenderTexture.h"
+#include "PostProcessShader.h"
 
 
 /////////////
@@ -47,18 +50,27 @@ public:
 
 private:
 	bool Render(float, float);
+	bool RenderTextureToScreen();
 
 
 private:
 
 	bool m_sprint;
 	float m_movSpeed;
+	int m_screenH;
+	int m_screenW;
 
 	D3DClass* m_D3D;
-	//SwordRockScene* m_Scene;
 	Scene* m_Scene;
 	CameraClass* m_Camera;
 	XMFLOAT3 m_camPos;
+
+	OrthoWindow* m_orthoW;
+	RenderTexture* m_RenderTexture;
+	PostProcessShader* m_ppShader;
+	XMMATRIX m_orthoMatrix;
+	XMMATRIX m_orthoView;
+
 };
 
 #endif

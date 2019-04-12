@@ -12,6 +12,7 @@ D3DClass::D3DClass()
 	m_renderTargetView = 0;
 	m_depthStencilBuffer = 0;
 	m_depthStencilState = 0;
+	m_depthDisabledStencilState = 0;
 	m_depthStencilStateSky = 0;
 	m_depthStencilView = 0;
 	m_rasterState = 0;
@@ -306,10 +307,19 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		return false;
 	}
 
+
+	depthStencilDesc.DepthEnable = false;
+	// Create the depth stencil state.
+	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthDisabledStencilState);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
 	// Set the depth stencil state.
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
 
-	//depthStencilDesc.DepthEnable = false;
+	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 	// Create the depth stencil state.
 	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilStateSky);
@@ -547,7 +557,23 @@ void D3DClass::TurnOffAlphaBlending()
 }
 
 
+void D3DClass::SetZBuffer(bool mode)
+{
+	if (mode)
+		m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
+	else
+		m_deviceContext->OMSetDepthStencilState(m_depthDisabledStencilState, 1);
+}
 
+void D3DClass::SetBackBufferRenderTarget()
+{
+	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+}
+
+void D3DClass::ResetViewport()
+{
+	m_deviceContext->RSSetViewports(1, &m_viewport);
+}
 
 
 
@@ -613,9 +639,3 @@ ID3D11DepthStencilView* D3DClass::GetDepthStencilView()
 	return m_depthStencilView;
 }
 
-void D3DClass::SetBackBufferRenderTarget()
-{
-	// Bind the render target view and depth stencil buffer to the output render pipeline.
-	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
-
-}

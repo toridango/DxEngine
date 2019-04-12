@@ -52,7 +52,7 @@ protected:
 	void OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename);
 
 	// In children: Add custom elements to setParameters
-	bool SetMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 lightDirection);
+	bool SetMatrixBuffer(XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix/*, XMFLOAT3 lightDirection*/);
 
 protected:
 	HWND m_hwnd;
