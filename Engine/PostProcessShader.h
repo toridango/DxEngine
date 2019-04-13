@@ -22,9 +22,9 @@ private:
 	};
 
 
-	struct ScreenSizeBufferType
+	struct VariableBufferType
 	{
-		float screenWidth;
+		bool sprinting;
 		XMFLOAT3 padding;
 	};
 
@@ -37,20 +37,15 @@ public:
 
 	void Shutdown();
 	bool Render(int indexCount, XMMATRIX viewMatrix,
-		XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, float screenWidth);
+		XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, bool sprinting);
 
 private:
 
 	void ShutdownShader();
 
-	bool SetShaderParameters(XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, float);
+	bool SetShaderParameters(XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, bool sprinting);
 
 
-private:
-	//ID3D11VertexShader* m_vertexShader;
-	//ID3D11PixelShader* m_pixelShader;
-	//ID3D11InputLayout* m_layout;
-	//ID3D11SamplerState* m_sampleState;
-	//ID3D11Buffer* m_matrixBuffer;
-	ID3D11Buffer* m_screenSizeBuffer;
+//private:
+	ID3D11Buffer* m_variableBuffer;
 };

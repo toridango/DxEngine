@@ -290,7 +290,7 @@ bool GraphicsClass::RenderTextureToScreen()
 
 	// Render the full screen ortho window using the texture shader and the full screen sized blurred render to texture resource.
 	result = m_ppShader->Render(m_orthoW->GetIndexCount(), m_orthoView, m_orthoMatrix, 
-								m_RenderTexture->GetShaderResourceView(), m_screenW);
+								m_RenderTexture->GetShaderResourceView(), m_sprint);
 	if (!result)
 	{
 		return false;

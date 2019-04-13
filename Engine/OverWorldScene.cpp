@@ -150,8 +150,10 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	if (!m_Light) { return false; }
 
 	// Initialize the light object.
-	m_Light->SetAmbientColour(1.f, 1.0f, 1.f, 1.0f);
-	m_Light->SetDiffuseColour(.6f, .0f, .3f, 1.0f);
+	//m_Light->SetAmbientColour(1.f, 1.0f, 1.f, 1.0f);
+	//m_Light->SetDiffuseColour(.6f, .0f, .3f, 1.0f);
+	m_Light->SetAmbientColour(0.8f, 0.8f, 0.8f, 1.0f);
+	m_Light->SetDiffuseColour(0.2f, 0.2f, 0.2f, 1.0f);
 	m_Light->SetSpecularColour(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(1.0f, -0.3f, 1.0f);
 	m_Light->SetSpecularPower(32.0f);

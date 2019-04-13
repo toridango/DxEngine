@@ -46,6 +46,7 @@ float4 TerrainPixelShader(PixelInputType input) : SV_TARGET
 	float3 lightDir;
 	float lightIntensity;
 	float4 color;
+    float3 reflection;
 	float4 textureColour1;
     float4 textureColour2;
     float4 textureColour3;
@@ -57,6 +58,14 @@ float4 TerrainPixelShader(PixelInputType input) : SV_TARGET
     textureColour4 = shLowestTexture.Sample(SampleType, input.tex);
 
 	// Set the default output color to the ambient light value for all pixels.
+    // color = ambientColor;
+     
+    // Apparently blending is in ARGB format, not RGBA // 1 is w, 2 is x, etc
+    float4 c12 = lerp(textureColour2, textureColour1, input.blending.x);
+    float4 c34 = lerp(textureColour4, textureColour3, input.blending.z);
+    float blend = input.blending.x + input.blending.y;
+    float4 c = lerp(c34, c12, blend);
+
     color = ambientColor;
 
 	// Invert the light direction for calculations.
@@ -69,24 +78,13 @@ float4 TerrainPixelShader(PixelInputType input) : SV_TARGET
     {
         // Determine the final diffuse color based on the diffuse color and the amount of light intensity.
         color += (diffuseColor * lightIntensity);
+        color = saturate(color);
+        reflection = normalize(2 * lightIntensity * input.normal - lightDir);
+        
     }
 
     // Saturate the final light color.
-    color = saturate(color);
-
-
-    
-    // Apparently blending is in ARGB format, not RGBA // 1 is w, 2 is x, etc
-    float4 c12 = lerp(textureColour2, textureColour1, input.blending.x);
-    float4 c34 = lerp(textureColour4, textureColour3, input.blending.z);
-    float blend = input.blending.x + input.blending.y;
-    float4 c = lerp(c34, c12, blend);
-
-    color = c;
-
-    // Color by height experiments
-    //color = input.color;
-    // ---------------------------
+    color = color * c;
 
     return color;
 }

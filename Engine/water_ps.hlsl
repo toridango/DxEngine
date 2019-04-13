@@ -116,9 +116,14 @@ float3 getNormal(float2 fragCoord, float zoom, float3 surfaceDimensions, float i
 
 float4 WaterPixelShader(PixelInputType input) : SV_TARGET
 {
+	float lightIntensity;
+	float3 lightDir;
+    float3 reflection;
+	float4 colour;
+    float4 specular;
+
     float iTime = input.delta;
-    // Normalized pixel coordinates (from 0 to 1)
-    float2 uv = input.tex.xy;///input.surfaceDimensions.xy;
+    float2 uv = input.tex.xy;
     float2 fragCoord = input.tex.xy * input.surfaceDimensions.xy;
     
     float zoom = 500.0;
@@ -127,40 +132,46 @@ float4 WaterPixelShader(PixelInputType input) : SV_TARGET
     float3 dark = float3(0.1, 0.15, 0.3);
     float3 light = float3(0.1, 0.25, 0.75);
     
-    /*float b1 = brownian(p)+iTime/1.3;
-    float b2 = brownian(1.2*p);
-	
-    float fbm1 = brownian(float2(iTime+p.x, iTime+p.y));
-    float fbm1slow = brownian(float2(iTime*0.3+p.x, iTime*0.3+p.y));
-	float fbm2 = brownian(float2(b1, b2));
-    
-    
-    float3 colour1 = lerp(dark, light, fbm1);
-    float3 colour1slow = lerp(dark, light, fbm1slow);
-    float3 colour2 = lerp(dark, light, fbm2);
-    
-    float3 colour = saturate(colour1 + colour2);*/
     float3 colour3 = lerp(dark, light, getHeight(p, iTime));
 
     
-    float3 lightDir = normalize(-lightDirection);
-    //float3 normal = getNormal(fragCoord, zoom, input.surfaceDimensions, iTime);
+    //float3 lightDir = normalize(-lightDirection);
     float3 normal = getNormal(fragCoord, zoom, input.surfaceDimensions, iTime);
-    float lightIntensity = saturate(dot(normal, lightDirection));
-    float3 reflection = normalize(2.0 * lightIntensity * normal - lightDir);
-    float specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
+    //float lightIntensity = saturate(dot(normal, lightDirection));
+    //float3 reflection = normalize(2.0 * lightIntensity * normal - lightDir);
+    //float specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
     
     
     
     // Output to screen
-    //fragColor = vec4(clamp(colour3, 0.0, 1.0),1.0);
-    float4 fragColour = float4(saturate(colour3 + /*vec3(0.1,0.1,0.1)*/specular), 0.75);
-    //fragColor = vec4(clamp(colour3 + vec3(0.1,0.1,0.1)*specular, 0.0, 1.0),1.0);
-    //fragColor = vec4(clamp(colour3 + mix(dark, light, specular), 0.0, 1.0),1.0);
-    //fragColor = vec4(clamp(vec3(1.0,1.0,1.0)*specular, 0.0, 1.0),1.0);
-    //fragColor = vec4(clamp(normal, 0.0, 1.0),1.0);
-    //fragColor = vec4(clamp(getNormal(fragCoord, zoom), 0.0, 1.0),1.0); // Normals visualised look cool
+    //float4 fragColour = float4(saturate(colour3 + /*vec3(0.1,0.1,0.1)*/specular), 0.75);
+    
+
+    colour = ambientColour;
+    specular = float4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// Invert the light direction for calculations.
+    lightDir = lightDirection;
+    // Calculate the amount of light on this pixel.
+    lightIntensity = saturate(dot(input.normal, lightDir));
+    // Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+    colour += (diffuseColour * lightIntensity);
+    // Saturate the ambient and diffuse colour.
+    colour = saturate(colour);
+    // Calculate the reflection vector based on the light intensity, normal vector, and light direction.
+    reflection = normalize(2 * lightIntensity * input.normal - lightDir);
+    // Determine the amount of specular light based on the reflection vector, viewing direction, and specular power.
+    specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
+
+		
+	// Multiply the texture pixel and the final diffuse color to get the final pixel color result.
+	float4 c = float4(colour.xyz * colour3, 0.75);
 
 
-    return fragColour;
+	c = saturate(c + specular);
+
+
+
+
+    return c;
 }

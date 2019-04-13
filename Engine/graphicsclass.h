@@ -5,6 +5,7 @@
 #define _GRAPHICSCLASS_H_
 
 
+
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
