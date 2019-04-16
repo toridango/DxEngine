@@ -113,6 +113,7 @@
     <ClCompile Include="texturearrayclass.cpp" />
     <ClCompile Include="textureclass.cpp" />
     <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="VolumetricLaserShader.cpp" />
     <ClCompile Include="WaterShader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +144,7 @@
     <ClInclude Include="texturearrayclass.h" />
     <ClInclude Include="textureclass.h" />
     <ClInclude Include="Utilities.h" />
+    <ClInclude Include="VolumetricLaserShader.h" />
     <ClInclude Include="WaterShader.h" />
   </ItemGroup>
   <ItemGroup>

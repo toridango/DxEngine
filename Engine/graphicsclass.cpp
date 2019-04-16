@@ -262,7 +262,10 @@ bool GraphicsClass::Render(float rotation, float deltavalue)
 	return true;
 }
 
-
+// Render scene into rendertexture with mask shader
+// Render result into rendertexture with vertical blur shader
+// Render result into rendertexture with horizontal blur shader
+// Render result into rendertexture with final shader (addition of blur to scene)
 
 
 bool GraphicsClass::RenderTextureToScreen()

@@ -109,8 +109,9 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 
 	m_cpPaths.push_back(path_soundLoop);
 	m_cpPaths.push_back(path_skyModel);
-	m_cpPaths.push_back((char*) path_rockModel);
+	m_cpPaths.push_back(/*(char*) */path_rockModel);
 	m_cpPaths.push_back(path_xwModel);
+	m_cpPaths.push_back(path_cubeModel);
 
 	m_wcpPaths.push_back(path_skyTex);
 	m_wcpPaths.push_back(path_rockAlbedo);
@@ -249,7 +250,7 @@ bool OverWorldScene::InitializeModels()
 	go_xw = new GameObject();
 	go_xw->SetModel(m_ModelXW);
 
-	go_xw->Scale(1.0f, 1.0f, 1.0f);
+	//go_xw->Scale(1.0f, 1.0f, 1.0f);
 	//go_xw->RotateDegreesAroundX(90.0f);
 	go_xw->SetOffsetRotation(90.0f, 180.0f, 0.0f);
 	//go_xw->SetTranslation(0.0f, 18.6f, 0.0f);
@@ -266,7 +267,6 @@ bool OverWorldScene::InitializeModels()
 
 
 	// ------------------ Terrain ------------------
-
 
 	go_procTerrain = new Terrain();
 	go_procTerrain->Initialize(m_D3D->GetDevice(), TERRAINWIDTH, TERRAINHEIGHT,
@@ -291,6 +291,26 @@ bool OverWorldScene::InitializeModels()
 	float elevation = 0.19*(terrainMaxH - terrainMinH) + terrainMinH;
 	go_waterSurface->SetTranslation(-(float)TERRAINWIDTH / 2.0f, elevation, -(float)TERRAINHEIGHT / 2.0f);
 
+
+
+
+	// ------------------ Laser (Volumetric Cube) ------------------
+
+	m_ModelCube = new AssimpModelClass;
+	if (!m_ModelCube) { return false; }
+
+	result = m_ModelCube->Initialize(m_D3D->GetDevice(), path_cubeModel, path_rockAlbedo);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the laser model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	go_laser = new GameObject();
+	go_laser->SetModel(m_ModelCube);
+
+	go_laser->Scale(3.0f, 3.0f, 3.0f);
+	go_laser->SetTranslation(0.0f, 30.0f, 0.0f);
 
 
 
@@ -363,6 +383,18 @@ bool OverWorldScene::InitializeShaders()
 		MessageBox(m_hwnd, L"Could not initialize the water shader object.", L"Error", MB_OK);
 		return false;
 	}
+
+
+	m_volLaserShader = new VolumetricLaserShader(m_hwnd, m_D3D->GetDevice(), m_D3D->GetDeviceContext());
+	if (!m_volLaserShader) { return false; }
+
+	result = m_volLaserShader->InitializeShader(path_volLaserVertexShader, path_volLaserPixelShader);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the volumetric laser shader object.", L"Error", MB_OK);
+		return false;
+	}
+
 
 
 	return true;
@@ -471,9 +503,12 @@ bool OverWorldScene::Render(float deltavalue)
 
 
 
+	// REGION: ALPHA BLENDING ON ---------------------------------------------------------
+
+	m_D3D->TurnOnAlphaBlending();
+
 	// ------------------ Water ------------------
 	
-	m_D3D->TurnOnAlphaBlending();
 
 	go_waterSurface->Render(m_D3D->GetDeviceContext());
 
@@ -481,10 +516,33 @@ bool OverWorldScene::Render(float deltavalue)
 
 	if (!result) { return false; }
 
+	//m_D3D->TurnOffAlphaBlending();
+
+
+	
+
+	// ------------------ Laser ------------------
+
+
+
+
+	go_laser->Render(m_D3D->GetDeviceContext());
+
+	// Render the model using its shader.
+	//result = m_LightShader->Render(go_laser, m_Camera, m_Light, deltavalue);
+	result = m_volLaserShader->Render(go_laser, m_Camera, m_Light, deltavalue);
+
+	if (!result) { return false; }
+
+
 	m_D3D->TurnOffAlphaBlending();
+	// -----------------------------------------------------------------------------------
+
+
+
+
 
 	// Present the rendered scene to the screen.
 	//m_D3D->EndScene();
-
 	return true;
 }

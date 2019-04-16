@@ -59,31 +59,31 @@ float4 PostProcessPixelShader (PixelInputType input) : SV_TARGET
     return float4(result, 1.0);*/
     // return float4(hdrColor, 1.0);
 
-    float mod = 0.0;
-    if(sprinting) { mod = 1.0;}
-
-    float2 Center   = {0.5, 0.5};
-    float BlurStart = 1.0;
-    //float BlurWidth = -0.14;
-    float BlurWidth = -0.09 * mod;
-    float samples   = 16;
-
-    float4 Color = 0;
-   
-    for(int i = 0; i < samples; i++)
+    //float mod = 1.0;
+    float4 colour = (float4)0.0;
+    if(!sprinting) 
     {
-       float scale = BlurStart + BlurWidth * (i / (samples - 1));
-       Color += shaderTexture.Sample(SampleType, (input.tex - 0.5) * scale + Center );
+        colour = shaderTexture.Sample(SampleType, input.tex);
     }
-    Color /= samples;
+    else
+    {
+        
+        float2 Center   = {0.5, 0.5};
+        float BlurStart = 1.0;
+        //float BlurWidth = -0.14;
+        float BlurWidth = -0.09;
+        float samples   = 16.0;
 
-    return Color;
+        for(int i = 0; i < samples; i++)
+        {
+            float scale = BlurStart + BlurWidth * (i / (samples - 1));
+            colour += shaderTexture.Sample(SampleType, (input.tex - 0.5) * scale + Center );
+        }
+        colour /= samples;
+
+    }
 
 
-
-
-
-
-
+    return colour;
 
 }

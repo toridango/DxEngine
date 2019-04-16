@@ -38,12 +38,14 @@ private:
 	GameObject* go_sky;
 	GameObject* go_rock;
 	GameObject* go_xw;
+	GameObject* go_laser;
 	Terrain* go_procTerrain;
 	Terrain* go_waterSurface;
 
 	// MODELS
 	AssimpModelClass* m_ModelXW;
 	AssimpModelClass* m_ModelSky;
+	AssimpModelClass* m_ModelCube;
 	AssimpBumpedModelClass* m_ModelRock;
 
 	// SHADERS
@@ -52,9 +54,12 @@ private:
 	BumpShader* m_BumpMapShader;
 	TerrainShader* m_TerrainShader;
 	WaterShader* m_WaterShader;
+	VolumetricLaserShader* m_volLaserShader;
 
 	// FILE PATHS
 	char* path_soundLoop = "../Engine/Assets/sounds/magical_forest.wav";
+
+	char* path_cubeModel = "../Engine/Assets/cube.fbx";
 
 	char* path_skyModel = "../Engine/Assets/sphere.fbx";
 	WCHAR* path_skyTex = L"../Engine/Assets/Skybox/skybox_texture.dds";
@@ -74,11 +79,14 @@ private:
 	WCHAR* path_lightPixelShader = L"../Engine/light_ps.hlsl";
 	WCHAR* path_skyVertexShader = L"../Engine/sky_vs.hlsl";
 	WCHAR* path_skyPixelShader = L"../Engine/sky_ps.hlsl";
-	WCHAR* path_bumpVertexShader = L"../Engine/bumpmap_vs.hlsl";
-	WCHAR* path_bumpPixelShader = L"../Engine/bumpmap_ps.hlsl";
+	WCHAR* path_volLaserVertexShader = L"../Engine/volLaser_vs.hlsl";
+	WCHAR* path_volLaserPixelShader = L"../Engine/volLaser_ps.hlsl";
 	WCHAR* path_terrainVertexShader = L"../Engine/terrain_vs.hlsl";
 	WCHAR* path_terrainPixelShader = L"../Engine/terrain_ps.hlsl";
 	WCHAR* path_waterVertexShader = L"../Engine/water_vs.hlsl";
 	WCHAR* path_waterPixelShader = L"../Engine/water_ps.hlsl";
+	WCHAR* path_bumpVertexShader = L"../Engine/bumpmap_vs.hlsl";
+	WCHAR* path_bumpPixelShader = L"../Engine/bumpmap_ps.hlsl";
+
 };
 

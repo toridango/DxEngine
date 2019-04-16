@@ -21,7 +21,7 @@ struct PixelInputType
 	float3 normal : NORMAL;
     float3 viewDirection : TEXCOORD1;
     float delta : TAIMU;
-    float3 surfaceDimensions: SOULS;
+    float3 surfaceDimensions: SOULS; // CAREFUL it's width and length and 0.0
 };
 
 
@@ -82,7 +82,7 @@ float getHeight(float2 p, float iTime)
 	
     float fbm1 = brownian(float2(iTime+p.x, iTime+p.y));
     float fbm1slow = brownian(float2(iTime*0.3+p.x, iTime*0.3+p.y));
-	float fbm2 = brownian(float2(b1, b2));
+    float fbm2 = brownian(float2(b1, b2));
 
     
     return fbm1+fbm1slow+fbm2;
@@ -124,7 +124,7 @@ float4 WaterPixelShader(PixelInputType input) : SV_TARGET
 
     float iTime = input.delta;
     float2 uv = input.tex.xy;
-    float2 fragCoord = input.tex.xy * input.surfaceDimensions.xy;
+    float2 fragCoord = uv * input.surfaceDimensions.xy;
     
     float zoom = 500.0;
 	float2 p = zoom * uv;
@@ -136,7 +136,7 @@ float4 WaterPixelShader(PixelInputType input) : SV_TARGET
 
     
     //float3 lightDir = normalize(-lightDirection);
-    float3 normal = getNormal(fragCoord, zoom, input.surfaceDimensions, iTime);
+    //float3 normal = getNormal(fragCoord, zoom, input.surfaceDimensions, iTime);
     //float lightIntensity = saturate(dot(normal, lightDirection));
     //float3 reflection = normalize(2.0 * lightIntensity * normal - lightDir);
     //float specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
@@ -151,7 +151,7 @@ float4 WaterPixelShader(PixelInputType input) : SV_TARGET
     specular = float4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Invert the light direction for calculations.
-    lightDir = lightDirection;
+    lightDir = -lightDirection;
     // Calculate the amount of light on this pixel.
     lightIntensity = saturate(dot(input.normal, lightDir));
     // Determine the final diffuse color based on the diffuse color and the amount of light intensity.
