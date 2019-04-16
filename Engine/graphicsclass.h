@@ -14,7 +14,7 @@
 #include "OrthoWindow.h"
 #include "RenderTexture.h"
 #include "PostProcessShader.h"
-
+#include "Timer.h"
 
 /////////////
 // GLOBALS //
@@ -39,7 +39,7 @@ public:
 
 	bool Initialize(int, int, HWND);
 	void Shutdown();
-	bool Frame();
+	bool Frame(Timer* timer);
 	void StrafeLeft();
 	void StrafeRight();
 	void MoveForward();
@@ -50,7 +50,7 @@ public:
 	void SetSprint(bool sprint);
 
 private:
-	bool Render(float, float);
+	bool Render(float deltaTime);
 	bool RenderTextureToScreen();
 
 

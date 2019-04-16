@@ -21,7 +21,7 @@ public:
 	bool InitializeModels();
 	bool InitializeShaders();
 
-	bool Render(float deltavalue);
+	bool Render(float deltaTime);
 
 
 
@@ -33,6 +33,7 @@ private:
 	LightClass* m_Light;
 	SoundClass* m_Sound;
 	double m_k; // iteration variable that was being used to watch the terrain change
+	XMFLOAT3 m_laserIniPos;
 
 	// GAME OBJECTS;
 	GameObject* go_sky;

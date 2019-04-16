@@ -1,4 +1,4 @@
-﻿  Terrain.cpp
+﻿  OverWorldScene.cpp
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
   c:\program files (x86)\windows kits\10\include\10.0.17134.0\shared\winerror.h(54723): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
@@ -55,5 +55,13 @@ c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): w
   c:\program files (x86)\windows kits\10\include\10.0.17134.0\shared\winerror.h(55162): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
   c:\program files (x86)\windows kits\10\include\10.0.17134.0\shared\winerror.h(55171): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
-c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\terrain.cpp(400): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(163): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(107): warning C4101: 'result': unreferenced local variable
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(206): warning C4316: 'GameObject': object allocated on the heap may not be aligned 16
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(231): warning C4316: 'GameObject': object allocated on the heap may not be aligned 16
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(250): warning C4316: 'GameObject': object allocated on the heap may not be aligned 16
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(274): warning C4316: 'Terrain': object allocated on the heap may not be aligned 16
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(291): warning C4316: 'Terrain': object allocated on the heap may not be aligned 16
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(294): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(312): warning C4316: 'GameObject': object allocated on the heap may not be aligned 16
   Engine.vcxproj -> C:\Users\Delom\Docs\MSc CGT\S2\CMP505 Procedural\UnDeadEngine\Debug\Engine.exe

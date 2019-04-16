@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 
 #include "modelclass.h"
 #include "AssimpModelClass.h"
@@ -49,11 +50,19 @@ public:
 	void Scale(XMVECTOR s);
 	void Scale(float sx, float sy, float sz);
 
+	XMFLOAT3 GetScaling();
+
 	XMMATRIX GetWorldMatrix();
 	MODELTYPE GetModelType();
 	virtual int GetIndexCount();
 	ID3D11ShaderResourceView* GetTexture();
 	ID3D11ShaderResourceView** GetTextureArray();
+
+	void Store(std::string keyname, XMFLOAT4 value);
+	float StorageGetFloat(std::string keyname);
+	XMFLOAT2 StorageGetFloat2(std::string keyname);
+	XMFLOAT3 StorageGetFloat3(std::string keyname);
+	XMFLOAT4 StorageGetFloat4(std::string keyname);
 
 	virtual void Render(ID3D11DeviceContext* deviceContext);
 
@@ -73,5 +82,7 @@ private:
 	ModelClass* m_model;
 	AssimpModelClass* m_assimpModel;
 	AssimpBumpedModelClass* m_assimpBumpModel;
+
+	std::map<std::string, XMFLOAT4> m_miscStorage;
 };
 

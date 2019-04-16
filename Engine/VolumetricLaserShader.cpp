@@ -8,7 +8,7 @@ VolumetricLaserShader::VolumetricLaserShader(HWND hwnd, ID3D11Device* device, ID
 	Shader(hwnd, device, immediateContext)
 {
 	m_cameraBuffer = 0;
-	m_lightBuffer = 0;
+	m_capsuleBuffer = 0;
 	m_variableBuffer = 0;
 }
 
@@ -21,10 +21,10 @@ VolumetricLaserShader::~VolumetricLaserShader()
 		m_cameraBuffer = 0;
 	}
 
-	if (m_lightBuffer)
+	if (m_capsuleBuffer)
 	{
-		m_lightBuffer->Release();
-		m_lightBuffer = 0;
+		m_capsuleBuffer->Release();
+		m_capsuleBuffer = 0;
 	}
 
 	if (m_variableBuffer)
@@ -45,7 +45,7 @@ bool VolumetricLaserShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilenam
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
 	D3D11_BUFFER_DESC cameraBufferDesc;
 	D3D11_BUFFER_DESC variableBufferDesc;
-	D3D11_BUFFER_DESC lightBufferDesc;
+	D3D11_BUFFER_DESC capsuleBufferDesc;
 	unsigned int numElements;
 
 	// Create the vertex input layout description.
@@ -118,20 +118,20 @@ bool VolumetricLaserShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilenam
 	}
 
 
-	// The light constant buffer is set up here.
-	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
-	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
-	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	lightBufferDesc.MiscFlags = 0;
-	lightBufferDesc.StructureByteStride = 0;
+	// Setup the description of the variable dynamic constant buffer that is in the vertex shader.
+	capsuleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	capsuleBufferDesc.ByteWidth = sizeof(CapsuleBufferType);
+	capsuleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	capsuleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	capsuleBufferDesc.MiscFlags = 0;
+	capsuleBufferDesc.StructureByteStride = 0;
 
-	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
-	if (FAILED(m_device->CreateBuffer(&lightBufferDesc, NULL, &m_lightBuffer)))
+	// Create the variable constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	if (FAILED(m_device->CreateBuffer(&capsuleBufferDesc, NULL, &m_capsuleBuffer)))
 	{
 		return false;
 	}
+
 
 	return true;
 }
@@ -139,14 +139,12 @@ bool VolumetricLaserShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilenam
 
 // The SetShaderParameters function sets the shader parameters before rendering occurs.
 bool VolumetricLaserShader::SetShaderParameters(XMMATRIX worldMatrix,
-	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 lightDirection, XMFLOAT4 ambientColour,
-	XMFLOAT4 diffuseColour, XMFLOAT3 cameraPosition, XMFLOAT4 specularColour,
-	float specularPower, float deltavalue, ID3D11ShaderResourceView* texture)
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT3 cameraPosition, 
+	XMFLOAT3 cPos, XMFLOAT3 cDir, float capsuleLen, float boundingCubeSide, float deltavalue)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	MatrixBufferType* dataPtr;
-	LightBufferType* dataPtr2;
+	CapsuleBufferType* dataPtr2;
 	VariableBufferType* dataPtr3;
 	CameraBufferType* dataPtr4;
 	unsigned int bufferNumber;
@@ -192,7 +190,7 @@ bool VolumetricLaserShader::SetShaderParameters(XMMATRIX worldMatrix,
 
 	// Copy the variablethe constant buffer.
 	dataPtr3->delta = deltavalue;
-	dataPtr3->padding = lightDirection; //this is just padding so this data isnt used.
+	dataPtr3->padding = XMFLOAT3(0.0f, 0.0f, 0.0f); //this is just padding so this data isnt used.
 
 	// Unlock the variable constant buffer.
 	m_context->Unmap(m_variableBuffer, 0);
@@ -207,56 +205,57 @@ bool VolumetricLaserShader::SetShaderParameters(XMMATRIX worldMatrix,
 
 
 
-	// Lock the light constant buffer so it can be written to.
-	result = m_context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+	// CAPSULE BUFFER
+	result = m_context->Map(m_capsuleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Get a pointer to the data in the constant buffer.
-	dataPtr2 = (LightBufferType*)mappedResource.pData;
+	dataPtr2 = (CapsuleBufferType*)mappedResource.pData;
 
-	// Copy the lighting variables into the constant buffer.
-	dataPtr2->ambientColour = ambientColour;
-	dataPtr2->diffuseColour = diffuseColour;
-	dataPtr2->lightDirection = lightDirection;
-	dataPtr2->specularColour = specularColour;
-	dataPtr2->specularPower = specularPower;
+	// Copy the variablethe constant buffer.
+	dataPtr2->cPos = cPos;
+	dataPtr2->cLen = capsuleLen;
+	dataPtr2->cDir = cDir;
+	dataPtr2->boundingCubeSide = boundingCubeSide;
 
-	// Unlock the constant buffer.
-	m_context->Unmap(m_lightBuffer, 0);
+	// Unlock the variable constant buffer.
+	m_context->Unmap(m_capsuleBuffer, 0);
 
-	// Set the position of the light constant buffer in the pixel shader.
+	// Set the position of the variable constant buffer in the vertex shader.
 	bufferNumber = 0;
 
-	// Finally set the light constant buffer in the pixel shader with the updated values.
-	m_context->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
+	// Now set the variable constant buffer in the vertex shader with the updated values.
+	m_context->PSSetConstantBuffers(bufferNumber, 1, &m_capsuleBuffer);
+
+	// END CAPSULE BUFFER
 
 
-	m_context->PSSetShaderResources(0, 1, &texture);
 
 	return true;
 }
 
 
 
-bool VolumetricLaserShader::Render(GameObject* go, CameraClass* camera, LightClass* light, float deltavalue)
+bool VolumetricLaserShader::Render(GameObject* go, CameraClass* camera, 
+	XMFLOAT3 cDir, float capsuleLen, float boundingCubeSide, float deltavalue)
 {
-
+	XMFLOAT3 cPos;
+	XMStoreFloat3(&cPos, go->GetWorldMatrix().r[3]);
 	// Set the shader parameters that it will use for rendering.
 	if (!SetShaderParameters(
 		go->GetWorldMatrix(),
 		camera->GetViewMatrix(),
 		camera->GetProjectionMatrix(),
-		light->GetDirection(),
-		light->GetAmbientColour(),
-		light->GetDiffuseColour(),
 		camera->GetPosition(),
-		light->GetSpecularColour(),
-		light->GetSpecularPower(),
-		deltavalue,
-		go->GetTexture()
+		cPos,
+		cDir,
+		capsuleLen,
+		boundingCubeSide,
+		deltavalue
 	))
 	{
 		return false;

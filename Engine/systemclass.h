@@ -22,7 +22,7 @@
 ///////////////////////
 #include "inputclass.h"
 #include "graphicsclass.h"
-//#include "soundclass.h"
+#include "Timer.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,9 +52,10 @@ private:
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
 
+	Timer* m_Timer;
 	InputClass* m_Input;
 	GraphicsClass* m_Graphics;
-	SoundClass* m_Sound;
+	//SoundClass* m_Sound;
 };
 
 

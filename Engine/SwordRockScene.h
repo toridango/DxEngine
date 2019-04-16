@@ -13,7 +13,7 @@ public:
 	bool InitializeModels();
 	bool InitializeShaders();
 
-	bool Render(float deltavalue);
+	bool Render(float deltaTime);
 
 /*private:
 	bool CheckPath(char* path);

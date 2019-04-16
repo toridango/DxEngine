@@ -217,6 +217,12 @@ void GameObject::Scale(float sx, float sy, float sz)
 }
 
 
+XMFLOAT3 GameObject::GetScaling()
+{
+	return m_scaling;
+}
+
+
 XMMATRIX GameObject::GetWorldMatrix()
 {
 	/*m_worldMatrix = XMMatrixIdentity();
@@ -313,4 +319,33 @@ void GameObject::Render(ID3D11DeviceContext* deviceContext)
 		break;
 	}
 	}
+}
+
+
+void GameObject::Store(std::string keyname, XMFLOAT4 value)
+{
+	m_miscStorage[keyname] = value;
+}
+
+float GameObject::StorageGetFloat(std::string keyname)
+{
+	return m_miscStorage[keyname].x;
+}
+
+XMFLOAT2 GameObject::StorageGetFloat2(std::string keyname)
+{
+	return { m_miscStorage[keyname].x,
+			m_miscStorage[keyname].y };
+}
+
+XMFLOAT3 GameObject::StorageGetFloat3(std::string keyname)
+{
+	return { m_miscStorage[keyname].x,
+			m_miscStorage[keyname].y ,
+			m_miscStorage[keyname].z };
+}
+
+XMFLOAT4 GameObject::StorageGetFloat4(std::string keyname)
+{
+	return m_miscStorage[keyname];
 }

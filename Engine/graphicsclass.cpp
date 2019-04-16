@@ -153,10 +153,10 @@ void GraphicsClass::Shutdown()
 
 
 
-bool GraphicsClass::Frame()
+bool GraphicsClass::Frame(Timer* timer)
 {
 	bool result;
-	static float rotation = 0.0f;
+	/*static float rotation = 0.0f;
 	static float delta = 0.0f;
 
 
@@ -168,14 +168,16 @@ bool GraphicsClass::Frame()
 	}
 
 	// Update the delta variable each frame. (keep this between 0 and 1)
-	delta += 0.1f;/*0.001f*/
+	// delta += 0.001f; // original
+	delta += 0.1f;
 	if (delta > 100000000.0f)
 	{
 		delta -= 100000000.0f;
-	}
+	}*/
 
 	// Render the graphics scene.
-	result = Render(rotation, delta);
+	//result = Render(timer->GetDeltaMilli());
+	result = Render(0.0f);
 	if (!result) { return false; }
 
 	return true;
@@ -227,7 +229,7 @@ void GraphicsClass::SetSprint(bool sprint)
 /////////////////////////
 
 
-bool GraphicsClass::Render(float rotation, float deltavalue)
+bool GraphicsClass::Render(float deltaTime)
 {
 	bool result;
 
@@ -241,7 +243,7 @@ bool GraphicsClass::Render(float rotation, float deltavalue)
 										0.0f, 0.0f, 0.0f, 1.0f);
 
 
-	result = m_Scene->Render(deltavalue);
+	result = m_Scene->Render(deltaTime);
 	if (!result)
 	{
 		return false;

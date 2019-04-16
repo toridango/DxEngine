@@ -20,13 +20,12 @@ private:
 		XMFLOAT3 padding;
 	};
 
-	struct LightBufferType
+	struct CapsuleBufferType
 	{
-		XMFLOAT4 ambientColour;
-		XMFLOAT4 diffuseColour;
-		XMFLOAT3 lightDirection;
-		float specularPower;
-		XMFLOAT4 specularColour;
+		XMFLOAT3 cPos;
+		float cLen;
+		XMFLOAT3 cDir;
+		float boundingCubeSide;
 	};
 
 
@@ -37,19 +36,20 @@ public:
 	bool InitializeShader(ShaderFiles sf);
 	bool InitializeShader(WCHAR* vsFilename, WCHAR* psFilename);
 
-	bool Render(GameObject* go, CameraClass* camera, LightClass* light, float deltavalue);
+	bool Render(GameObject* go, CameraClass* camera, XMFLOAT3 cDir,
+		float capsuleLen, float boundingCubeSide, float deltavalue);
 
 private:
 
-	bool SetShaderParameters(XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-		XMMATRIX projectionMatrix, XMFLOAT3 lightDirection, XMFLOAT4 ambientColour,
-		XMFLOAT4 diffuseColour, XMFLOAT3 cameraPosition, XMFLOAT4 specularColour,
-		float specularPower, float deltavalue, ID3D11ShaderResourceView* texture);
+	bool SetShaderParameters(XMMATRIX worldMatrix,
+		XMMATRIX viewMatrix, XMMATRIX projectionMatrix,
+		XMFLOAT3 cameraPosition, XMFLOAT3 cPos, XMFLOAT3 cDir,
+		float capsuleLen, float boundingCubeSide, float deltavalue);
 
 protected:
 
 	ID3D11Buffer* m_cameraBuffer;
-	ID3D11Buffer* m_lightBuffer;
+	ID3D11Buffer* m_capsuleBuffer;
 	ID3D11Buffer* m_variableBuffer;
 
 };
