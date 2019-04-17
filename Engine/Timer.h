@@ -16,7 +16,7 @@ public:
 private:
 	std::chrono::high_resolution_clock::time_point m_startTime;
 	std::chrono::high_resolution_clock::time_point m_previousTime;
-	std::chrono::duration<float> m_deltaTime;
+	float m_deltaTime;
 
 };
 

@@ -175,13 +175,33 @@ bool GraphicsClass::Frame(Timer* timer)
 		delta -= 100000000.0f;
 	}*/
 
+
+	result = Update(timer->GetDeltaMilli());
+	if (!result) { return false; }
+
+
 	// Render the graphics scene.
-	//result = Render(timer->GetDeltaMilli());
-	result = Render(0.0f);
+	result = Render(timer->GetMillisecondsElapsed());
 	if (!result) { return false; }
 
 	return true;
 }
+
+
+
+bool GraphicsClass::Update(float deltaTime)
+{
+	bool result;
+
+	result = m_Scene->Update(deltaTime);
+	if (!result)
+	{
+		return false;
+	}
+}
+
+
+
 
 /////////////////////////
 //     INPUT CODE      //
@@ -225,6 +245,11 @@ void GraphicsClass::SetSprint(bool sprint)
 	else m_movSpeed = MOV_SPEED_NORMAL;
 }
 
+bool GraphicsClass::SpacePressed()
+{
+	return m_Scene->KeyPressed(Scene::SPACE_KEY);
+}
+
 //                     //
 /////////////////////////
 
@@ -264,10 +289,12 @@ bool GraphicsClass::Render(float deltaTime)
 	return true;
 }
 
+// BLOOM ----------------------------------------------------------------------------
 // Render scene into rendertexture with mask shader
 // Render result into rendertexture with vertical blur shader
 // Render result into rendertexture with horizontal blur shader
 // Render result into rendertexture with final shader (addition of blur to scene)
+// ----------------------------------------------------------------------------------
 
 
 bool GraphicsClass::RenderTextureToScreen()

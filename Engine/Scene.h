@@ -8,13 +8,14 @@
 #include "cameraclass.h"
 #include "lightclass.h"
 #include "soundclass.h"
-#include "GameObject.h"
 #include "Utilities.h"
+#include "GameObject.h"
+#include "Terrain.h"
+#include "LaserShot.h"
 
 #include "modelclass.h"
 #include "AssimpModelClass.h"
 #include "AssimpBumpedModelClass.h"
-#include "Terrain.h"
 
 #include "LightShader.h"
 #include "BumpShader.h"
@@ -27,12 +28,21 @@
 class Scene
 {
 public:
+	enum KEYBINDS
+	{
+		SPACE_KEY
+	};
+
+public:
 	Scene();
 	~Scene();
 
 	virtual void Shutdown() = 0;
 	virtual bool Initialize(CameraClass* camera) = 0;
+	virtual bool Update(float deltaTime) = 0;
 	virtual bool Render(float deltavalue) = 0;
+
+	virtual bool KeyPressed(KEYBINDS id) = 0;
 
 	
 protected:

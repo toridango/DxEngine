@@ -48,8 +48,10 @@ public:
 	void Advance(float);
 	void Rotate(XMFLOAT3);
 	void SetSprint(bool sprint);
+	bool SpacePressed();
 
 private:
+	bool Update(float deltaTime);
 	bool Render(float deltaTime);
 	bool RenderTextureToScreen();
 

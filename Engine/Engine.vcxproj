@@ -94,6 +94,7 @@
     <ClCompile Include="graphicsclass.cpp" />
     <ClCompile Include="ImprovedNoise.cpp" />
     <ClCompile Include="inputclass.cpp" />
+    <ClCompile Include="LaserShot.cpp" />
     <ClCompile Include="lightclass.cpp" />
     <ClCompile Include="LightShader.cpp" />
     <ClCompile Include="main.cpp" />
@@ -127,6 +128,7 @@
     <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="ImprovedNoise.h" />
     <ClInclude Include="inputclass.h" />
+    <ClInclude Include="LaserShot.h" />
     <ClInclude Include="lightclass.h" />
     <ClInclude Include="LightShader.h" />
     <ClInclude Include="modelclass.h" />

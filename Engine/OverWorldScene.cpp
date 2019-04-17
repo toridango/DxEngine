@@ -312,21 +312,23 @@ bool OverWorldScene::InitializeModels()
 	go_laser = new GameObject();
 	go_laser->SetModel(m_ModelCube);
 
-	float cubeScale = 4.5f;
-	go_laser->Scale(cubeScale, cubeScale, cubeScale);
+	m_laserCubeScale = 4.5f;
+	go_laser->Scale(m_laserCubeScale, m_laserCubeScale, m_laserCubeScale);
 	// the laser capsule (pos set every frame) will need to be in the same position as the bounding volume to be seen
-	go_laser->SetTranslation(go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector());
+	//go_laser->SetTranslation(go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector());
+	//go_laser->SetTranslation(0.0, 30.0, 0.0);
+	go_laser->SetTranslation(-10.0, 0.0, -10.0);
 
 
-	XMFLOAT3 lookAt;
-	XMStoreFloat3(&lookAt, m_Camera->GetLookAtVector());
-	XMVECTOR trans = go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector();	
-	XMStoreFloat3(&m_laserIniPos, trans);
-	//go_laser->SetTranslation(trans);
-	XMFLOAT3 pos;
-	XMStoreFloat3(&pos, trans);
-	go_laser->Store("direction", { lookAt.x, lookAt.y, lookAt.z, 0.0f });
-	go_laser->Store("position", { pos.x, pos.y, pos.z, 0.0f });
+	//XMFLOAT3 lookAt;
+	//XMStoreFloat3(&lookAt, m_Camera->GetLookAtVector());
+	//XMVECTOR trans = go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector();	
+	//XMStoreFloat3(&m_laserIniPos, trans);
+	////go_laser->SetTranslation(trans);
+	//XMFLOAT3 pos;
+	//XMStoreFloat3(&pos, trans);
+	//go_laser->Store("direction", { lookAt.x, lookAt.y, lookAt.z, 0.0f });
+	//go_laser->Store("position", { pos.x, pos.y, pos.z, 0.0f });
 
 
 
@@ -417,6 +419,133 @@ bool OverWorldScene::InitializeShaders()
 }
 
 
+
+
+bool OverWorldScene::KeyPressed(KEYBINDS id)
+{
+	switch (id)
+	{
+	case SPACE_KEY:
+		if (!SpawnLaserShot())
+			return false;
+		break;
+	default:
+		break;
+	}
+	return true;
+}
+
+bool OverWorldScene::SpawnLaserShot()
+{
+	bool result;
+
+	if (!LaserShot::IsOnCooldown())
+	{
+		XMFLOAT3 lookAt;
+		XMStoreFloat3(&lookAt, XMVector3Normalize(m_Camera->GetLookAtVector()));
+
+
+		LaserShot* shot = new LaserShot(lookAt);
+		shot->SetModel(m_ModelCube);
+		shot->Scale(m_laserCubeScale, m_laserCubeScale, m_laserCubeScale);
+		shot->SetTranslation(go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector());
+
+		go_laserQ.push_back(shot);
+
+
+
+		// In order to shoot one from each wing every 4
+		m_shootingWingIdx = (m_shootingWingIdx + 1) % 4;
+		LaserShot::ResetCooldown();
+	}
+
+	return true;
+}
+
+
+
+bool OverWorldScene::Update(float deltaTime)
+{
+
+
+	// ------------------ Sky ------------------
+
+	go_sky->SetTranslation(m_Camera->GetPosition());
+
+
+	// ------------------ XW ------------------
+
+	XMFLOAT3 cpF3 = m_Camera->GetPosition();
+	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
+	XMVECTOR XWPos = XMVectorAdd(camPos, -5.0f*m_Camera->GetUpVector());
+	XMFLOAT3 camRot = m_Camera->GetRotation();
+	XWPos = XMVectorAdd(XWPos, 9.0f * m_Camera->GetLookAtVector());
+
+	// OUTPUTTING STUFF TO THE DEBUGGER // FOR FUTURE REFERENCE
+	/*XMStoreFloat3(&cpF3, haha);
+	std::wstringstream s;
+	s << cpF3.x << ", " << cpF3.y << ", " << cpF3.z << std::endl;
+	std::wstring ws = s.str();
+	OutputDebugString(ws.c_str());*/
+
+
+	//XMVECTOR r = XMVector3Cross(m_Camera->GetLookAtVector(), m_Camera->GetUpVector());
+	//go_xw->SetRotationDegAroundAxis(r, 10.0f);
+	go_xw->SetRotationXYZ(camRot);
+
+	go_xw->SetTranslation(XWPos);
+
+
+
+
+	// ------------------ Laser ------------------
+
+
+	/*XMFLOAT3 lookAt;
+	XMFLOAT3 pos;
+	XMStoreFloat3(&lookAt, m_Camera->GetLookAtVector());
+	XMVECTOR trans = go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector();
+	XMStoreFloat3(&pos, trans);
+	go_laser->SetTranslation(trans);
+	go_laser->Store("direction", { lookAt.x, lookAt.y, lookAt.z, 0.0f });*/
+
+	/*std::wstringstream s;
+	s << deltaTime << std::endl;
+	std::wstring ws = s.str();
+	OutputDebugString(ws.c_str());*/
+
+
+	//float speed = 50.0f;
+	// Change laser shot to be child of game object and give it:
+	// iniPos ??
+	// direction
+	// lifespan
+	// remaining duration ?? -> hasExpired
+	//XMVECTOR trans = go_laser->GetWorldMatrix().r[3] + speed * deltaTime*XMLoadFloat3(&(go_laser->StorageGetFloat3("direction")));
+
+	//go_laser->SetTranslation(trans);
+
+
+
+	// ------------------ Laser Queue ------------------
+
+
+	LaserShot::UpdateCooldown(deltaTime);
+	int expiredCount = 0;
+	for (auto it = go_laserQ.cbegin(); it != go_laserQ.cend(); ++it)
+	{
+		if (!(*it)->HasExpired())
+			(*it)->Update(deltaTime);
+		else
+			++expiredCount;
+	}
+	for (; expiredCount > 0; --expiredCount)
+		go_laserQ.pop_front();
+
+	return true;
+}
+
+
 bool OverWorldScene::Render(float deltaTime)
 {
 
@@ -431,30 +560,6 @@ bool OverWorldScene::Render(float deltaTime)
 
 	// Clear the buffers to begin the scene.
 	// m_D3D->BeginScene(R, G, B, A);
-
-
-	// UPDATE --------------------------
-
-	/*XMFLOAT3 lookAt;
-	XMFLOAT3 pos;
-	XMStoreFloat3(&lookAt, m_Camera->GetLookAtVector());
-	XMVECTOR trans = go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector();
-	XMStoreFloat3(&pos, trans);
-	go_laser->SetTranslation(trans);
-	go_laser->Store("direction", { lookAt.x, lookAt.y, lookAt.z, 0.0f });*/
-
-	// Use timedelta
-	XMVECTOR trans = go_laser->GetWorldMatrix().r[3] + XMLoadFloat3(&(go_laser->StorageGetFloat3("direction")));
-	XMFLOAT3 lookAt;
-	XMStoreFloat3(&lookAt, m_Camera->GetLookAtVector());
-
-
-
-
-	// END UPDATE ----------------------
-
-
-
 
 
 	// Generate the view matrix based on the camera's position.
@@ -477,25 +582,7 @@ bool OverWorldScene::Render(float deltaTime)
 	// ------------------ XW ------------------
 
 
-	XMFLOAT3 cpF3 = m_Camera->GetPosition();
-	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
-	XMVECTOR XWPos = XMVectorAdd(camPos, -5.0f*m_Camera->GetUpVector());
-	XMFLOAT3 camRot = m_Camera->GetRotation();
-	XWPos = XMVectorAdd(XWPos, 9.0f * m_Camera->GetLookAtVector());
-
-	// OUTPUTTING STUFF TO THE DEBUGGER // FOR FUTURE REFERENCE
-	/*XMStoreFloat3(&cpF3, haha);
-	std::wstringstream s;
-	s << cpF3.x << ", " << cpF3.y << ", " << cpF3.z << std::endl;
-	std::wstring ws = s.str();
-	OutputDebugString(ws.c_str());*/
-
-
-	//XMVECTOR r = XMVector3Cross(m_Camera->GetLookAtVector(), m_Camera->GetUpVector());
-	//go_xw->SetRotationDegAroundAxis(r, 10.0f);
-	go_xw->SetRotationXYZ(camRot);
-
-	go_xw->SetTranslation(XWPos);
+	
 
 	go_xw->Render(m_D3D->GetDeviceContext());
 
@@ -514,7 +601,6 @@ bool OverWorldScene::Render(float deltaTime)
 	//m_ModelSky->Render(m_D3D->GetDeviceContext());
 	go_sky->Render(m_D3D->GetDeviceContext());
 
-	go_sky->SetTranslation(m_Camera->GetPosition());
 
 	// Render the model using the light shader.
 	result = m_SkyShader->Render(go_sky, m_Camera, m_Light, deltaTime);
@@ -565,7 +651,6 @@ bool OverWorldScene::Render(float deltaTime)
 	// ------------------ Laser ------------------
 
 	
-	go_laser->Render(m_D3D->GetDeviceContext());
 
 	float capsuleLen = 4.0f;
 	// Assuming uniform scaling
@@ -579,17 +664,33 @@ bool OverWorldScene::Render(float deltaTime)
 	XMStoreFloat3(&pos, trans);
 	go_laser->SetTranslation(trans);
 	go_laser->Store("direction", { lookAt.x, lookAt.y, lookAt.z, 0.0f });*/
-
-
-
-	go_laser->SetTranslation(trans);
+	
+	go_laser->Render(m_D3D->GetDeviceContext());
+	
 	//go_laser->SetTranslation(m_laserIniPos);
 	// Assuming uniform scaling
-	result = m_volLaserShader->Render(go_laser, m_Camera, lookAt, 
+	result = m_volLaserShader->Render(go_laser, m_Camera, XMFLOAT3(1.0, 0.0, 0.0), 
 		capsuleLen, go_laser->GetScaling().x, deltaTime);
-
+	
 	if (!result) { return false; }
 
+
+
+
+
+	// ------------------ Laser Queue ------------------
+
+	m_ModelCube->Render(m_D3D->GetDeviceContext());
+
+	for (auto it = go_laserQ.cbegin(); it != go_laserQ.cend(); ++it)
+	{
+		//(*it)->Render(m_D3D->GetDeviceContext());
+		// Assuming uniform scaling
+		result = m_volLaserShader->Render((*it), m_Camera, (*it)->GetDirectionFloat3(),
+			capsuleLen, (*it)->GetScaling().x, deltaTime);
+
+		if (!result) { return false; }
+	}
 
 
 

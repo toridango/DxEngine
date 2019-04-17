@@ -17,7 +17,7 @@ Timer::~Timer()
 
 float Timer::GetDeltaMilli()
 {
-	return m_deltaTime.count();
+	return m_deltaTime;
 }
 
 float Timer::GetMillisecondsElapsed()
@@ -31,6 +31,6 @@ void Timer::Update()
 {
 	auto now = std::chrono::high_resolution_clock::now();
 	auto elapsed = std::chrono::duration<float, std::milli>(now - m_previousTime);
-	m_deltaTime = elapsed;
+	m_deltaTime = elapsed.count();
 	m_previousTime = now;
 }

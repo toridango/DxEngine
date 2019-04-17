@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-
+#include <queue>
 
 #include "Scene.h"
 
@@ -21,7 +21,12 @@ public:
 	bool InitializeModels();
 	bool InitializeShaders();
 
+	bool KeyPressed(KEYBINDS id);
+	bool SpawnLaserShot();
+
+	bool Update(float deltaTime);
 	bool Render(float deltaTime);
+
 
 
 
@@ -33,13 +38,16 @@ private:
 	LightClass* m_Light;
 	SoundClass* m_Sound;
 	double m_k; // iteration variable that was being used to watch the terrain change
+	float m_laserCubeScale;
 	XMFLOAT3 m_laserIniPos;
+	int m_shootingWingIdx;
 
 	// GAME OBJECTS;
 	GameObject* go_sky;
 	GameObject* go_rock;
 	GameObject* go_xw;
 	GameObject* go_laser;
+	std::deque<LaserShot*> go_laserQ;
 	Terrain* go_procTerrain;
 	Terrain* go_waterSurface;
 

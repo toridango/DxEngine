@@ -13,6 +13,7 @@ public:
 	bool InitializeModels();
 	bool InitializeShaders();
 
+	bool Update(float deltaTime);
 	bool Render(float deltaTime);
 
 /*private:

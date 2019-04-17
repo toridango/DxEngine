@@ -328,6 +328,12 @@ bool SwordRockScene::InitializeShaders()
 }
 
 
+bool SwordRockScene::Update(float deltaTime)
+{
+	// Nothing needs updating
+	return true;
+}
+
 bool SwordRockScene::Render(float deltavalue)
 {
 
@@ -335,14 +341,14 @@ bool SwordRockScene::Render(float deltavalue)
 	bool result;
 
 	// Base colour
-	float R, G, B, A;
-	R = m_sceneBaseColour.x;
-	G = m_sceneBaseColour.y;
-	B = m_sceneBaseColour.z;
-	A = m_sceneBaseColour.w;
+	//float R, G, B, A;
+	//R = m_sceneBaseColour.x;
+	//G = m_sceneBaseColour.y;
+	//B = m_sceneBaseColour.z;
+	//A = m_sceneBaseColour.w;
 
 	// Clear the buffers to begin the scene.
-	m_D3D->BeginScene(R, G, B, A);
+	//m_D3D->BeginScene(R, G, B, A);
 
 
 	// Generate the view matrix based on the camera's position.
@@ -441,7 +447,7 @@ bool SwordRockScene::Render(float deltavalue)
 
 
 	// Present the rendered scene to the screen.
-	m_D3D->EndScene();
+	//m_D3D->EndScene();
 
 	return true;
 }

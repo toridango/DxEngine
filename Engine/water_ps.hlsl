@@ -76,7 +76,7 @@ float brownian(float2 p)
 
 float getHeight(float2 p, float iTime)
 {
-    iTime *= 0.25; // slowing it down if its under 1, else speeding it up
+    iTime *= 0.002; // slowing it down if its under 1, else speeding it up
     float b1 = brownian(p)+iTime/1.3;
     float b2 = brownian(1.2*p);
 	

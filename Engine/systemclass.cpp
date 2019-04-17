@@ -140,6 +140,7 @@ void SystemClass::Run()
 		}
 		else
 		{
+			m_Timer->Update();
 			// Otherwise do the frame processing.
 			result = Frame();
 			if (!result)
@@ -189,6 +190,7 @@ bool SystemClass::HandleInput()
 	// a set of moveControlledCharacter inside graphicsclass then inside scene
 	// To move the camera just make it the controlled character
 	// To have a 3rd person camera, move the object and make the camera follow it
+	// -----------------------------------------------------------------------------
 
 	if (m_Input->IsEscapePressed())
 	{
@@ -212,6 +214,11 @@ bool SystemClass::HandleInput()
 	if (m_Input->IsDPressed())
 	{
 		m_Graphics->StrafeRight();
+	}
+	if (m_Input->IsSpacePressed())
+	{
+		if( !m_Graphics->SpacePressed())
+			return false;
 	}
 
 	XMFLOAT3 mouseMov = m_Input->GetMouseMovement();

@@ -64,4 +64,6 @@ c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldsc
 c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(291): warning C4316: 'Terrain': object allocated on the heap may not be aligned 16
 c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(294): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(312): warning C4316: 'GameObject': object allocated on the heap may not be aligned 16
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(447): warning C4316: 'LaserShot': object allocated on the heap may not be aligned 16
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(439): warning C4101: 'result': unreferenced local variable
   Engine.vcxproj -> C:\Users\Delom\Docs\MSc CGT\S2\CMP505 Procedural\UnDeadEngine\Debug\Engine.exe
