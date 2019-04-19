@@ -4,10 +4,26 @@
 
 float LaserShot::cooldown = LASER_COOLDOWN;
 
+XMFLOAT2 LaserShot::offsets[] =	{
+								{ 4.6f,  2.3f },
+								{ -4.6f,  2.3f },
+								{  4.6f,  1.1f },
+								{ -4.6f,  1.1f } 
+								};
+
 LaserShot::LaserShot(XMFLOAT3 direction) :
 	m_direction(direction)
 {
 	m_birthTime = std::chrono::high_resolution_clock::now();
+
+	/*
+	float hOff = 4.6f;
+	float vOff = 2.3f;
+	m_offsets[0] = { hOff,  vOff };
+	m_offsets[1] = { -hOff,  0.0f };
+	m_offsets[2] = { -hOff,  vOff };
+	m_offsets[3] = { hOff,  0.0f };
+	*/
 }
 
 
@@ -59,4 +75,10 @@ XMFLOAT3 LaserShot::GetDirectionFloat3()
 XMVECTOR LaserShot::GetDirectionVector()
 {
 	return XMLoadFloat3(&m_direction);
+}
+
+
+XMFLOAT2* LaserShot::GetOffsets()
+{
+	return offsets;
 }

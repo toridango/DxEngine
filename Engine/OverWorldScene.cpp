@@ -7,6 +7,7 @@ OverWorldScene::OverWorldScene(HWND hwnd, D3DClass* d3d) :
 	m_D3D(d3d)
 {
 	m_k = 0;
+	m_shootingWingIdx = 0;
 }
 
 
@@ -285,6 +286,7 @@ bool OverWorldScene::InitializeModels()
 
 
 	// ------------------ Water ------------------
+
 	float terrainMaxH = (float)go_procTerrain->GetMaxHeight();
 	float terrainMinH = (float)go_procTerrain->GetMinHeight();
 
@@ -312,8 +314,8 @@ bool OverWorldScene::InitializeModels()
 	go_laser = new GameObject();
 	go_laser->SetModel(m_ModelCube);
 
-	m_laserCubeScale = 4.5f;
-	go_laser->Scale(m_laserCubeScale, m_laserCubeScale, m_laserCubeScale);
+	m_laserCubeScale = XMFLOAT3(4.2f, 0.2f, 0.2f);
+	go_laser->Scale(m_laserCubeScale);// , m_laserCubeScale, m_laserCubeScale);
 	// the laser capsule (pos set every frame) will need to be in the same position as the bounding volume to be seen
 	//go_laser->SetTranslation(go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector());
 	//go_laser->SetTranslation(0.0, 30.0, 0.0);
@@ -447,8 +449,15 @@ bool OverWorldScene::SpawnLaserShot()
 
 		LaserShot* shot = new LaserShot(lookAt);
 		shot->SetModel(m_ModelCube);
-		shot->Scale(m_laserCubeScale, m_laserCubeScale, m_laserCubeScale);
-		shot->SetTranslation(go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector());
+		shot->Scale(m_laserCubeScale);// , m_laserCubeScale, m_laserCubeScale);
+		
+		XMFLOAT2* offsets = shot->GetOffsets();
+
+		XMVECTOR v = go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector();
+		// LEFT HANDED: right = cross(up, lookAT)
+		v += offsets[m_shootingWingIdx].x * XMVector3Cross(m_Camera->GetUpVector(), m_Camera->GetLookAtVector());
+		v += offsets[m_shootingWingIdx].y * m_Camera->GetUpVector();
+		shot->SetTranslation(v);
 
 		go_laserQ.push_back(shot);
 
@@ -566,6 +575,26 @@ bool OverWorldScene::Render(float deltaTime)
 	m_Camera->Render();
 
 
+
+
+
+
+
+	// ------------------ XW ------------------
+
+
+	go_xw->Render(m_D3D->GetDeviceContext());
+
+	// Render the model using the light shader.
+	result = m_LightShader->Render(go_xw, m_Camera, m_Light, deltaTime);
+
+	if (!result) { return false; }
+
+
+
+
+
+
 	// ------------------ New Rock ------------------
 
 
@@ -578,20 +607,7 @@ bool OverWorldScene::Render(float deltaTime)
 	if (!result) { return false; }
 
 
-
-	// ------------------ XW ------------------
-
-
-	
-
-	go_xw->Render(m_D3D->GetDeviceContext());
-
-	// Render the model using the light shader.
-	result = m_LightShader->Render(go_xw, m_Camera, m_Light, deltaTime);
-
-	if (!result) { return false; }
-
-
+	   
 
 	// ------------------ Sky ------------------
 
@@ -697,6 +713,9 @@ bool OverWorldScene::Render(float deltaTime)
 	m_D3D->TurnOffAlphaBlending();
 	// -----------------------------------------------------------------------------------
 	
+
+
+
 
 	// Present the rendered scene to the screen.
 	//m_D3D->EndScene();

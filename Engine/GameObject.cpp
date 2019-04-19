@@ -134,7 +134,7 @@ void GameObject::Translate(float x, float y, float z)
 	/*XMMATRIX transform = XMMatrixIdentity();
 	transform.r[3] = XMVectorSet(x, y, z, 1.0f);*/
 
-	Translate(XMVectorSet(x, y, z, 0.0f));
+	Translate({ x, y, z, 0.0f });
 }
 
 

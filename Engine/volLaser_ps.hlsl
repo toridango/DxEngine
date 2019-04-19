@@ -46,6 +46,34 @@ float sdCapsule(float3 p, float3 a, float3 b, float radius)
 }
 
 
+
+
+float GetDistCore(float3 p)
+{
+    float3 a = cPos - ((cLen / 2.05) * cDir); 
+    float3 b = cPos + ((cLen / 2.05) * cDir); 
+    return sdCapsule(p, a, b, 0.025);
+    //return sdCapsule(p, a, b, 0.08);
+}
+
+float RayMarchCore(float3 rayOrigin, float3 rayDirection)
+{
+    float distFromOrigin = 0.0;
+    
+    bool end = false;
+    float density = 0.;
+
+    for (int i = 0; i < STEPS; ++i)
+    {
+        float3 p = rayOrigin + rayDirection * distFromOrigin;
+        float distToScene = GetDistCore(p);
+        distFromOrigin += distToScene;
+        if (distToScene < SURF_DIST)
+            density += 1.0 / (float) STEPS;
+    }
+    return density;
+}
+
 float GetDist(float3 p)
 {
     //float3 a = cPos - ((cLen / 2.0) * cDir); // float3(-1.0, 30, 0.0);
@@ -55,10 +83,11 @@ float GetDist(float3 p)
     float3 a = cPos - ((cLen / 2.0) * cDir); // float3(-1.0, 30, 0.0);
     float3 b = cPos + ((cLen / 2.0) * cDir); // float3(1.0, 30, 0.0);
     return sdCapsule(p, a, b, 0.1);
-}
+ }
+
+
 
 //#define eps 0.1
-
 float RayMarch(float3 rayOrigin, float3 rayDirection)
 {
     float distFromOrigin = 0.0;
@@ -70,7 +99,9 @@ float RayMarch(float3 rayOrigin, float3 rayDirection)
     {
         float3 p = rayOrigin + rayDirection * distFromOrigin;
         float distToScene = GetDist(p);
-        distFromOrigin += distToScene;
+        float distToCore = GetDistCore(p);
+        distFromOrigin += max(distToScene, distToCore);
+        //distFromOrigin += distToScene;
         if (distToScene < SURF_DIST)
             density += /*smoothstep(radius, 0.0, length(p - centre))*/1.0 / (float) STEPS;
 
@@ -103,9 +134,10 @@ float4 VolumetricLaserPixelShader(PixelInputType input) : SV_TARGET
 	//return float4((float3)raymarch2(worldPosition, viewDirection), 1.0);
 
     float d = RayMarch(worldPosition, viewDirection);
+    float e = RayMarchCore(worldPosition, viewDirection);
     //d /= GetDist(worldPosition);
     //colour = float4(1.0 - d, d, 0.0, 0.5*d);
     float c = smoothstep(0.0, 1.2, d);
-    colour = float4(6.0, 0.8*(float2) c, 1.2*c);
+    colour = float4(6.0, (float2) c/*max(0.1, e)*/ /*0.8*(float2) c*/, 1.2 * c);
     return colour;
  }

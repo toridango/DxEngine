@@ -38,7 +38,7 @@ private:
 	LightClass* m_Light;
 	SoundClass* m_Sound;
 	double m_k; // iteration variable that was being used to watch the terrain change
-	float m_laserCubeScale;
+	XMFLOAT3 m_laserCubeScale;
 	XMFLOAT3 m_laserIniPos;
 	int m_shootingWingIdx;
 

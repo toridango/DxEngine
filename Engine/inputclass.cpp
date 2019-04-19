@@ -127,7 +127,6 @@ void InputClass::Shutdown()
 		m_directInput = 0;
 	}
 
-	return;
 }
 
 // Reads Keyboard and Mouse when called. Updates mouse position data
@@ -218,7 +217,6 @@ void InputClass::ProcessInput()
 	if (m_mouseX > m_screenWidth) { m_mouseX = m_screenWidth; }
 	if (m_mouseY > m_screenHeight) { m_mouseY = m_screenHeight; }
 
-	return;
 }
 
 
@@ -253,5 +251,4 @@ void InputClass::GetMouseLocation(int& mouseX, int& mouseY)
 {
 	mouseX = m_mouseX;
 	mouseY = m_mouseY;
-	return;
 }

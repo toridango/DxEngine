@@ -67,12 +67,12 @@ public:
 	virtual void Render(ID3D11DeviceContext* deviceContext);
 
 
-private:
+protected:
 
 	void RotateDegreesMatrix(XMMATRIX rot);
 	void SetOffsetRotation(XMMATRIX rot);
 
-private:
+protected:
 
 	XMFLOAT3 m_scaling;
 	XMMATRIX m_baseRotation;

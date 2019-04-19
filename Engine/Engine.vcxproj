@@ -88,7 +88,9 @@
     <ClCompile Include="AssimpBumpedModelClass.cpp" />
     <ClCompile Include="AssimpModelClass.cpp" />
     <ClCompile Include="BumpShader.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="cameraclass.cpp" />
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="d3dclass.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
@@ -122,7 +124,9 @@
     <ClInclude Include="AssimpBumpedModelClass.h" />
     <ClInclude Include="AssimpModelClass.h" />
     <ClInclude Include="BumpShader.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="cameraclass.h" />
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="d3dclass.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="graphicsclass.h" />
