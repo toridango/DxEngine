@@ -131,6 +131,8 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	m_wcpPaths.push_back(path_xwTex);
 	m_wcpPaths.push_back(path_waterVertexShader);
 	m_wcpPaths.push_back(path_waterPixelShader);
+	m_wcpPaths.push_back(path_volBalloonVertexShader);
+	m_wcpPaths.push_back(path_volBalloonPixelShader);
 
 	CheckAllPaths(m_hwnd);
 
@@ -280,7 +282,7 @@ bool OverWorldScene::InitializeModels()
 	double zoom = 12.0;
 	go_procTerrain->GenerateHeightMap(scaling, zoom);
 	//OutputDebugStringA(("Scaling: " + std::to_string(scaling) + "\t\tZoom: " + std::to_string(zoom) + "\n").c_str());
-	go_procTerrain->SetTranslation(-(float)TERRAINWIDTH/2.0f, -0.5f, -(float)TERRAINHEIGHT/2.0f);
+	go_procTerrain->SetTranslation(-(float)TERRAINWIDTH / 2.0f, -0.5f, -(float)TERRAINHEIGHT / 2.0f);
 
 
 
@@ -314,7 +316,8 @@ bool OverWorldScene::InitializeModels()
 	go_laser = new GameObject();
 	go_laser->SetModel(m_ModelCube);
 
-	m_laserCubeScale = XMFLOAT3(4.2f, 0.2f, 0.2f);
+	//m_laserCubeScale = XMFLOAT3(4.2f, 0.2f, 0.2f);
+	m_laserCubeScale = XMFLOAT3(4.2f, 4.2f, 4.2f);
 	go_laser->Scale(m_laserCubeScale);// , m_laserCubeScale, m_laserCubeScale);
 	// the laser capsule (pos set every frame) will need to be in the same position as the bounding volume to be seen
 	//go_laser->SetTranslation(go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector());
@@ -333,6 +336,38 @@ bool OverWorldScene::InitializeModels()
 	//go_laser->Store("position", { pos.x, pos.y, pos.z, 0.0f });
 
 
+
+
+
+	// ------------------ Balloon targets (Volumetric Cube) ------------------
+
+	float balloonRowCount = std::pow((double) min(TERRAINWIDTH, TERRAINHEIGHT), 1.0 / 4.0);
+	go_targets.reserve(balloonRowCount * balloonRowCount);
+
+	float step = min(TERRAINWIDTH, TERRAINHEIGHT) / (balloonRowCount + 1);
+	float ix = -(float)TERRAINWIDTH / 2.0f + step;
+	float iz = -(float)TERRAINHEIGHT / 2.0f + step;
+	float x = ix;
+	float z = iz;
+	XMFLOAT3 scale = XMFLOAT3(3.8f, 3.8f, 3.8f);
+
+	for (int i = 0; i < balloonRowCount; ++i)
+	{
+		for (int j = 0; j < balloonRowCount; ++j)
+		{
+			x = i * step + ix;
+			z = j * step + iz;
+
+			GameObject* balloon = new GameObject();
+			balloon->SetModel(m_ModelCube);
+
+			balloon->Scale(scale);
+			balloon->SetTranslation(x, 30.0, z);
+
+			go_targets.push_back(balloon);
+			m_targetCooldowns.push_back(0.0f);
+		}
+	}
 
 	return true;
 }
@@ -416,6 +451,18 @@ bool OverWorldScene::InitializeShaders()
 	}
 
 
+	m_volBalloonShader = new VolumetricBalloonShader(m_hwnd, m_D3D->GetDevice(), m_D3D->GetDeviceContext());
+	if (!m_volBalloonShader) { return false; }
+
+	result = m_volBalloonShader->InitializeShader(path_volBalloonVertexShader, path_volBalloonPixelShader);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the volumetric balloon shader object.", L"Error", MB_OK);
+		return false;
+	}
+
+
+
 
 	return true;
 }
@@ -444,8 +491,13 @@ bool OverWorldScene::SpawnLaserShot()
 	if (!LaserShot::IsOnCooldown())
 	{
 		XMFLOAT3 lookAt;
-		XMStoreFloat3(&lookAt, XMVector3Normalize(m_Camera->GetLookAtVector()));
-
+		XMVECTOR lookAtV = XMVector3Normalize(m_Camera->GetLookAtVector());
+		XMVECTOR up = m_Camera->GetUpVector();
+		int way = (m_shootingWingIdx % 2 == 0) ? -1.0f : 1.0f;
+		//XMMATRIX m = XMMatrixRotationAxis(up, 15.0f);
+		XMVECTOR q = XMQuaternionRotationAxis(up, way * 3.0f * (XM_PI / 180.0f));
+		lookAtV = XMVector3Rotate(lookAtV, q);
+		XMStoreFloat3(&lookAt, lookAtV);
 
 		LaserShot* shot = new LaserShot(lookAt);
 		shot->SetModel(m_ModelCube);
@@ -455,8 +507,8 @@ bool OverWorldScene::SpawnLaserShot()
 
 		XMVECTOR v = go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector();
 		// LEFT HANDED: right = cross(up, lookAT)
-		v += offsets[m_shootingWingIdx].x * XMVector3Cross(m_Camera->GetUpVector(), m_Camera->GetLookAtVector());
-		v += offsets[m_shootingWingIdx].y * m_Camera->GetUpVector();
+		v += offsets[m_shootingWingIdx].x * XMVector3Cross(up, m_Camera->GetLookAtVector());
+		v += offsets[m_shootingWingIdx].y * up;
 		shot->SetTranslation(v);
 
 		go_laserQ.push_back(shot);
@@ -550,6 +602,36 @@ bool OverWorldScene::Update(float deltaTime)
 	}
 	for (; expiredCount > 0; --expiredCount)
 		go_laserQ.pop_front();
+
+
+	// ------------------ Collision Check ------------------
+
+	for (int i = 0; i < go_targets.size(); ++i)
+	{
+		if (m_targetCooldowns[i] > 0.0f)
+		{
+			m_targetCooldowns[i] -= (deltaTime / 1000.0f);
+		}
+	}
+
+
+	for (int i = 0; i < go_targets.size(); ++i)
+	{
+		for (auto it = go_laserQ.cbegin(); it != go_laserQ.cend(); ++it)
+		{
+			XMVECTOR len = XMVector4Length((*it)->GetWorldMatrix().r[3] - go_targets[i]->GetWorldMatrix().r[3]);
+			XMFLOAT4 x; XMStoreFloat4(&x, len);
+			if (x.x < 1.75f)
+			{
+				// seconds
+				m_targetCooldowns[i] = 60.0f;
+			}
+				
+		}
+	}
+
+
+
 
 	return true;
 }
@@ -650,6 +732,10 @@ bool OverWorldScene::Render(float deltaTime)
 
 	m_D3D->TurnOnAlphaBlending();
 
+
+
+
+
 	// ------------------ Water ------------------
 	
 
@@ -660,6 +746,26 @@ bool OverWorldScene::Render(float deltaTime)
 	if (!result) { return false; }
 
 	//m_D3D->TurnOffAlphaBlending();
+
+
+
+
+	// ------------------ Balloon targets (Volumetric Cube) ------------------
+
+
+	m_ModelCube->Render(m_D3D->GetDeviceContext());
+	int i = 0;
+	for (auto go : go_targets)
+	{
+		if (m_targetCooldowns[i] <= 0.0f)
+		{
+			result = m_volBalloonShader->Render(go, m_Camera, deltaTime);
+
+			if (!result) { return false; }
+		}
+		++i;
+	}
+
 
 
 	
@@ -707,6 +813,9 @@ bool OverWorldScene::Render(float deltaTime)
 
 		if (!result) { return false; }
 	}
+
+
+
 
 
 

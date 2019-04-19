@@ -22,6 +22,7 @@
 #include "TerrainShader.h"
 #include "WaterShader.h"
 #include "VolumetricLaserShader.h"
+#include "VolumetricBalloonShader.h"
 
 
 // Abstract Scene

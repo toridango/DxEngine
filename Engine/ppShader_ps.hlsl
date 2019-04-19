@@ -23,6 +23,28 @@ float4 PostProcessPixelShader(PixelInputType input) : SV_TARGET
 	c.a=1;
 	return c;
 */
+float gt(float x, float y)
+{
+    return max(sign(x - y), 0.0);
+}
+
+// x and y must be either 0 or 1.
+float and(float x, float y)
+{
+    return x * y;
+}
+
+// x and y must be 0 or 1.
+float or(float x, float y)
+{
+    return min(x + y, 1.0);
+}
+
+// x must be 0 or 1
+float not_(float x)
+{
+    return 1.0 - x;
+}
 
 
 cbuffer VariableBuffer
@@ -44,6 +66,8 @@ struct PixelInputType
 
  
 static const float exposure = 1.0;
+static const float thickness = 0.0015;
+static const float len = 0.02;
 
 float4 PostProcessPixelShader (PixelInputType input) : SV_TARGET
 {
@@ -81,6 +105,15 @@ float4 PostProcessPixelShader (PixelInputType input) : SV_TARGET
         }
         colour /= samples;
 
+    }
+
+	
+    float2 d = abs(input.tex - float2(0.5, 0.54));
+	
+    if (min(d.x, d.y) < thickness && max(d.x, d.y) < len)
+    {
+        colour = float4(1.0, 0.0, 0.0, 1.0);
+        //colour = 1.0 - colour;
     }
 
 

@@ -41,6 +41,7 @@ private:
 	XMFLOAT3 m_laserCubeScale;
 	XMFLOAT3 m_laserIniPos;
 	int m_shootingWingIdx;
+	std::vector<float> m_targetCooldowns;
 
 	// GAME OBJECTS;
 	GameObject* go_sky;
@@ -48,6 +49,7 @@ private:
 	GameObject* go_xw;
 	GameObject* go_laser;
 	std::deque<LaserShot*> go_laserQ;
+	std::vector<GameObject*> go_targets;
 	Terrain* go_procTerrain;
 	Terrain* go_waterSurface;
 
@@ -64,6 +66,7 @@ private:
 	TerrainShader* m_TerrainShader;
 	WaterShader* m_WaterShader;
 	VolumetricLaserShader* m_volLaserShader;
+	VolumetricBalloonShader* m_volBalloonShader;
 
 	// FILE PATHS
 	char* path_soundLoop = "../Engine/Assets/sounds/magical_forest.wav";
@@ -88,6 +91,8 @@ private:
 	WCHAR* path_lightPixelShader = L"../Engine/light_ps.hlsl";
 	WCHAR* path_skyVertexShader = L"../Engine/sky_vs.hlsl";
 	WCHAR* path_skyPixelShader = L"../Engine/sky_ps.hlsl";
+	WCHAR* path_volBalloonVertexShader = L"../Engine/volBalloon_vs.hlsl";
+	WCHAR* path_volBalloonPixelShader = L"../Engine/volBalloon_ps.hlsl";
 	WCHAR* path_volLaserVertexShader = L"../Engine/volLaser_vs.hlsl";
 	WCHAR* path_volLaserPixelShader = L"../Engine/volLaser_ps.hlsl";
 	WCHAR* path_terrainVertexShader = L"../Engine/terrain_vs.hlsl";
