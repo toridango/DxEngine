@@ -84,6 +84,8 @@ public:
 	XMFLOAT4 TextureBlendingByHeight(HeightMapType h);
 	XMFLOAT4 TextureBlendingByHeight(float h);
 	void CalculateBlendings();
+	int RandBetween(int min, int max);
+	float Rand01();
 
 private:
 	void NormalizeHeightMap();
@@ -96,8 +98,6 @@ private:
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 
-	int RandBetween(int min, int max);
-	float Rand01();
 
 private:
 	bool m_terrainGeneratedToggle;

@@ -357,12 +357,16 @@ bool OverWorldScene::InitializeModels()
 		{
 			x = i * step + ix;
 			z = j * step + iz;
+			// Add noise to the positions using a function from the terrain
+			float rx = (go_procTerrain->Rand01() - 0.5f) * 25.0f;
+			float ry = (go_procTerrain->Rand01() - 0.5f) * 25.0f;
+			float rz = (go_procTerrain->Rand01() - 0.5f) * 25.0f;
 
 			GameObject* balloon = new GameObject();
 			balloon->SetModel(m_ModelCube);
 
 			balloon->Scale(scale);
-			balloon->SetTranslation(x, 30.0, z);
+			balloon->SetTranslation(x+rx, 30.0f+ry, z+rz);
 
 			go_targets.push_back(balloon);
 			m_targetCooldowns.push_back(0.0f);

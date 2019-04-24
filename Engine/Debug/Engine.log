@@ -66,10 +66,10 @@ c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldsc
 c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(316): warning C4316: 'GameObject': object allocated on the heap may not be aligned 16
 c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(344): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(345): warning C4244: 'argument': conversion from 'float' to 'const unsigned int', possible loss of data
-c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(361): warning C4316: 'GameObject': object allocated on the heap may not be aligned 16
-c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(496): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(502): warning C4316: 'LaserShot': object allocated on the heap may not be aligned 16
-c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(489): warning C4101: 'result': unreferenced local variable
-c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(609): warning C4018: '<': signed/unsigned mismatch
-c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(618): warning C4018: '<': signed/unsigned mismatch
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(365): warning C4316: 'GameObject': object allocated on the heap may not be aligned 16
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(500): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(506): warning C4316: 'LaserShot': object allocated on the heap may not be aligned 16
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(493): warning C4101: 'result': unreferenced local variable
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(613): warning C4018: '<': signed/unsigned mismatch
+c:\users\delom\docs\msc cgt\s2\cmp505 procedural\undeadengine\engine\overworldscene.cpp(622): warning C4018: '<': signed/unsigned mismatch
   Engine.vcxproj -> C:\Users\Delom\Docs\MSc CGT\S2\CMP505 Procedural\UnDeadEngine\Debug\Engine.exe
