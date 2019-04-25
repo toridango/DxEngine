@@ -50,6 +50,7 @@ private:
 		float x, y, z;
 	};
 
+
 public:
 	enum TEXID
 	{
@@ -97,6 +98,8 @@ private:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
+
+	float InRangeFromFloat01(float f01, int max, int min);
 
 
 private:

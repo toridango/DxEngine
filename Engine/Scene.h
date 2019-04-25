@@ -51,10 +51,14 @@ protected:
 	bool CheckPath(const char* path);
 	bool CheckPath(WCHAR* path);
 	bool CheckAllPaths(HWND hwnd);
+
+	float DistanceToCamera(GameObject* go);
 	
 
 protected:
 	XMFLOAT4 m_sceneBaseColour = {0.6f, 0.1f, 0.5f, 1.0f};
+
+	CameraClass* m_Camera;
 
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> m_converter;
 

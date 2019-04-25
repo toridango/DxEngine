@@ -254,7 +254,9 @@ bool OverWorldScene::InitializeModels()
 	go_xw->SetModel(m_ModelXW);
 	XMFLOAT3 cpF3 = m_Camera->GetPosition();
 	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
-	XMVECTOR XWPos = camPos - 5.0f*m_Camera->GetUpVector() + 9.0f * m_Camera->GetLookAtVector();
+	//XMVECTOR XWPos = camPos - 5.0f * m_Camera->GetUpVector() + 9.0f * m_Camera->GetLookAtVector();
+	//XMVECTOR XWPos = camPos - 0.3125f * m_Camera->GetUpVector() + 0.5625f * m_Camera->GetLookAtVector();
+	XMVECTOR XWPos = camPos - 0.2f * m_Camera->GetUpVector() + 0.4f * m_Camera->GetLookAtVector();
 
 	//go_xw->Scale(1.0f, 1.0f, 1.0f);
 	//go_xw->RotateDegreesAroundX(90.0f);
@@ -317,7 +319,7 @@ bool OverWorldScene::InitializeModels()
 	go_laser->SetModel(m_ModelCube);
 
 	//m_laserCubeScale = XMFLOAT3(4.2f, 0.2f, 0.2f);
-	m_laserCubeScale = XMFLOAT3(4.2f, 4.2f, 4.2f);
+	m_laserCubeScale = XMFLOAT3(4.5f, 4.5f, 4.5f);
 	go_laser->Scale(m_laserCubeScale);// , m_laserCubeScale, m_laserCubeScale);
 	// the laser capsule (pos set every frame) will need to be in the same position as the bounding volume to be seen
 	//go_laser->SetTranslation(go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector());
@@ -624,7 +626,8 @@ bool OverWorldScene::Update(float deltaTime)
 		for (auto it = go_laserQ.cbegin(); it != go_laserQ.cend(); ++it)
 		{
 			XMVECTOR len = XMVector4Length((*it)->GetWorldMatrix().r[3] - go_targets[i]->GetWorldMatrix().r[3]);
-			XMFLOAT4 x; XMStoreFloat4(&x, len);
+			XMFLOAT4 x; 
+			XMStoreFloat4(&x, len);
 			if (x.x < 1.75f)
 			{
 				// seconds
@@ -638,6 +641,31 @@ bool OverWorldScene::Update(float deltaTime)
 
 
 	return true;
+}
+
+
+std::vector<OverWorldScene::DepthGO> OverWorldScene::ArrangeDepthRenderOrder()
+{
+	std::vector<OverWorldScene::DepthGO> v;
+
+	int i = 0;
+	for (auto go : go_targets)
+	{
+		if (m_targetCooldowns[i] <= 0.0f)
+		{
+			v.push_back({ DistanceToCamera(go), go });
+		}
+		++i;
+	}
+
+
+	for (auto it = go_laserQ.cbegin(); it != go_laserQ.cend(); ++it)
+	{
+		v.push_back({ DistanceToCamera((*it)), (*it) });
+	}
+
+	std::sort(v.begin(), v.end());
+	return v;
 }
 
 
@@ -757,7 +785,7 @@ bool OverWorldScene::Render(float deltaTime)
 	// ------------------ Balloon targets (Volumetric Cube) ------------------
 
 
-	m_ModelCube->Render(m_D3D->GetDeviceContext());
+	/*m_ModelCube->Render(m_D3D->GetDeviceContext());
 	int i = 0;
 	for (auto go : go_targets)
 	{
@@ -768,7 +796,7 @@ bool OverWorldScene::Render(float deltaTime)
 			if (!result) { return false; }
 		}
 		++i;
-	}
+	}*/
 
 
 
@@ -806,7 +834,7 @@ bool OverWorldScene::Render(float deltaTime)
 
 	// ------------------ Laser Queue ------------------
 
-	m_ModelCube->Render(m_D3D->GetDeviceContext());
+	/*m_ModelCube->Render(m_D3D->GetDeviceContext());
 
 	for (auto it = go_laserQ.cbegin(); it != go_laserQ.cend(); ++it)
 	{
@@ -816,9 +844,31 @@ bool OverWorldScene::Render(float deltaTime)
 			capsuleLen, (*it)->GetScaling().x, deltaTime);
 
 		if (!result) { return false; }
+	}*/
+
+
+
+	std::vector<OverWorldScene::DepthGO> v = ArrangeDepthRenderOrder();
+
+	m_ModelCube->Render(m_D3D->GetDeviceContext());
+
+	for (auto dgo : v)
+	{
+		LaserShot* ls = dynamic_cast<LaserShot*>(dgo.go);
+		if (ls != NULL)
+		{
+			ls->Render(m_D3D->GetDeviceContext());
+			result = m_volLaserShader->Render(ls, m_Camera, ls->GetDirectionFloat3(),
+				capsuleLen, ls->GetScaling().x, deltaTime);
+		}
+		else
+		{
+			result = m_volBalloonShader->Render(dgo.go, m_Camera, deltaTime);
+		}
+
+		if (!result) { return false; }
+
 	}
-
-
 
 
 

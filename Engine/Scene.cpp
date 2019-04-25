@@ -71,3 +71,14 @@ bool Scene::CheckAllPaths(HWND hwnd)
 
 	return all_correct;
 }
+
+
+
+
+float Scene::DistanceToCamera(GameObject* go)
+{
+	XMVECTOR goPos = go->GetWorldMatrix().r[3];
+	XMVECTOR caPos = XMLoadFloat3(&(m_Camera->GetPosition()));
+	
+	return XMVectorGetX(XMVector3LengthSq(goPos - caPos));
+}

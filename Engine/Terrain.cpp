@@ -261,6 +261,12 @@ float Terrain::Rand01()
 	return ((float)rand() / (RAND_MAX)) + 1;
 }
 
+float Terrain::InRangeFromFloat01(float f01, int max, int min)
+{
+	float range = (float)(max - min);
+	return (range * f01 - (float)min);
+}
+
 bool Terrain::GenerateHeightMap(double scaling, double zoom)
 {
 
@@ -271,10 +277,37 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 	//if (keydown && (!m_terrainGeneratedToggle))
 	//{
 	int index;
-	float height = 0.0;
+	float height = 0.0f;
 
 	double maxHeight = -DBL_MAX;
 	double minHeight = DBL_MAX;
+
+
+	// Pre-compute faulting lines
+
+	std::vector<XMFLOAT4> fLines;
+	std::vector<float> displacements;
+
+	float baseDisplacement = 0.5f;
+	float maxDisplacement = 10.0f;
+	int faultingIterations = 100;
+
+	fLines.resize(faultingIterations);
+	displacements.resize(faultingIterations);
+
+	// Faulting lines defined by XMFLOAT4 where
+	// indices 0 & 1 are (a_x, a_z)  and  indices 2 & 3 are (b_x, b_z)
+	for (int i = 0; i < faultingIterations; ++i)
+	{
+		float a_x = InRangeFromFloat01( m_perlinImpNoise.RollFloat(), m_terrainWidth,  0);
+		float a_z = InRangeFromFloat01( m_perlinImpNoise.RollFloat(), m_terrainHeight, 0);
+		float b_x = InRangeFromFloat01( m_perlinImpNoise.RollFloat(), m_terrainWidth,  0);
+		float b_z = InRangeFromFloat01( m_perlinImpNoise.RollFloat(), m_terrainHeight, 0);
+
+		fLines[i] = { a_x, a_z, b_x, b_z };
+		displacements[i] = baseDisplacement + (i / faultingIterations) * (maxDisplacement - baseDisplacement);
+	}
+
 
 	//loop through the terrain and set the heights how we want. This is where we generate the terrain
 	//in this case I will run a sin-wave through the terrain in one axis.
@@ -288,7 +321,9 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 			double y = (double)m_heightMap[index].y * zoom;
 			double x = (double)m_heightMap[index].x * zoom * (1.0 / (double)m_terrainWidth);
 
+			// frequencies (1 / amplitudes) with lacunarity of 2.0 and gain of 0.5
 			double k[] = { 1.0, 2.0, 4.0 };
+			// resulting elevation
 			double n = 0.0;
 			for (double d : k)
 			{
@@ -296,6 +331,19 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 			}
 
 			double e = (n * scaling);
+
+			// Add faulting
+			for (int k = 0; k < faultingIterations; ++k)
+			{
+				XMFLOAT4 line = fLines[k];
+				if ((line.z - line.x) * ((float)j - line.y) - (line.w - line.y) * ((float)i - line.x) > 0.0f)
+					e += displacements[k];
+				else
+					e -= displacements[k];
+			}
+
+
+
 
 			if (e > maxHeight) maxHeight = e;
 			if (e < minHeight) minHeight = e;

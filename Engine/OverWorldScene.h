@@ -11,6 +11,19 @@
 
 class OverWorldScene : public Scene
 {
+private:
+	struct DepthGO
+	{
+		float d;
+		GameObject* go;
+
+		bool operator<(DepthGO& dgo)
+		{
+			// It's flipped because we want the farthest objects first
+			return (d > dgo.d);
+		}
+	};
+
 public:
 	OverWorldScene(HWND hwnd, D3DClass* d3d);
 	~OverWorldScene();
@@ -28,13 +41,16 @@ public:
 	bool Render(float deltaTime);
 
 
+private:
+	std::vector<DepthGO> ArrangeDepthRenderOrder();
+
 
 
 private:
 	// CLASS VARIABLES
 	HWND m_hwnd;
 	D3DClass* m_D3D;
-	CameraClass* m_Camera;
+	//CameraClass* m_Camera;
 	LightClass* m_Light;
 	SoundClass* m_Sound;
 	double m_k; // iteration variable that was being used to watch the terrain change
