@@ -36,6 +36,7 @@ public:
 
 	bool KeyPressed(KEYBINDS id);
 	bool SpawnLaserShot();
+	void SetSprint(bool sprint);
 
 	bool Update(float deltaTime);
 	bool Render(float deltaTime);
@@ -58,6 +59,10 @@ private:
 	XMFLOAT3 m_laserIniPos;
 	int m_shootingWingIdx;
 	std::vector<float> m_targetCooldowns;
+	float m_XW_upOffset;
+	float m_XW_lookAtOffset;
+	std::array<XMFLOAT2, 4> m_laserOffsets;
+	float m_fovLerp;
 
 	// GAME OBJECTS;
 	GameObject* go_sky;

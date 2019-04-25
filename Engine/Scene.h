@@ -31,7 +31,9 @@ class Scene
 public:
 	enum KEYBINDS
 	{
-		SPACE_KEY
+		NONE,
+		SPACE_KEY,
+		SHIFT_KEY
 	};
 
 public:

@@ -243,6 +243,11 @@ void GraphicsClass::SetSprint(bool sprint)
 	m_sprint = sprint;
 	if (sprint) m_movSpeed = MOV_SPEED_SPRINT;
 	else m_movSpeed = MOV_SPEED_NORMAL;
+
+	if (sprint)
+		m_Scene->KeyPressed(Scene::SHIFT_KEY);
+	else
+		m_Scene->KeyPressed(Scene::NONE);
 }
 
 bool GraphicsClass::SpacePressed()

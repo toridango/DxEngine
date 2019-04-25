@@ -8,6 +8,7 @@ OverWorldScene::OverWorldScene(HWND hwnd, D3DClass* d3d) :
 {
 	m_k = 0;
 	m_shootingWingIdx = 0;
+	m_fovLerp = 0.0f;
 }
 
 
@@ -254,14 +255,38 @@ bool OverWorldScene::InitializeModels()
 	go_xw->SetModel(m_ModelXW);
 	XMFLOAT3 cpF3 = m_Camera->GetPosition();
 	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
+	// Position for scale 1.0
 	//XMVECTOR XWPos = camPos - 5.0f * m_Camera->GetUpVector() + 9.0f * m_Camera->GetLookAtVector();
-	//XMVECTOR XWPos = camPos - 0.3125f * m_Camera->GetUpVector() + 0.5625f * m_Camera->GetLookAtVector();
-	XMVECTOR XWPos = camPos - 0.2f * m_Camera->GetUpVector() + 0.4f * m_Camera->GetLookAtVector();
+	// Position for scale 0.2 // -0.85, 1.55
+	m_XW_upOffset = -0.85f;
+	m_XW_lookAtOffset = 1.55f;
+	XMVECTOR XWPos = camPos + 
+		m_XW_upOffset * m_Camera->GetUpVector() + 
+		m_XW_lookAtOffset * m_Camera->GetLookAtVector();
 
 	//go_xw->Scale(1.0f, 1.0f, 1.0f);
+	float xw_scaling = 0.2f;
+	go_xw->Scale(xw_scaling, xw_scaling, xw_scaling);
 	//go_xw->RotateDegreesAroundX(90.0f);
 	go_xw->SetOffsetRotation(90.0f, 180.0f, 0.0f);
 	go_xw->SetTranslation(XWPos);
+
+	/*{
+								{  0.85f,  0.48f },
+								{ -0.85f,  0.48f },
+								{  0.85f,  0.18f },
+								{ -0.85f,  0.18f }
+	};*/
+
+	float h  = 4.6f * xw_scaling;
+	float v1 = 2.3f * xw_scaling;
+	float v2 = 1.1f * xw_scaling;
+
+	m_laserOffsets[0] = {  h, v1 };
+	m_laserOffsets[1] = { -h, v1 };
+	m_laserOffsets[2] = {  h, v2 };
+	m_laserOffsets[3] = { -h, v2 };
+
 
 	/*XMFLOAT3 cpF3 = m_Camera->GetPosition();
 	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
@@ -484,7 +509,11 @@ bool OverWorldScene::KeyPressed(KEYBINDS id)
 		if (!SpawnLaserShot())
 			return false;
 		break;
+	case SHIFT_KEY:
+		SetSprint(true);
+		break;
 	default:
+		SetSprint(false);
 		break;
 	}
 	return true;
@@ -501,20 +530,20 @@ bool OverWorldScene::SpawnLaserShot()
 		XMVECTOR up = m_Camera->GetUpVector();
 		int way = (m_shootingWingIdx % 2 == 0) ? -1.0f : 1.0f;
 		//XMMATRIX m = XMMatrixRotationAxis(up, 15.0f);
-		XMVECTOR q = XMQuaternionRotationAxis(up, way * 3.0f * (XM_PI / 180.0f));
-		lookAtV = XMVector3Rotate(lookAtV, q);
+		// Rotate direction vector 
+		//XMVECTOR q = XMQuaternionRotationAxis(up, way * 3.0f * (XM_PI / 180.0f));
+		//lookAtV = XMVector3Rotate(lookAtV, q);
 		XMStoreFloat3(&lookAt, lookAtV);
 
 		LaserShot* shot = new LaserShot(lookAt);
 		shot->SetModel(m_ModelCube);
 		shot->Scale(m_laserCubeScale);// , m_laserCubeScale, m_laserCubeScale);
 		
-		XMFLOAT2* offsets = shot->GetOffsets();
-
+		
 		XMVECTOR v = go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector();
 		// LEFT HANDED: right = cross(up, lookAT)
-		v += offsets[m_shootingWingIdx].x * XMVector3Cross(up, m_Camera->GetLookAtVector());
-		v += offsets[m_shootingWingIdx].y * up;
+		v += m_laserOffsets[m_shootingWingIdx].x * XMVector3Cross(up, m_Camera->GetLookAtVector());
+		v += m_laserOffsets[m_shootingWingIdx].y * up;
 		shot->SetTranslation(v);
 
 		go_laserQ.push_back(shot);
@@ -527,6 +556,20 @@ bool OverWorldScene::SpawnLaserShot()
 	}
 
 	return true;
+}
+
+
+void OverWorldScene::SetSprint(bool sprint)
+{
+	float min = 0.00f;
+	float max = 0.85f;
+
+	if (sprint)
+		m_fovLerp += (max - m_fovLerp) / 8.0f;
+	else
+		m_fovLerp -= (m_fovLerp - min) / 8.0f;
+
+	m_Camera->SetFOV(m_fovLerp);
 }
 
 
@@ -544,9 +587,11 @@ bool OverWorldScene::Update(float deltaTime)
 
 	XMFLOAT3 cpF3 = m_Camera->GetPosition();
 	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
-	XMVECTOR XWPos = XMVectorAdd(camPos, -5.0f*m_Camera->GetUpVector());
 	XMFLOAT3 camRot = m_Camera->GetRotation();
-	XWPos = XMVectorAdd(XWPos, 9.0f * m_Camera->GetLookAtVector());
+
+	XMVECTOR XWPos = camPos + 
+		m_XW_upOffset * m_Camera->GetUpVector() + 
+		m_XW_lookAtOffset * m_Camera->GetLookAtVector();
 
 	// OUTPUTTING STUFF TO THE DEBUGGER // FOR FUTURE REFERENCE
 	/*XMStoreFloat3(&cpF3, haha);

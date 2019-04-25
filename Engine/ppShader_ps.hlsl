@@ -108,7 +108,7 @@ float4 PostProcessPixelShader (PixelInputType input) : SV_TARGET
     }
 
 	
-    float2 d = abs(input.tex - float2(0.5, 0.54));
+    float2 d = abs(input.tex - float2(0.5, 0.5));
 	
     if (min(d.x, d.y) < thickness && max(d.x, d.y) < len)
     {

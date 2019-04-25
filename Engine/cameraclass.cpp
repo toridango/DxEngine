@@ -17,6 +17,12 @@ CameraClass::CameraClass(const CameraClass& other)
 
 bool CameraClass::Initialize(int screenWidth, int screenHeight, float screenDepth, float screenNear)
 {
+
+	m_screenW = screenWidth;
+	m_screenH = screenHeight;
+	m_screenFar = screenDepth;
+	m_screenNear = screenNear;
+
 	float fieldOfView = (float)XM_PIDIV4;
 	float screenAspect = (float)screenWidth / (float)screenHeight;
 
@@ -63,6 +69,20 @@ void CameraClass::SetRotation(XMFLOAT3 vec)
 	m_rotation.x = vec.x;
 	m_rotation.y = vec.y;
 	m_rotation.z = vec.z;
+}
+
+
+
+void CameraClass::SetFOV(float fovLerp)
+{
+	XMVECTOR fov0 = {XM_PIDIV4, XM_PIDIV4, XM_PIDIV4};
+	XMVECTOR fov1 = {XM_PIDIV2, XM_PIDIV2, XM_PIDIV2};
+
+	XMVECTOR lerp = XMVectorLerp(fov0, fov1, fovLerp);
+
+	float fieldOfView = (float)XMVectorGetX(lerp);
+	float screenAspect = (float)m_screenW / (float)m_screenH;
+	m_projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, m_screenNear, m_screenFar);
 }
 
 

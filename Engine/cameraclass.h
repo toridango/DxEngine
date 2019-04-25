@@ -11,7 +11,8 @@
 // #include <d3dx10math.h>
 #include <DirectXMath.h>
 
-const float ROTATION_SPEED = 1.65f;
+//const float ROTATION_SPEED = 1.65f;
+const float ROTATION_SPEED = 1.25f;
 
 using namespace DirectX;
 
@@ -31,6 +32,8 @@ public:
 	void SetPosition(XMFLOAT3 vec);
 	void SetRotation(float, float, float);
 	void SetRotation(XMFLOAT3 vec);
+
+	void SetFOV(float fov);
 
 	//D3DXVECTOR3 GetPosition();
 	//D3DXVECTOR3 GetRotation();
@@ -57,6 +60,12 @@ public:
 	XMMATRIX GetTextureViewMatrix();
 
 private:
+
+	int m_screenW;
+	int m_screenH;
+	float m_screenFar;
+	float m_screenNear;
+
 	// X, Y, Z
 	XMFLOAT3 m_position;
 
