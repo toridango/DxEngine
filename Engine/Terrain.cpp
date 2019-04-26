@@ -113,8 +113,10 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	m_pastMap = new HeightMapType[m_terrainWidth * m_terrainHeight];
 	if (!m_pastMap) { return false; }
 
-	float invWidth = 1.0f / m_terrainWidth;
-	float invHeight = 1.0f / m_terrainHeight;
+	// make numerator >1 to tile
+	float tilingParam = 8.0f;
+	float invWidth  = tilingParam / m_terrainWidth;
+	float invHeight = tilingParam / m_terrainHeight;
 
 	// Initialise the data in the height map (flat).
 	for (int j = 0; j < m_terrainHeight; j++)
@@ -139,6 +141,7 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 
 	// Normalize the height of the height map.
 	NormalizeHeightMap();
+
 
 	//even though we are generating a flat terrain, we still need to normalise it. 
 	// Calculate the normals for the terrain data.
@@ -332,7 +335,7 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 
 			double e = (n * scaling);
 
-			// Add faulting
+			// Add faulting // for every iteration (aka line)
 			for (int k = 0; k < faultingIterations; ++k)
 			{
 				XMFLOAT4 line = fLines[k];
@@ -352,6 +355,22 @@ bool Terrain::GenerateHeightMap(double scaling, double zoom)
 			m_heightMap[index].y = (float)e;
 			m_heightMap[index].z = (float)j;
 
+
+		}
+	}
+
+
+	Smooth();
+
+	for (int j = 0; j < m_terrainHeight; j++)
+	{
+		for (int i = 0; i < m_terrainWidth; i++)
+		{
+			index = (m_terrainHeight * j) + i;
+			float e = m_heightMap[index].y;
+
+			if (e > maxHeight) maxHeight = e;
+			if (e < minHeight) minHeight = e;
 
 		}
 	}
@@ -406,19 +425,52 @@ bool Terrain::Smooth()
 	{
 		for (i = 0; i < m_terrainWidth; i++)
 		{
-			//m_heightMap[(m_terrainHeight * j) + i].y = m_pastMap[(m_terrainHeight * j) + i].y;
-			m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j) + i - 1].y;
-			m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j) + i + 1].y;
+			int c = 0;
+			m_heightMap[(m_terrainHeight * j) + i].y = m_pastMap[(m_terrainHeight * j) + i].y;
+			++c;
+			if (i != 0)
+			{
+				m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j) + i - 1].y;
+				++c;
+			}
+			if (i != m_terrainWidth)
+			{
+				m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j) + i + 1].y;
+				++c;
+			}
+			if (j != m_terrainHeight)
+			{
+				m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j + 1) + i].y;
+				++c;
+			}
+			if (j != m_terrainHeight && i != 0)
+			{
+				m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j + 1) + i - 1].y;
+				++c;
+			}
+			if (j != m_terrainHeight && i != m_terrainWidth)
+			{
+				m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j + 1) + i + 1].y;
+				++c;
+			}
 
-			m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j + 1) + i].y;
-			m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j + 1) + i - 1].y;
-			m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j + 1) + i + 1].y;
+			if (j != 0)
+			{
+				m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j - 1) + i].y;
+				++c;
+			}
+			if (j != 0 && i != 0)
+			{
+				m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j - 1) + i - 1].y;
+				++c;
+			}
+			if (j != 0 && i != m_terrainWidth)
+			{
+				m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j - 1) + i + 1].y;
+				++c;
+			}
 
-			m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j - 1) + i].y;
-			m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j - 1) + i - 1].y;
-			m_heightMap[(m_terrainHeight * j) + i].y += m_pastMap[(m_terrainHeight * j - 1) + i + 1].y;
-
-			m_heightMap[(m_terrainHeight * j) + i].y /= 9.0f;
+			m_heightMap[(m_terrainHeight * j) + i].y /= (float)c;
 		}
 	}
 

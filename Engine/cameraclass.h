@@ -34,6 +34,7 @@ public:
 	void SetRotation(XMFLOAT3 vec);
 
 	void SetFOV(float fov);
+	XMVECTOR ProjectVector(XMVECTOR v);
 
 	//D3DXVECTOR3 GetPosition();
 	//D3DXVECTOR3 GetRotation();
@@ -43,6 +44,8 @@ public:
 	XMVECTOR GetLookAtVector();
 	XMVECTOR GetWrongUpVector();
 	XMVECTOR GetUpVector();
+
+	float GetFOV();
 
 	//D3DXVECTOR3 Strafe(float);
 	//D3DXVECTOR3 Advance(float);
@@ -65,6 +68,8 @@ private:
 	int m_screenH;
 	float m_screenFar;
 	float m_screenNear;
+
+	float m_fov;
 
 	// X, Y, Z
 	XMFLOAT3 m_position;

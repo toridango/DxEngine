@@ -9,6 +9,7 @@ OverWorldScene::OverWorldScene(HWND hwnd, D3DClass* d3d) :
 	m_k = 0;
 	m_shootingWingIdx = 0;
 	m_fovLerp = 0.0f;
+	m_fov = (float)XM_PIDIV4;
 }
 
 
@@ -260,8 +261,8 @@ bool OverWorldScene::InitializeModels()
 	// Position for scale 0.2 // -0.85, 1.55
 	m_XW_upOffset = -0.85f;
 	m_XW_lookAtOffset = 1.55f;
-	XMVECTOR XWPos = camPos + 
-		m_XW_upOffset * m_Camera->GetUpVector() + 
+	XMVECTOR XWPos = camPos +
+		m_XW_upOffset * m_Camera->GetUpVector() +
 		m_XW_lookAtOffset * m_Camera->GetLookAtVector();
 
 	//go_xw->Scale(1.0f, 1.0f, 1.0f);
@@ -278,13 +279,13 @@ bool OverWorldScene::InitializeModels()
 								{ -0.85f,  0.18f }
 	};*/
 
-	float h  = 4.6f * xw_scaling;
+	float h = 4.6f * xw_scaling;
 	float v1 = 2.3f * xw_scaling;
 	float v2 = 1.1f * xw_scaling;
 
-	m_laserOffsets[0] = {  h, v1 };
+	m_laserOffsets[0] = { h, v1 };
 	m_laserOffsets[1] = { -h, v1 };
-	m_laserOffsets[2] = {  h, v2 };
+	m_laserOffsets[2] = { h, v2 };
 	m_laserOffsets[3] = { -h, v2 };
 
 
@@ -368,7 +369,7 @@ bool OverWorldScene::InitializeModels()
 
 	// ------------------ Balloon targets (Volumetric Cube) ------------------
 
-	float balloonRowCount = std::pow((double) min(TERRAINWIDTH, TERRAINHEIGHT), 1.0 / 4.0);
+	float balloonRowCount = std::pow((double)min(TERRAINWIDTH, TERRAINHEIGHT), 1.0 / 4.0);
 	go_targets.reserve(balloonRowCount * balloonRowCount);
 
 	float step = min(TERRAINWIDTH, TERRAINHEIGHT) / (balloonRowCount + 1);
@@ -393,7 +394,7 @@ bool OverWorldScene::InitializeModels()
 			balloon->SetModel(m_ModelCube);
 
 			balloon->Scale(scale);
-			balloon->SetTranslation(x+rx, 30.0f+ry, z+rz);
+			balloon->SetTranslation(x + rx, 30.0f + ry, z + rz);
 
 			go_targets.push_back(balloon);
 			m_targetCooldowns.push_back(0.0f);
@@ -533,17 +534,26 @@ bool OverWorldScene::SpawnLaserShot()
 		// Rotate direction vector 
 		//XMVECTOR q = XMQuaternionRotationAxis(up, way * 3.0f * (XM_PI / 180.0f));
 		//lookAtV = XMVector3Rotate(lookAtV, q);
-		XMStoreFloat3(&lookAt, lookAtV);
+
+		XMVECTOR v = go_xw->GetWorldMatrix().r[3] + 2.0f*lookAtV;
+		// LEFT HANDED: right = cross(up, lookAT)
+		v += m_laserOffsets[m_shootingWingIdx].x * XMVector3Cross(up, lookAtV);
+		v += m_laserOffsets[m_shootingWingIdx].y * up;
+		
+		XMVECTOR* aimAt = TraceFirstTargetInRadius(XMLoadFloat3(&(m_Camera->GetPosition())), lookAtV);
+
+		if (aimAt)
+			XMStoreFloat3(&lookAt, XMVector3Normalize(*aimAt));
+		else
+			XMStoreFloat3(&lookAt, lookAtV);
+
+		// m_Camera->ProjectVector(targetPos - pos)
+		// m_Camera->ProjectVector(*aimAt)
 
 		LaserShot* shot = new LaserShot(lookAt);
 		shot->SetModel(m_ModelCube);
 		shot->Scale(m_laserCubeScale);// , m_laserCubeScale, m_laserCubeScale);
-		
-		
-		XMVECTOR v = go_xw->GetWorldMatrix().r[3] + 2.0f*m_Camera->GetLookAtVector();
-		// LEFT HANDED: right = cross(up, lookAT)
-		v += m_laserOffsets[m_shootingWingIdx].x * XMVector3Cross(up, m_Camera->GetLookAtVector());
-		v += m_laserOffsets[m_shootingWingIdx].y * up;
+
 		shot->SetTranslation(v);
 
 		go_laserQ.push_back(shot);
@@ -570,7 +580,60 @@ void OverWorldScene::SetSprint(bool sprint)
 		m_fovLerp -= (m_fovLerp - min) / 8.0f;
 
 	m_Camera->SetFOV(m_fovLerp);
+
 }
+
+XMVECTOR* OverWorldScene::TraceFirstTargetInRadius(XMVECTOR pos, XMVECTOR lookAt)
+{
+	XMVECTOR* aimAt = nullptr;
+
+	// linepoint2 is (pos + lookAt), linepoint1 is pos
+	XMVECTOR lp2 = pos + lookAt;
+
+	int i = 0;
+	bool found = false;
+	std::wstring ws = L"";
+
+	// using d to store the distance
+	std::vector<DepthGO> foundTargets;
+	for (int i = 0; i < go_targets.size(); ++i)
+	{
+		if (m_targetCooldowns[i] <= 0.0f)
+		{
+			XMVECTOR targetPos = go_targets[i]->GetWorldMatrix().r[3];
+			float angle = (180.0f / XM_PI) * XMVectorGetX(XMVector3AngleBetweenVectors(targetPos - pos, lookAt));
+
+			if (angle <= 3.69f)
+			{ 
+				// aimAt = &(targetPos - pos);
+				foundTargets.push_back({
+					XMVectorGetX(XMVector3Length(targetPos - pos)), // use distance to sort
+					//angle, // use angle to sort
+					go_targets[i]
+					});
+				found = true;
+				ws += std::to_wstring(angle) + L", ";
+			}
+		}
+	}
+	if (found)
+	{
+		// std::wstringstream s;
+		// s << ws << std::endl;
+		// std::wstring ws = s.str();
+		// OutputDebugString(ws.c_str());
+
+		
+		std::sort(foundTargets.begin(), foundTargets.end());
+		// get closest (DepthGO gets ordered by farthest first)
+		aimAt = &(foundTargets.back().go->GetWorldMatrix().r[3] - pos);
+	}
+
+
+	return aimAt;
+}
+
+
 
 
 
@@ -589,8 +652,8 @@ bool OverWorldScene::Update(float deltaTime)
 	XMVECTOR camPos = { cpF3.x, cpF3.y, cpF3.z };
 	XMFLOAT3 camRot = m_Camera->GetRotation();
 
-	XMVECTOR XWPos = camPos + 
-		m_XW_upOffset * m_Camera->GetUpVector() + 
+	XMVECTOR XWPos = camPos +
+		m_XW_upOffset * m_Camera->GetUpVector() +
 		m_XW_lookAtOffset * m_Camera->GetLookAtVector();
 
 	// OUTPUTTING STUFF TO THE DEBUGGER // FOR FUTURE REFERENCE
@@ -671,14 +734,14 @@ bool OverWorldScene::Update(float deltaTime)
 		for (auto it = go_laserQ.cbegin(); it != go_laserQ.cend(); ++it)
 		{
 			XMVECTOR len = XMVector4Length((*it)->GetWorldMatrix().r[3] - go_targets[i]->GetWorldMatrix().r[3]);
-			XMFLOAT4 x; 
+			XMFLOAT4 x;
 			XMStoreFloat4(&x, len);
 			if (x.x < 1.75f)
 			{
 				// seconds
 				m_targetCooldowns[i] = 60.0f;
 			}
-				
+
 		}
 	}
 
@@ -759,14 +822,14 @@ bool OverWorldScene::Render(float deltaTime)
 
 	//m_ModelRock->Render(m_D3D->GetDeviceContext());
 	go_rock->Render(m_D3D->GetDeviceContext());
-	
+
 	// Render the model using the light shader.
 	result = m_BumpMapShader->Render(go_rock, m_Camera, m_Light);
 
 	if (!result) { return false; }
 
 
-	   
+
 
 	// ------------------ Sky ------------------
 
@@ -787,7 +850,7 @@ bool OverWorldScene::Render(float deltaTime)
 
 
 	// ------------------ Terrain ------------------
-	
+
 	// Stupid but fun animation to see the parameters increasing
 	/*go_procTerrain->ModelShutdown();
 	go_procTerrain->Initialize(m_D3D->GetDevice(), TERRAINWIDTH, TERRAINHEIGHT);
@@ -795,7 +858,7 @@ bool OverWorldScene::Render(float deltaTime)
 	go_procTerrain->Smooth();
 	OutputDebugStringA(("Scaling: " + std::to_string(m_k) + "\t\tZoom: " + std::to_string(m_k*2) + "\n").c_str());
 	m_k += 0.05;*/
-	
+
 
 	go_procTerrain->Render(m_D3D->GetDeviceContext());
 
@@ -814,7 +877,7 @@ bool OverWorldScene::Render(float deltaTime)
 
 
 	// ------------------ Water ------------------
-	
+
 
 	go_waterSurface->Render(m_D3D->GetDeviceContext());
 
@@ -845,17 +908,17 @@ bool OverWorldScene::Render(float deltaTime)
 
 
 
-	
+
 
 	// ------------------ Laser ------------------
 
-	
+
 
 	float capsuleLen = 4.0f;
 	// Assuming uniform scaling
 	// result = m_volLaserShader->Render(go_laser, m_Camera, XMFLOAT3(1.0f, 0.0f, 0.0f), 
 	// 	capsuleLen, go_laser->GetScaling().x, deltavalue);
-	
+
 	/*XMFLOAT3 lookAt;
 	XMFLOAT3 pos;
 	XMStoreFloat3(&lookAt, m_Camera->GetLookAtVector());
@@ -863,14 +926,14 @@ bool OverWorldScene::Render(float deltaTime)
 	XMStoreFloat3(&pos, trans);
 	go_laser->SetTranslation(trans);
 	go_laser->Store("direction", { lookAt.x, lookAt.y, lookAt.z, 0.0f });*/
-	
+
 	go_laser->Render(m_D3D->GetDeviceContext());
-	
+
 	//go_laser->SetTranslation(m_laserIniPos);
 	// Assuming uniform scaling
-	result = m_volLaserShader->Render(go_laser, m_Camera, XMFLOAT3(1.0, 0.0, 0.0), 
+	result = m_volLaserShader->Render(go_laser, m_Camera, XMFLOAT3(1.0, 0.0, 0.0),
 		capsuleLen, go_laser->GetScaling().x, deltaTime);
-	
+
 	if (!result) { return false; }
 
 
@@ -920,7 +983,7 @@ bool OverWorldScene::Render(float deltaTime)
 
 	m_D3D->TurnOffAlphaBlending();
 	// -----------------------------------------------------------------------------------
-	
+
 
 
 

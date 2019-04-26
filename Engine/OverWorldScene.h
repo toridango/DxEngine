@@ -44,6 +44,7 @@ public:
 
 private:
 	std::vector<DepthGO> ArrangeDepthRenderOrder();
+	XMVECTOR* TraceFirstTargetInRadius(XMVECTOR pos, XMVECTOR lookAt);
 
 
 
@@ -63,6 +64,7 @@ private:
 	float m_XW_lookAtOffset;
 	std::array<XMFLOAT2, 4> m_laserOffsets;
 	float m_fovLerp;
+	float m_fov;
 
 	// GAME OBJECTS;
 	GameObject* go_sky;

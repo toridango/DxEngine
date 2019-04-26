@@ -25,7 +25,8 @@ private:
 	struct VariableBufferType
 	{
 		bool sprinting;
-		XMFLOAT3 padding;
+		float fov;
+		XMFLOAT2 padding;
 	};
 
 public:
@@ -37,13 +38,14 @@ public:
 
 	void Shutdown();
 	bool Render(int indexCount, XMMATRIX viewMatrix,
-		XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, bool sprinting);
+		XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, 
+		bool sprinting, float fov);
 
 private:
 
 	void ShutdownShader();
 
-	bool SetShaderParameters(XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, bool sprinting);
+	bool SetShaderParameters(XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, bool sprinting, float fov);
 
 
 //private:

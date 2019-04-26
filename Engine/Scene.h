@@ -47,6 +47,8 @@ public:
 
 	virtual bool KeyPressed(KEYBINDS id) = 0;
 
+	float GetFOV();
+
 	
 protected:
 	bool CheckPath(char* path);

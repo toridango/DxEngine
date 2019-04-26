@@ -82,3 +82,9 @@ float Scene::DistanceToCamera(GameObject* go)
 	
 	return XMVectorGetX(XMVector3LengthSq(goPos - caPos));
 }
+
+
+float Scene::GetFOV()
+{
+	return m_Camera->GetFOV();
+}

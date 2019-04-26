@@ -50,7 +50,8 @@ float not_(float x)
 cbuffer VariableBuffer
 {
     bool sprinting;
-    float3 padding;
+    float fov;
+    float2 padding;
 };
 
 
@@ -65,6 +66,7 @@ struct PixelInputType
 };
 
  
+static const float pi = 3.141592;
 static const float exposure = 1.0;
 static const float thickness = 0.0015;
 static const float len = 0.02;
@@ -109,14 +111,23 @@ float4 PostProcessPixelShader (PixelInputType input) : SV_TARGET
 
 	
     float2 d = abs(input.tex - float2(0.5, 0.5));
+    float ld = length(d);
+	// Threshold distance for the circle around the crosshairs
+    float fovdeg = fov*(180.0 / pi);
+    float th = (3.69 / (fovdeg / 2.0)) * 0.5;
 	
     if (min(d.x, d.y) < thickness && max(d.x, d.y) < len)
     {
         colour = float4(1.0, 0.0, 0.0, 1.0);
         //colour = 1.0 - colour;
     }
+    //if (ld > 0.081 && ld < 0.082)
+    if (ld > (th - 0.001)  && ld < th)
+    {
+        colour = float4(1.0, 0.0, 0.0, 0.3);
+    }
 
 
-    return colour;
+        return colour;
 
-}
+    }

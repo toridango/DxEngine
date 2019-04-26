@@ -24,6 +24,7 @@ bool CameraClass::Initialize(int screenWidth, int screenHeight, float screenDept
 	m_screenNear = screenNear;
 
 	float fieldOfView = (float)XM_PIDIV4;
+	m_fov = fieldOfView;
 	float screenAspect = (float)screenWidth / (float)screenHeight;
 
 	// Create the projection matrix for 3D rendering.
@@ -83,6 +84,26 @@ void CameraClass::SetFOV(float fovLerp)
 	float fieldOfView = (float)XMVectorGetX(lerp);
 	float screenAspect = (float)m_screenW / (float)m_screenH;
 	m_projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, m_screenNear, m_screenFar);
+
+	m_fov = fieldOfView;
+}
+
+XMVECTOR CameraClass::ProjectVector(XMVECTOR v)
+{
+	XMMATRIX cameraMatrix(m_viewMatrix);
+	cameraMatrix = XMMatrixInverse(&XMMatrixDeterminant(cameraMatrix), cameraMatrix);
+	return XMVector3Project(
+		v,
+		0,
+		0,
+		m_screenW,
+		m_screenH,
+		0.0f,
+		1.0f,
+		m_projectionMatrix,
+		m_viewMatrix,
+		cameraMatrix
+	);
 }
 
 
@@ -122,6 +143,12 @@ XMVECTOR CameraClass::GetUpVector()
 	// Invert it
 	cameraMatrix = XMMatrixInverse(&XMMatrixDeterminant(cameraMatrix), cameraMatrix);
 	return cameraMatrix.r[1];
+}
+
+
+float CameraClass::GetFOV()
+{
+	return m_fov;
 }
 
 
