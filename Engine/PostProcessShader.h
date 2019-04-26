@@ -26,7 +26,8 @@ private:
 	{
 		bool sprinting;
 		float fov;
-		XMFLOAT2 padding;
+		bool aimAssist;
+		float padding;
 	};
 
 public:
@@ -39,13 +40,13 @@ public:
 	void Shutdown();
 	bool Render(int indexCount, XMMATRIX viewMatrix,
 		XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, 
-		bool sprinting, float fov);
+		bool sprinting, bool aimAssist, float fov);
 
 private:
 
 	void ShutdownShader();
 
-	bool SetShaderParameters(XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, bool sprinting, float fov);
+	bool SetShaderParameters(XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, bool sprinting, bool aimAssist, float fov);
 
 
 //private:

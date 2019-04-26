@@ -10,6 +10,7 @@ OverWorldScene::OverWorldScene(HWND hwnd, D3DClass* d3d) :
 	m_shootingWingIdx = 0;
 	m_fovLerp = 0.0f;
 	m_fov = (float)XM_PIDIV4;
+	m_aimAssist = false;
 }
 
 
@@ -513,6 +514,8 @@ bool OverWorldScene::KeyPressed(KEYBINDS id)
 	case SHIFT_KEY:
 		SetSprint(true);
 		break;
+	case T_KEY:
+		m_aimAssist = !m_aimAssist;
 	default:
 		SetSprint(false);
 		break;
@@ -542,7 +545,7 @@ bool OverWorldScene::SpawnLaserShot()
 		
 		XMVECTOR* aimAt = TraceFirstTargetInRadius(XMLoadFloat3(&(m_Camera->GetPosition())), lookAtV);
 
-		if (aimAt)
+		if (aimAt && m_aimAssist)
 			XMStoreFloat3(&lookAt, XMVector3Normalize(*aimAt));
 		else
 			XMStoreFloat3(&lookAt, lookAtV);
@@ -632,7 +635,6 @@ XMVECTOR* OverWorldScene::TraceFirstTargetInRadius(XMVECTOR pos, XMVECTOR lookAt
 
 	return aimAt;
 }
-
 
 
 

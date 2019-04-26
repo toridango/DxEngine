@@ -11,6 +11,8 @@ GraphicsClass::GraphicsClass()
 	m_Camera = 0;
 	m_orthoW = 0;
 	m_RenderTexture = 0;
+	m_aimAssist = false; 
+	m_T_cooldown = 0.0f;
 }
 
 
@@ -192,6 +194,8 @@ bool GraphicsClass::Frame(Timer* timer)
 bool GraphicsClass::Update(float deltaTime)
 {
 	bool result;
+	if (m_T_cooldown > 0.0f)
+		m_T_cooldown -= deltaTime / 1000.0f;
 
 	result = m_Scene->Update(deltaTime);
 	if (!result)
@@ -253,6 +257,16 @@ void GraphicsClass::SetSprint(bool sprint)
 bool GraphicsClass::SpacePressed()
 {
 	return m_Scene->KeyPressed(Scene::SPACE_KEY);
+}
+
+void GraphicsClass::TPressed()
+{
+	if (m_T_cooldown <= 0.0f)
+	{
+		m_aimAssist = !m_aimAssist;
+		m_Scene->KeyPressed(Scene::T_KEY);
+		m_T_cooldown = 0.2f;
+	}
 }
 
 //                     //
@@ -327,7 +341,7 @@ bool GraphicsClass::RenderTextureToScreen()
 
 	// Render the full screen ortho window using the texture shader and the full screen sized blurred render to texture resource.
 	result = m_ppShader->Render(m_orthoW->GetIndexCount(), m_orthoView, m_orthoMatrix, 
-								m_RenderTexture->GetShaderResourceView(), m_sprint, m_Scene->GetFOV());
+								m_RenderTexture->GetShaderResourceView(), m_sprint, m_aimAssist, m_Scene->GetFOV());
 	if (!result)
 	{
 		return false;

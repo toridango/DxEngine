@@ -51,7 +51,8 @@ cbuffer VariableBuffer
 {
     bool sprinting;
     float fov;
-    float2 padding;
+    bool aimAssist;
+    float padding;
 };
 
 
@@ -122,10 +123,11 @@ float4 PostProcessPixelShader (PixelInputType input) : SV_TARGET
         //colour = 1.0 - colour;
     }
     //if (ld > 0.081 && ld < 0.082)
-    if (ld > (th - 0.001)  && ld < th)
-    {
-        colour = float4(1.0, 0.0, 0.0, 0.3);
-    }
+    if (aimAssist)
+        if (ld > (th - 0.001) && ld < th)
+        {
+            colour = float4(1.0, 0.0, 0.0, 0.3);
+        }
 
 
         return colour;

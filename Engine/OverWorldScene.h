@@ -47,7 +47,6 @@ private:
 	XMVECTOR* TraceFirstTargetInRadius(XMVECTOR pos, XMVECTOR lookAt);
 
 
-
 private:
 	// CLASS VARIABLES
 	HWND m_hwnd;
@@ -65,6 +64,7 @@ private:
 	std::array<XMFLOAT2, 4> m_laserOffsets;
 	float m_fovLerp;
 	float m_fov;
+	bool m_aimAssist;
 
 	// GAME OBJECTS;
 	GameObject* go_sky;

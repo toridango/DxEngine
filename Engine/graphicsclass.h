@@ -49,6 +49,7 @@ public:
 	void Rotate(XMFLOAT3);
 	void SetSprint(bool sprint);
 	bool SpacePressed();
+	void TPressed();
 
 private:
 	bool Update(float deltaTime);
@@ -59,6 +60,8 @@ private:
 private:
 
 	bool m_sprint;
+	bool m_aimAssist;
+	float m_T_cooldown;
 	float m_movSpeed;
 	int m_screenH;
 	int m_screenW;

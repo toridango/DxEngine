@@ -116,7 +116,7 @@ bool PostProcessShader::InitializeShader(WCHAR* vsFilename, WCHAR* psFilename)
 
 
 bool PostProcessShader::Render(int indexCount, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, bool sprinting, float fov)
+	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, bool sprinting, bool aimAssist, float fov)
 {
 	bool result;
 
@@ -128,6 +128,7 @@ bool PostProcessShader::Render(int indexCount, XMMATRIX viewMatrix,
 		projectionMatrix, 
 		texture, 
 		sprinting,
+		aimAssist,
 		fov);
 	if (!result)
 	{
@@ -142,7 +143,7 @@ bool PostProcessShader::Render(int indexCount, XMMATRIX viewMatrix,
 
 
 bool PostProcessShader::SetShaderParameters(XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, bool sprinting, float fov)
+	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, bool sprinting, bool aimAssist, float fov)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -171,7 +172,8 @@ bool PostProcessShader::SetShaderParameters(XMMATRIX worldMatrix, XMMATRIX viewM
 	// Copy the data into the constant buffer.
 	dataPtr2->sprinting = sprinting;
 	dataPtr2->fov = fov;
-	dataPtr2->padding = XMFLOAT2(0.0f, 0.0f);
+	dataPtr2->aimAssist = aimAssist;
+	dataPtr2->padding = 0.0f;
 
 	// Unlock the constant buffer.
 	m_context->Unmap(m_variableBuffer, 0);

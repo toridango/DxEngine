@@ -220,6 +220,10 @@ bool SystemClass::HandleInput()
 		if( !m_Graphics->SpacePressed())
 			return false;
 	}
+	if (m_Input->IsTPressed())
+	{
+		m_Graphics->TPressed();
+	}
 
 	XMFLOAT3 mouseMov = m_Input->GetMouseMovement();
 	if (mouseMov.x || mouseMov.y)

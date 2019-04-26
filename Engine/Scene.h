@@ -33,7 +33,12 @@ public:
 	{
 		NONE,
 		SPACE_KEY,
-		SHIFT_KEY
+		SHIFT_KEY,
+		A_KEY,
+		D_KEY,
+		S_KEY,
+		T_KEY,
+		W_KEY
 	};
 
 public:

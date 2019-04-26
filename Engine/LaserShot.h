@@ -6,7 +6,7 @@
 #include "GameObject.h"
 
 // in seconds
-const float LASER_LIFESPAN = 2.0f;
+const float LASER_LIFESPAN = 3.0f;
 // in units/second
 const float LASER_SPEED = 50.0f;
 // in seconds
