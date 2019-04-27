@@ -120,6 +120,9 @@
     <ClCompile Include="VolumetricBalloonShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PPSEdgeDetection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cameraclass.h">
@@ -224,6 +227,9 @@
     <ClInclude Include="VolumetricBalloonShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PPSEdgeDetection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -275,6 +281,12 @@
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="volBalloon_vs.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="pps_edge_ps.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="pps_edge_vs.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>

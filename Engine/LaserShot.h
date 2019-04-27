@@ -8,7 +8,7 @@
 // in seconds
 const float LASER_LIFESPAN = 3.0f;
 // in units/second
-const float LASER_SPEED = 50.0f;
+const float LASER_SPEED = 80.0f;
 // in seconds
 const float LASER_COOLDOWN = 1.0f / 8.0f;
 

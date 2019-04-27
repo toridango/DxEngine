@@ -104,6 +104,7 @@
     <ClCompile Include="OrthoWindow.cpp" />
     <ClCompile Include="OverWorldScene.cpp" />
     <ClCompile Include="PostProcessShader.cpp" />
+    <ClCompile Include="PPSEdgeDetection.cpp" />
     <ClCompile Include="RenderTexture.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SwordRockScene.cpp" />
@@ -140,6 +141,7 @@
     <ClInclude Include="OrthoWindow.h" />
     <ClInclude Include="OverWorldScene.h" />
     <ClInclude Include="PostProcessShader.h" />
+    <ClInclude Include="PPSEdgeDetection.h" />
     <ClInclude Include="RenderTexture.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SwordRockScene.h" />
@@ -177,6 +179,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="ppShader_vs.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="pps_edge_ps.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="pps_edge_vs.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="sky_ps.hlsl">

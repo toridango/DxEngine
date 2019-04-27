@@ -102,6 +102,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	m_ppsEdgeShader = new PPSEdgeDetection(hwnd, m_D3D->GetDevice(), m_D3D->GetDeviceContext());
+	if (!m_ppsEdgeShader) { return false; }
+	result = m_ppsEdgeShader->InitializeShader(L"../Engine/pps_edge_vs.hlsl", L"../Engine/pps_edge_ps.hlsl");
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the pps edge detection shader.", L"Error", MB_OK);
+		return false;
+	}
+
 
 
 	return true;
@@ -149,6 +158,12 @@ void GraphicsClass::Shutdown()
 	{
 		delete m_ppShader;
 		m_ppShader = 0;
+	}
+
+	if (m_ppsEdgeShader)
+	{
+		delete m_ppsEdgeShader;
+		m_ppsEdgeShader = 0;
 	}
 }
 
@@ -322,7 +337,7 @@ bool GraphicsClass::RenderTextureToScreen()
 
 
 	// Clear the buffers to begin the scene.
-	m_D3D->BeginScene(1.0f, 0.0f, 0.0f, 0.0f);
+	m_D3D->BeginScene(0.45f, 0.07f, 0.60f, 0.0f);
 
 	// Generate the view matrix based on the camera's position.
 	//m_Camera->Render();
@@ -339,12 +354,24 @@ bool GraphicsClass::RenderTextureToScreen()
 	// Put the full screen ortho window vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_orthoW->Render(m_D3D->GetDeviceContext());
 
-	// Render the full screen ortho window using the texture shader and the full screen sized blurred render to texture resource.
-	result = m_ppShader->Render(m_orthoW->GetIndexCount(), m_orthoView, m_orthoMatrix, 
-								m_RenderTexture->GetShaderResourceView(), m_sprint, m_aimAssist, m_Scene->GetFOV());
-	if (!result)
+	if (false)
 	{
-		return false;
+		// Render the full screen ortho window using the texture shader and the full screen sized blurred render to texture resource.
+		result = m_ppShader->Render(m_orthoW->GetIndexCount(), m_orthoView, m_orthoMatrix,
+			m_RenderTexture->GetShaderResourceView(), m_sprint, m_aimAssist, m_Scene->GetFOV());
+		if (!result)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		result = m_ppsEdgeShader->Render(m_orthoW->GetIndexCount(), m_orthoView, m_orthoMatrix,
+			m_RenderTexture->GetShaderResourceView(), { (float)m_screenW, (float)m_screenH });
+		if (!result)
+		{
+			return false;
+		}
 	}
 
 	// Turn the Z buffer back on now that all 2D rendering has completed.

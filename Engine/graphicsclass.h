@@ -15,6 +15,7 @@
 #include "RenderTexture.h"
 #include "PostProcessShader.h"
 #include "Timer.h"
+#include "PPSEdgeDetection.h"
 
 /////////////
 // GLOBALS //
@@ -74,6 +75,7 @@ private:
 	OrthoWindow* m_orthoW;
 	RenderTexture* m_RenderTexture;
 	PostProcessShader* m_ppShader;
+	PPSEdgeDetection* m_ppsEdgeShader;
 	XMMATRIX m_orthoMatrix;
 	XMMATRIX m_orthoView;
 
