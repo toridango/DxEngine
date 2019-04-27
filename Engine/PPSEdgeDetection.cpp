@@ -112,7 +112,8 @@ bool PPSEdgeDetection::InitializeShader(WCHAR* vsFilename, WCHAR* psFilename)
 
 
 bool PPSEdgeDetection::Render(int indexCount, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, XMFLOAT2 screenDimensions)
+	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, 
+	XMFLOAT2 screenDimensions, bool onlyEdges)
 {
 	bool result;
 
@@ -123,7 +124,8 @@ bool PPSEdgeDetection::Render(int indexCount, XMMATRIX viewMatrix,
 		viewMatrix,
 		projectionMatrix,
 		texture,
-		screenDimensions);
+		screenDimensions,
+		onlyEdges);
 	if (!result)
 	{
 		return false;
@@ -137,7 +139,8 @@ bool PPSEdgeDetection::Render(int indexCount, XMMATRIX viewMatrix,
 
 
 bool PPSEdgeDetection::SetShaderParameters(XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, XMFLOAT2 screenDimensions)
+	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, XMFLOAT2 screenDimensions,
+	bool onlyEdges)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -164,7 +167,8 @@ bool PPSEdgeDetection::SetShaderParameters(XMMATRIX worldMatrix, XMMATRIX viewMa
 
 	// Copy the data into the constant buffer.
 	dataPtr2->screenDimensions = screenDimensions;
-	dataPtr2->padding = { 0.0f, 0.0f };
+	dataPtr2->onlyEdges = onlyEdges;
+	dataPtr2->padding = 0.0f;
 
 	// Unlock the constant buffer.
 	m_context->Unmap(m_variableBuffer, 0);
@@ -174,6 +178,9 @@ bool PPSEdgeDetection::SetShaderParameters(XMMATRIX worldMatrix, XMMATRIX viewMa
 
 	// Now set the constant buffer in the vertex shader with the updated values.
 	m_context->VSSetConstantBuffers(bufferNumber, 1, &m_variableBuffer);
+
+
+
 
 	// Set shader texture resource in the pixel shader.
 	m_context->PSSetShaderResources(0, 1, &texture);

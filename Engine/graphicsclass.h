@@ -51,6 +51,8 @@ public:
 	void SetSprint(bool sprint);
 	bool SpacePressed();
 	void TPressed();
+	void GPressed();
+	void HPressed();
 
 private:
 	bool Update(float deltaTime);
@@ -62,7 +64,11 @@ private:
 
 	bool m_sprint;
 	bool m_aimAssist;
+	bool m_ppsEdge;
+	bool m_onlyEdges;
 	float m_T_cooldown;
+	float m_G_cooldown;
+	float m_H_cooldown;
 	float m_movSpeed;
 	int m_screenH;
 	int m_screenW;

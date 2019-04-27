@@ -43,6 +43,7 @@ struct PixelInputType
     float2 tex : TEXCOORD0;
 
     float2 sampleOffsets[8] : SOULS;
+    bool onlyEdges : EDGES;
 };
 
  
@@ -97,10 +98,9 @@ float4 PPSEdgePixelShader(PixelInputType input) : SV_TARGET
 
     float4 h = (float4) 0.0;
     float4 v = (float4) 0.0;
+	
 
-    bool onlyEdges = false;
-
-    if (onlyEdges)
+    if (input.onlyEdges)
     {
 		for (int i = 0; i < 9; ++i)
 		{

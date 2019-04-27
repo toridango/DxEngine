@@ -11,8 +11,12 @@ GraphicsClass::GraphicsClass()
 	m_Camera = 0;
 	m_orthoW = 0;
 	m_RenderTexture = 0;
-	m_aimAssist = false; 
+	m_aimAssist = true; 
+	m_ppsEdge = false;
+	m_onlyEdges = false;
 	m_T_cooldown = 0.0f;
+	m_G_cooldown = 0.0f;
+	m_H_cooldown = 0.0f;
 }
 
 
@@ -211,6 +215,10 @@ bool GraphicsClass::Update(float deltaTime)
 	bool result;
 	if (m_T_cooldown > 0.0f)
 		m_T_cooldown -= deltaTime / 1000.0f;
+	if (m_G_cooldown > 0.0f)
+		m_G_cooldown -= deltaTime / 1000.0f;
+	if (m_H_cooldown > 0.0f)
+		m_H_cooldown -= deltaTime / 1000.0f;
 
 	result = m_Scene->Update(deltaTime);
 	if (!result)
@@ -284,6 +292,24 @@ void GraphicsClass::TPressed()
 	}
 }
 
+void GraphicsClass::GPressed()
+{
+	if (m_G_cooldown <= 0.0f)
+	{
+		m_ppsEdge = !m_ppsEdge;
+		m_G_cooldown = 0.2f;
+	}
+}
+
+void GraphicsClass::HPressed()
+{
+	if (m_H_cooldown <= 0.0f)
+	{
+		m_onlyEdges = !m_onlyEdges;
+		m_H_cooldown = 0.2f;
+	}
+}
+
 //                     //
 /////////////////////////
 
@@ -354,7 +380,7 @@ bool GraphicsClass::RenderTextureToScreen()
 	// Put the full screen ortho window vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_orthoW->Render(m_D3D->GetDeviceContext());
 
-	if (false)
+	if (!m_ppsEdge)
 	{
 		// Render the full screen ortho window using the texture shader and the full screen sized blurred render to texture resource.
 		result = m_ppShader->Render(m_orthoW->GetIndexCount(), m_orthoView, m_orthoMatrix,
@@ -367,7 +393,7 @@ bool GraphicsClass::RenderTextureToScreen()
 	else
 	{
 		result = m_ppsEdgeShader->Render(m_orthoW->GetIndexCount(), m_orthoView, m_orthoMatrix,
-			m_RenderTexture->GetShaderResourceView(), { (float)m_screenW, (float)m_screenH });
+			m_RenderTexture->GetShaderResourceView(), { (float)m_screenW, (float)m_screenH }, m_onlyEdges);
 		if (!result)
 		{
 			return false;

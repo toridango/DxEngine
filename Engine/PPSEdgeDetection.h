@@ -25,7 +25,8 @@ private:
 	struct VariableBufferType
 	{
 		XMFLOAT2 screenDimensions;
-		XMFLOAT2 padding;
+		bool onlyEdges;
+		float padding;
 	};
 
 public:
@@ -38,13 +39,14 @@ public:
 	void Shutdown();
 	bool Render(int indexCount, XMMATRIX viewMatrix,
 		XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture,
-		XMFLOAT2 screenDimensions);
+		XMFLOAT2 screenDimensions, bool onlyEdges);
 
 private:
 
 	void ShutdownShader();
 
-	bool SetShaderParameters(XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, XMFLOAT2 screenDimensions);
+	bool SetShaderParameters(XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, 
+		XMFLOAT2 screenDimensions, bool onlyEdges);
 
 
 	ID3D11Buffer* m_variableBuffer;

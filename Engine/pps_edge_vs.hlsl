@@ -10,7 +10,8 @@ cbuffer MatrixBuffer
 cbuffer VariableBuffer
 {
     float2 screenDimensions;
-    float2 padding;
+    bool onlyEdges;
+    float padding;
 };
 
 struct VertexInputType
@@ -25,6 +26,7 @@ struct PixelInputType
     float2 tex : TEXCOORD0;
 
     float2 sampleOffsets[8] : SOULS;
+    bool onlyEdges : EDGES;
 };
 
 
@@ -64,5 +66,7 @@ PixelInputType PPSEdgeVertexShader(VertexInputType input)
     output.sampleOffsets[6] = input.tex + float2( 0.0,	 uv.y);
     output.sampleOffsets[7] = input.tex + float2( uv.x,	 uv.y);
     
+    output.onlyEdges = onlyEdges;
+
     return output;
 }

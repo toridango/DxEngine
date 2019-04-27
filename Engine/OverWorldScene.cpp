@@ -10,7 +10,7 @@ OverWorldScene::OverWorldScene(HWND hwnd, D3DClass* d3d) :
 	m_shootingWingIdx = 0;
 	m_fovLerp = 0.0f;
 	m_fov = (float)XM_PIDIV4;
-	m_aimAssist = false;
+	m_aimAssist = true;
 }
 
 

@@ -244,6 +244,10 @@ bool InputClass::IsSpacePressed() const { return (m_keyboardState[DIK_SPACE] & 0
 
 bool InputClass::IsTPressed() const { return (m_keyboardState[DIK_T] & 0x80); }
 
+bool InputClass::IsGPressed() const { return (m_keyboardState[DIK_G] & 0x80); }
+
+bool InputClass::IsHPressed() const { return (m_keyboardState[DIK_H] & 0x80); }
+
 XMFLOAT3 InputClass::GetMouseMovement() const { return XMFLOAT3(m_mouseState.lX, m_mouseState.lY, m_mouseState.lZ); }
 
 
