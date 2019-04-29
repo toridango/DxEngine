@@ -116,6 +116,7 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	m_cpPaths.push_back(/*(char*) */path_rockModel);
 	m_cpPaths.push_back(path_xwModel);
 	m_cpPaths.push_back(path_cubeModel);
+	m_cpPaths.push_back(path_sphereModel);
 
 	m_wcpPaths.push_back(path_skyTex);
 	m_wcpPaths.push_back(path_rockAlbedo);
@@ -134,6 +135,8 @@ bool OverWorldScene::Initialize(CameraClass* camera)
 	m_wcpPaths.push_back(path_xwTex);
 	m_wcpPaths.push_back(path_waterVertexShader);
 	m_wcpPaths.push_back(path_waterPixelShader);
+	m_wcpPaths.push_back(path_volLaserVertexShader);
+	m_wcpPaths.push_back(path_volLaserPixelShader);
 	m_wcpPaths.push_back(path_volBalloonVertexShader);
 	m_wcpPaths.push_back(path_volBalloonPixelShader);
 
@@ -369,6 +372,16 @@ bool OverWorldScene::InitializeModels()
 
 
 	// ------------------ Balloon targets (Volumetric Cube) ------------------
+	
+	m_ModelSphere = new AssimpModelClass;
+	if (!m_ModelSphere) { return false; }
+
+	result = m_ModelSphere->Initialize(m_D3D->GetDevice(), path_cubeModel, path_rockAlbedo);
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the balloon model object.", L"Error", MB_OK);
+		return false;
+	}
 
 	float balloonRowCount = std::pow((double)min(TERRAINWIDTH, TERRAINHEIGHT), 1.0 / 4.0);
 	go_targets.reserve(balloonRowCount * balloonRowCount);
@@ -378,7 +391,7 @@ bool OverWorldScene::InitializeModels()
 	float iz = -(float)TERRAINHEIGHT / 2.0f + step;
 	float x = ix;
 	float z = iz;
-	XMFLOAT3 scale = XMFLOAT3(3.8f, 3.8f, 3.8f);
+	XMFLOAT3 scale = XMFLOAT3(4.5f, 4.5f, 4.5f);
 
 	for (int i = 0; i < balloonRowCount; ++i)
 	{
@@ -392,7 +405,7 @@ bool OverWorldScene::InitializeModels()
 			float rz = (go_procTerrain->Rand01() - 0.5f) * 25.0f;
 
 			GameObject* balloon = new GameObject();
-			balloon->SetModel(m_ModelCube);
+			balloon->SetModel(m_ModelSphere);
 
 			balloon->Scale(scale);
 			balloon->SetTranslation(x + rx, 30.0f + ry, z + rz);

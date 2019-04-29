@@ -1,37 +1,5 @@
 
 
-float gt(float x, float y)
-{
-    return max(sign(x - y), 0.0);
-}
-
-// x and y must be either 0 or 1.
-float and(float x, float y)
-{
-    return x * y;
-}
-
-// x and y must be 0 or 1.
-float or(float x, float y)
-{
-    return min(x + y, 1.0);
-}
-
-// x must be 0 or 1
-float not_(float x)
-{
-    return 1.0 - x;
-}
-
-
-/*cbuffer VariableBuffer
-{
-    bool sprinting;
-    float fov;
-    bool aimAssist;
-    float padding;
-};*/
-
 
 Texture2D shaderTexture;
 SamplerState SampleType;

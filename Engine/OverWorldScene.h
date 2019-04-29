@@ -54,6 +54,7 @@ private:
 	//CameraClass* m_Camera;
 	LightClass* m_Light;
 	SoundClass* m_Sound;
+
 	double m_k; // iteration variable that was being used to watch the terrain change
 	XMFLOAT3 m_laserCubeScale;
 	XMFLOAT3 m_laserIniPos;
@@ -80,6 +81,7 @@ private:
 	AssimpModelClass* m_ModelXW;
 	AssimpModelClass* m_ModelSky;
 	AssimpModelClass* m_ModelCube;
+	AssimpModelClass* m_ModelSphere;
 	AssimpBumpedModelClass* m_ModelRock;
 
 	// SHADERS
@@ -95,6 +97,7 @@ private:
 	char* path_soundLoop = "../Engine/Assets/sounds/magical_forest.wav";
 
 	char* path_cubeModel = "../Engine/Assets/cube.fbx";
+	char* path_sphereModel = "../Engine/Assets/sphere.fbx";
 
 	char* path_skyModel = "../Engine/Assets/sphere.fbx";
 	WCHAR* path_skyTex = L"../Engine/Assets/Skybox/skybox_texture.dds";

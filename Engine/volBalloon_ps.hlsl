@@ -1,5 +1,26 @@
 
 
+cbuffer CapsuleBuffer
+{
+    float3 cPos;
+    float delta;
+};
+
+struct PixelInputType
+{
+    float4 position : SV_POSITION;
+    float4 wPos : TEXCOORD0;
+    float3 normal : NORMAL;
+    float3 camPos : SOULS0;
+    float2 tex : TEXCOORD1;
+};
+
+
+static const int STEPS = 64;
+static const float SURF_DIST = 0.01;
+
+
+
 // Some useful functions
 float3 mod289(float3 x)
 {
@@ -71,7 +92,8 @@ float snoise(float2 v)
     float3 x = 2.0 * frac(p * C.www) - 1.0;
     float3 h = abs(x) - 0.5;
     float3 ox = floor(x + 0.5);
-    float3 a0 = x - ox;
+    //float3 a0 = x - ox;
+    float3 a0 = x * (1 + sin(0.025 * delta)) - ox;
 
     // Normalise gradients implicitly by scaling m
     // Approximation of: m *= inversesqrt(a0*a0 + h*h);
@@ -118,28 +140,6 @@ float ridgedMF(float2 p)
 }
 
 
-
-
-
-
-cbuffer CapsuleBuffer
-{
-    float3 cPos;
-    float delta;
-};
-
-struct PixelInputType
-{
-    float4 position : SV_POSITION;
-    float4 wPos : TEXCOORD0;
-	float3 normal : NORMAL;
-    float3 camPos : SOULS0;
-    float2 tex : TEXCOORD1;
-};
-
-
-static const int STEPS = 64;
-static const float SURF_DIST = 0.01;
 
 
 float sdSphere(float3 p, float4 s /*sphere*/)
@@ -190,7 +190,11 @@ float4 VolumetricBalloonPixelShader(PixelInputType input) : SV_TARGET
 
     float c = smoothstep(0.0, 1.2, d);
 	
-    colour = float4(2.0 * c * ridgedMF(0.0002*delta * input.tex * 3.0), 2.0 * c, 0.1 * c, 1.15 * c);
+    float rmf = ridgedMF(0.0002 * delta * input.tex * 3.0);
+    //float rmf = ridgedMF(0.2 * (sin(20.0 + 0.0002 * delta) + cos(20.0 + 0.0002 * delta)) * input.tex * 3.0);
+	
+    //colour = float4(2.0 * c * ridgedMF(0.0002 * delta * input.tex * 3.0), 2.0 * c, 0.1 * c, 1.15 * c);
+    colour = float4(0.5 * c * rmf , 1.0 * c * rmf, 2.1 * c * rmf, c * c * c);
     colour = smoothstep(0.0, 1.2, colour);
     return colour;
  }
