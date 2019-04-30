@@ -35,8 +35,8 @@ float3 permute(float3 x)
     return mod289(((x * 34.0) + 1.0) * x);
 }
 
-//
-// Description : GLSL 2D simplex noise function
+//(slightly modified version)
+// Description : GLSL 2D simplex noise function 
 //      Author : Ian McEwan, Ashima Arts
 //  Maintainer : ijm
 //     Lastmod : 20110822 (ijm)
@@ -93,6 +93,7 @@ float snoise(float2 v)
     float3 h = abs(x) - 0.5;
     float3 ox = floor(x + 0.5);
     //float3 a0 = x - ox;
+	// modification to animate the effect
     float3 a0 = x * (1 + sin(0.025 * delta)) - ox;
 
     // Normalise gradients implicitly by scaling m
@@ -194,6 +195,7 @@ float4 VolumetricBalloonPixelShader(PixelInputType input) : SV_TARGET
     //float rmf = ridgedMF(0.2 * (sin(20.0 + 0.0002 * delta) + cos(20.0 + 0.0002 * delta)) * input.tex * 3.0);
 	
     //colour = float4(2.0 * c * ridgedMF(0.0002 * delta * input.tex * 3.0), 2.0 * c, 0.1 * c, 1.15 * c);
+    // colour = float4(0.5 * c * rmf, 1.0 * c * rmf, 2.1 * c * rmf, 0.8 * c * rmf); // floating electricity
     colour = float4(0.5 * c * rmf , 1.0 * c * rmf, 2.1 * c * rmf, c * c * c);
     colour = smoothstep(0.0, 1.2, colour);
     return colour;

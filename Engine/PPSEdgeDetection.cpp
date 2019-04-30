@@ -167,7 +167,7 @@ bool PPSEdgeDetection::SetShaderParameters(XMMATRIX worldMatrix, XMMATRIX viewMa
 
 	// Copy the data into the constant buffer.
 	dataPtr2->screenDimensions = screenDimensions;
-	dataPtr2->onlyEdges = onlyEdges;
+	dataPtr2->onlyEdges = onlyEdges ? 1 : 0;
 	dataPtr2->padding = 0.0f;
 
 	// Unlock the constant buffer.

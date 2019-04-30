@@ -48,10 +48,9 @@ private:
 
 
 private:
-	// CLASS VARIABLES
+	// CLASS VARIABLES (Camera in parent class)
 	HWND m_hwnd;
 	D3DClass* m_D3D;
-	//CameraClass* m_Camera;
 	LightClass* m_Light;
 	SoundClass* m_Sound;
 

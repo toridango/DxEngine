@@ -27,6 +27,7 @@ public:
 	void SetModel(AssimpModelClass* model);
 	void SetModel(AssimpBumpedModelClass* model);
 
+	// Base rotation to compensate for rotated models
 	void SetOffsetRotation(XMFLOAT3 rot);
 	void SetOffsetRotation(float x, float y, float z);
 
@@ -83,6 +84,7 @@ protected:
 	AssimpModelClass* m_assimpModel;
 	AssimpBumpedModelClass* m_assimpBumpModel;
 
+	// Place to store tags and variables, just in case (unused in the end)
 	std::map<std::string, XMFLOAT4> m_miscStorage;
 };
 

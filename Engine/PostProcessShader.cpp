@@ -170,9 +170,9 @@ bool PostProcessShader::SetShaderParameters(XMMATRIX worldMatrix, XMMATRIX viewM
 	dataPtr2 = (VariableBufferType*)mappedResource.pData;
 
 	// Copy the data into the constant buffer.
-	dataPtr2->sprinting = sprinting;
+	dataPtr2->sprinting = sprinting ? 1 : 0;
 	dataPtr2->fov = fov;
-	dataPtr2->aimAssist = aimAssist;
+	dataPtr2->aimAssist = aimAssist ? 1 : 0;
 	dataPtr2->padding = 0.0f;
 
 	// Unlock the constant buffer.

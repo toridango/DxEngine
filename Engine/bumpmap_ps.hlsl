@@ -1,11 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: bumpmap.ps
-////////////////////////////////////////////////////////////////////////////////
 
-
-/////////////
-// GLOBALS //
-/////////////
 
 // The bump map shader requires two textures // but I'm pushing five for all presaved colours
 // The first texture in the array is the color texture
@@ -25,9 +18,7 @@ cbuffer LightBuffer
 };
 
 
-//////////////
-// TYPEDEFS //
-//////////////
+
 struct PixelInputType
 {
     float4 position : SV_POSITION;
@@ -53,9 +44,6 @@ struct PixelInputType
 // Once the light intensity at this pixel has been obtained the bump mapping is done
 // The light intensity is used with the light color and texture color to get the final pixel color.
 
-////////////////////////////////////////////////////////////////////////////////
-// Pixel Shader
-////////////////////////////////////////////////////////////////////////////////
 float4 BumpMapPixelShader(PixelInputType input) : SV_TARGET
 {
     float4 textureColour;

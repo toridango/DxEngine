@@ -10,7 +10,7 @@ cbuffer MatrixBuffer
 cbuffer VariableBuffer
 {
     float2 screenDimensions;
-    bool onlyEdges;
+    int onlyEdges;
     float padding;
 };
 
@@ -26,7 +26,7 @@ struct PixelInputType
     float2 tex : TEXCOORD0;
 
     float2 sampleOffsets[8] : SOULS;
-    bool onlyEdges : EDGES;
+    int onlyEdges : EDGES;
 };
 
 

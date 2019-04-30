@@ -42,7 +42,7 @@ void GameObject::ModelShutdown()
 	}
 }
 
-
+// Class can only use one of the models at the same time
 void GameObject::SetModel(ModelClass* model)
 {
 	ModelShutdown();
@@ -50,6 +50,7 @@ void GameObject::SetModel(ModelClass* model)
 	m_modelType = MODEL_RSTTEK;
 }
 
+// Class can only use one of the models at the same time
 void GameObject::SetModel(AssimpModelClass* model)
 {
 	ModelShutdown();
@@ -57,6 +58,7 @@ void GameObject::SetModel(AssimpModelClass* model)
 	m_modelType = MODEL_ASSIMP;
 }
 
+// Class can only use one of the models at the same time
 void GameObject::SetModel(AssimpBumpedModelClass* model)
 {
 	ModelShutdown();
@@ -120,19 +122,6 @@ void GameObject::Translate(XMFLOAT3 t)
 
 void GameObject::Translate(float x, float y, float z)
 {
-	/*XMMATRIX transform = XMMATRIX(
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		x,    y,    z,    1.0f);*/
-
-	/*XMMATRIX transform = XMMatrixIdentity();
-	XMVectorSetX(transform.r[3], x);
-	XMVectorSetY(transform.r[3], y);
-	XMVectorSetZ(transform.r[3], z);*/
-
-	/*XMMATRIX transform = XMMatrixIdentity();
-	transform.r[3] = XMVectorSet(x, y, z, 1.0f);*/
 
 	Translate({ x, y, z, 0.0f });
 }
@@ -199,11 +188,6 @@ void GameObject::Scale(XMVECTOR s)
 
 void GameObject::Scale(XMFLOAT3 s)
 {
-	/*XMMATRIX transform = XMMATRIX(
-		 s.x,  0.0f, 0.0f, 0.0f,
-		0.0f,  s.y, 0.0f, 0.0f,
-		0.0f, 0.0f,  s.z, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f);*/
 
 	m_worldMatrix *= XMMatrixScalingFromVector(XMLoadFloat3(&s));
 	XMStoreFloat3(&m_scaling, { m_scaling.x * s.x, m_scaling.y * s.y, m_scaling.z * s.z });
@@ -211,7 +195,6 @@ void GameObject::Scale(XMFLOAT3 s)
 
 void GameObject::Scale(float sx, float sy, float sz)
 {
-	//ScaleAtOrigin(XMFLOAT3(sx, sy, sz));
 	m_worldMatrix *= XMMatrixScaling(sx, sy, sz);
 	XMStoreFloat3(&m_scaling, { m_scaling.x * sx, m_scaling.y * sy, m_scaling.z * sz });
 }
@@ -225,20 +208,6 @@ XMFLOAT3 GameObject::GetScaling()
 
 XMMATRIX GameObject::GetWorldMatrix()
 {
-	/*m_worldMatrix = XMMatrixIdentity();
-
-	m_worldMatrix *= XMMatrixScalingFromVector(XMLoadFloat3(&m_scaling));
-
-	float pitch = m_rotationXYZ.x * (XM_PI / 180.0);
-	float yaw = m_rotationXYZ.y * (XM_PI / 180.0);
-	float roll = m_rotationXYZ.z * (XM_PI / 180.0);
-	RotateDegreesMatrix(XMMatrixRotationRollPitchYaw(pitch, yaw, roll));
-
-
-	XMVECTOR t = XMLoadFloat3(&m_translation);
-	t = XMVectorSetW(t, 1.0f);
-	m_worldMatrix *= XMMatrixTranslationFromVector(t);*/
-
 	return m_worldMatrix;
 }
 

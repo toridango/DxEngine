@@ -25,7 +25,7 @@ private:
 	struct VariableBufferType
 	{
 		XMFLOAT2 screenDimensions;
-		bool onlyEdges;
+		int onlyEdges;
 		float padding;
 	};
 

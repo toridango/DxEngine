@@ -177,31 +177,12 @@ void GraphicsClass::Shutdown()
 bool GraphicsClass::Frame(Timer* timer)
 {
 	bool result;
-	/*static float rotation = 0.0f;
-	static float delta = 0.0f;
-
-
-	// Update the rotation variable each frame.
-	rotation += (float)D3DX_PI * 0.01f;
-	if (rotation > 360.0f)
-	{
-		rotation -= 360.0f;
-	}
-
-	// Update the delta variable each frame. (keep this between 0 and 1)
-	// delta += 0.001f; // original
-	delta += 0.1f;
-	if (delta > 100000000.0f)
-	{
-		delta -= 100000000.0f;
-	}*/
-
 
 	result = Update(timer->GetDeltaMilli());
 	if (!result) { return false; }
 
 
-	// Render the graphics scene.
+	// Render the graphics scene into the render texture, then that with the screen quad.
 	result = Render(timer->GetMillisecondsElapsed());
 	if (!result) { return false; }
 

@@ -24,9 +24,9 @@ private:
 
 	struct VariableBufferType
 	{
-		bool sprinting;
+		int sprinting;
 		float fov;
-		bool aimAssist;
+		int aimAssist;
 		float padding;
 	};
 
